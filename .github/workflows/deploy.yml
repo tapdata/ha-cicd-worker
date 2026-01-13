@@ -58,7 +58,7 @@ jobs:
           repository: ${{ steps.get_repo.outputs.repo }}
           ref: main
           path: config-repo
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: 压缩配置仓库为tar
         id: create_tar
@@ -134,7 +134,7 @@ jobs:
     steps:
       - name: 生成部署报告
         run: |
-          # 判断整体状态
+          # 判断整体部署状态（用于报告内容，不影响此 job 的成功/失败）
           if [ "${{ needs.prepare.result }}" == "success" ] && \
              [ "${{ needs.import.result }}" == "success" ] && \
              [ "${{ needs.verify.result }}" == "success" ]; then
@@ -172,7 +172,7 @@ jobs:
 
           EOF
 
-          # 如果失败，添加失败原因分析
+          # 如果部署失败，添加失败原因分析
           if [ "$OVERALL_STATUS" == "failure" ]; then
             cat >> $GITHUB_STEP_SUMMARY << EOF
           ### 💡 失败原因分析
@@ -218,14 +218,12 @@ jobs:
           echo "📊 Tapdata 配置部署报告"
           echo "=========================================="
           echo ""
-          echo "整体状态: ${STATUS_ICON} ${STATUS_TEXT}"
+          echo "部署整体状态: ${STATUS_ICON} ${STATUS_TEXT}"
           echo "环境: ${{ inputs.env }}"
           echo "项目分组: ${{ inputs.project_group }}"
           echo ""
-          echo "详细报告已输出到 GitHub Actions Summary"
+          echo "✅ 报告生成成功！详细报告已输出到 GitHub Actions Summary"
           echo "=========================================="
 
-          # 根据状态退出
-          if [ "$OVERALL_STATUS" == "failure" ]; then
-            exit 1
-          fi
+          # 注意：不再根据部署状态退出，只要报告生成成功，此 job 就成功
+          # 这样即使前面的步骤失败，报告 job 也会显示为成功（绿色）

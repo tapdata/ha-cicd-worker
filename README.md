@@ -182,7 +182,9 @@ hospital=tapdata/ha-cicd-hospital
 ## ⚠️ 注意事项
 
 1. **权限要求**
-   - 确保 `GITHUB_TOKEN` 有权限访问配置仓库
+   - **必须配置 PAT Token**：需要创建 `PAT_TOKEN` Secret 用于访问配置仓库
+     - 默认的 `GITHUB_TOKEN` 只有当前仓库权限，无法访问其他仓库
+     - 详细配置步骤请参考：[PAT Token 配置指南](docs/PAT-TOKEN-SETUP.md)
    - 确保 self-hosted runner 有文件系统读写权限
 
 2. **配置文件**

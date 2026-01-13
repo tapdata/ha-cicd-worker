@@ -121,7 +121,9 @@ prod=http://prod.tapdata.com:3030
 
 ## 注意事项
 
-1. 确保 `GITHUB_TOKEN` 有权限访问配置仓库
+1. **配置 PAT Token**：确保已创建 `PAT_TOKEN` Secret，用于访问配置仓库
+   - 默认的 `GITHUB_TOKEN` 只有当前仓库权限，无法访问其他仓库
+   - 详细配置步骤请参考：[PAT Token 配置指南](../docs/PAT-TOKEN-SETUP.md)
 2. 确保 env.conf 中配置了所有环境的 Tapdata 地址
 3. 确保 project.conf 中配置了所有项目分组的仓库名称
 4. 导入失败时会打印详细的错误信息，请查看日志
