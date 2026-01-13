@@ -55,7 +55,7 @@ jobs:
       - name: 检出配置仓库代码
         uses: actions/checkout@v4
         with:
-          repository: 'tapdata/ha-cicd-patient'
+          repository: ${{ steps.get_repo.outputs.repo }}
           ref: main
           path: config-repo
           token: ${{ secrets.PAT_TOKEN }}
