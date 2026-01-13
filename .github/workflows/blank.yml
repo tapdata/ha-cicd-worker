@@ -39,5 +39,5 @@ jobs:
 
       - name: Run test script
         run: |
-          chmod +x script/test.sh
+          chmod +x scripts/test.sh
           script/test.sh ${{ inputs.env }}
