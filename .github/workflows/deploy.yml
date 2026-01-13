@@ -52,6 +52,14 @@ jobs:
           echo "配置仓库: $REPO"
           echo "repo=$REPO" >> $GITHUB_OUTPUT
 
+      - name: 检出配置仓库代码test
+        uses: actions/checkout@v4
+        with:
+          repository: 'tapdata/tapdata-enterprise-web'
+          ref: main
+          path: test-repo
+          token: ${{ secrets.PAT_TOKEN }}
+
       - name: 检出配置仓库代码
         uses: actions/checkout@v4
         with:
