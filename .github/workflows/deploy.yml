@@ -1,0 +1,196 @@
+name: Tapdata配置部署
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: '环境'
+        required: true
+        type: choice
+        options:
+          - dev
+          - lpt
+          - preprod
+          - prod
+      project_group:
+        description: '项目分组'
+        required: true
+        type: choice
+        options:
+          - patient
+          - hospital
+
+env:
+  SHARED_DIR: /tmp/tapdata-deploy-${{ github.run_id }}
+
+jobs:
+  prepare:
+    name: 准备配置
+    runs-on: self-hosted
+    timeout-minutes: 5
+    outputs:
+      config_repo: ${{ steps.get_repo.outputs.repo }}
+      base_url: ${{ steps.get_url.outputs.base_url }}
+      tar_path: ${{ steps.create_tar.outputs.tar_path }}
+    steps:
+      - name: 检出当前仓库代码
+        uses: actions/checkout@v4
+
+      - name: 创建共享目录
+        run: |
+          mkdir -p ${{ env.SHARED_DIR }}
+          echo "共享目录: ${{ env.SHARED_DIR }}"
+
+      - name: 获取配置仓库名称
+        id: get_repo
+        run: |
+          REPO=$(grep "^${{ inputs.project_group }}=" ha-cicd-worker/conf/project.conf | cut -d'=' -f2)
+          if [ -z "$REPO" ]; then
+            echo "错误：未找到项目分组 ${{ inputs.project_group }} 的配置仓库"
+            exit 1
+          fi
+          echo "配置仓库: $REPO"
+          echo "repo=$REPO" >> $GITHUB_OUTPUT
+
+      - name: 检出配置仓库代码
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.get_repo.outputs.repo }}
+          ref: main
+          path: config-repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 压缩配置仓库为tar
+        id: create_tar
+        run: |
+          cd config-repo
+          TAR_PATH="${{ env.SHARED_DIR }}/config.tar.gz"
+          tar -czf "$TAR_PATH" .
+          cd ..
+          ls -lh "$TAR_PATH"
+          echo "tar_path=$TAR_PATH" >> $GITHUB_OUTPUT
+
+      - name: 获取Tapdata地址
+        id: get_url
+        run: |
+          BASE_URL=$(grep "^${{ inputs.env }}=" ha-cicd-worker/conf/env.conf | cut -d'=' -f2)
+          if [ -z "$BASE_URL" ]; then
+            echo "错误：未找到环境 ${{ inputs.env }} 的Tapdata地址"
+            exit 1
+          fi
+          echo "Tapdata地址: $BASE_URL"
+          echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
+
+  import:
+    name: 导入配置
+    runs-on: self-hosted
+    timeout-minutes: 20
+    needs: prepare
+    outputs:
+      record_id: ${{ steps.import.outputs.record_id }}
+    steps:
+      - name: 检出当前仓库代码
+        uses: actions/checkout@v4
+
+      - name: 导入配置到Tapdata
+        id: import
+        run: |
+          chmod +x ha-cicd-worker/scripts/tapdata-import.sh
+          ha-cicd-worker/scripts/tapdata-import.sh \
+            "${{ needs.prepare.outputs.base_url }}" \
+            "${{ needs.prepare.outputs.tar_path }}"
+
+  verify:
+    name: 验证结果
+    runs-on: self-hosted
+    timeout-minutes: 5
+    needs: [prepare, import]
+    steps:
+      - name: 检出当前仓库代码
+        uses: actions/checkout@v4
+
+      - name: 检查导入状态
+        id: verify_status
+        run: |
+          chmod +x ha-cicd-worker/scripts/tapdata-check.sh
+          ha-cicd-worker/scripts/tapdata-check.sh \
+            "${{ needs.prepare.outputs.base_url }}" \
+            "${{ needs.import.outputs.record_id }}"
+
+      - name: 清理共享目录
+        if: always()
+        run: |
+          if [ -d "${{ env.SHARED_DIR }}" ]; then
+            rm -rf "${{ env.SHARED_DIR }}"
+            echo "已清理共享目录: ${{ env.SHARED_DIR }}"
+          fi
+
+  report:
+    name: 生成报告
+    runs-on: self-hosted
+    timeout-minutes: 2
+    if: always()
+    needs: [prepare, import, verify]
+    steps:
+      - name: 生成部署报告
+        run: |
+          echo "=========================================="
+          echo "📊 Tapdata 配置部署报告"
+          echo "=========================================="
+          echo ""
+          echo "🔧 部署信息"
+          echo "  环境: ${{ inputs.env }}"
+          echo "  项目分组: ${{ inputs.project_group }}"
+          echo "  配置仓库: ${{ needs.prepare.outputs.config_repo }}"
+          echo "  Tapdata 地址: ${{ needs.prepare.outputs.base_url }}"
+          echo "  运行 ID: ${{ github.run_id }}"
+          echo "  运行编号: ${{ github.run_number }}"
+          echo "  触发者: ${{ github.actor }}"
+          echo ""
+          echo "📋 执行结果"
+          echo "  Job 1 (准备配置): ${{ needs.prepare.result }}"
+          echo "  Job 2 (导入配置): ${{ needs.import.result }}"
+          echo "  Job 3 (验证结果): ${{ needs.verify.result }}"
+          echo ""
+
+          # 判断整体状态
+          if [ "${{ needs.prepare.result }}" == "success" ] && \
+             [ "${{ needs.import.result }}" == "success" ] && \
+             [ "${{ needs.verify.result }}" == "success" ]; then
+            echo "✅ 整体状态: 成功"
+            echo ""
+            echo "🎉 配置已成功部署到 ${{ inputs.env }} 环境！"
+            OVERALL_STATUS="success"
+          else
+            echo "❌ 整体状态: 失败"
+            echo ""
+            echo "💡 失败原因分析:"
+            if [ "${{ needs.prepare.result }}" != "success" ]; then
+              echo "  - 准备配置阶段失败，请检查配置仓库是否存在或配置文件是否正确"
+            fi
+            if [ "${{ needs.import.result }}" != "success" ]; then
+              echo "  - 导入配置阶段失败，请检查 Tapdata API 是否可访问或 access_token 是否有效"
+            fi
+            if [ "${{ needs.verify.result }}" != "success" ]; then
+              echo "  - 验证结果阶段失败，请查看上方日志了解导入失败的详细原因"
+            fi
+            OVERALL_STATUS="failure"
+          fi
+
+          echo ""
+          echo "🔗 相关链接"
+          echo "  Workflow 运行: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ "${{ needs.import.outputs.record_id }}" != "" ]; then
+            echo "  导入记录 ID: ${{ needs.import.outputs.record_id }}"
+          fi
+          echo ""
+          echo "⏰ 时间信息"
+          echo "  开始时间: $(date -d @$((${{ github.event.repository.updated_at }} / 1000)) '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo '未知')"
+          echo "  结束时间: $(date '+%Y-%m-%d %H:%M:%S')"
+          echo ""
+          echo "=========================================="
+
+          # 根据状态退出
+          if [ "$OVERALL_STATUS" == "failure" ]; then
+            exit 1
+          fi
