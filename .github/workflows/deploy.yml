@@ -44,7 +44,7 @@ jobs:
       - name: 获取配置仓库名称
         id: get_repo
         run: |
-          REPO=$(grep "^${{ inputs.project_group }}=" ha-cicd-worker/conf/project.conf | cut -d'=' -f2)
+          REPO=$(grep "^${{ inputs.project_group }}=" conf/project.conf | cut -d'=' -f2)
           if [ -z "$REPO" ]; then
             echo "错误：未找到项目分组 ${{ inputs.project_group }} 的配置仓库"
             exit 1
@@ -73,7 +73,7 @@ jobs:
       - name: 获取Tapdata地址
         id: get_url
         run: |
-          BASE_URL=$(grep "^${{ inputs.env }}=" ha-cicd-worker/conf/env.conf | cut -d'=' -f2)
+          BASE_URL=$(grep "^${{ inputs.env }}=" conf/env.conf | cut -d'=' -f2)
           if [ -z "$BASE_URL" ]; then
             echo "错误：未找到环境 ${{ inputs.env }} 的Tapdata地址"
             exit 1
@@ -95,8 +95,8 @@ jobs:
       - name: 导入配置到Tapdata
         id: import
         run: |
-          chmod +x ha-cicd-worker/scripts/tapdata-import.sh
-          ha-cicd-worker/scripts/tapdata-import.sh \
+          chmod +x scripts/tapdata-import.sh
+          scripts/tapdata-import.sh \
             "${{ needs.prepare.outputs.base_url }}" \
             "${{ needs.prepare.outputs.tar_path }}"
 
@@ -112,8 +112,8 @@ jobs:
       - name: 检查导入状态
         id: verify_status
         run: |
-          chmod +x ha-cicd-worker/scripts/tapdata-check.sh
-          ha-cicd-worker/scripts/tapdata-check.sh \
+          chmod +x scripts/tapdata-check.sh
+          scripts/tapdata-check.sh \
             "${{ needs.prepare.outputs.base_url }}" \
             "${{ needs.import.outputs.record_id }}"
 
@@ -134,60 +134,95 @@ jobs:
     steps:
       - name: 生成部署报告
         run: |
-          echo "=========================================="
-          echo "📊 Tapdata 配置部署报告"
-          echo "=========================================="
-          echo ""
-          echo "🔧 部署信息"
-          echo "  环境: ${{ inputs.env }}"
-          echo "  项目分组: ${{ inputs.project_group }}"
-          echo "  配置仓库: ${{ needs.prepare.outputs.config_repo }}"
-          echo "  Tapdata 地址: ${{ needs.prepare.outputs.base_url }}"
-          echo "  运行 ID: ${{ github.run_id }}"
-          echo "  运行编号: ${{ github.run_number }}"
-          echo "  触发者: ${{ github.actor }}"
-          echo ""
-          echo "📋 执行结果"
-          echo "  Job 1 (准备配置): ${{ needs.prepare.result }}"
-          echo "  Job 2 (导入配置): ${{ needs.import.result }}"
-          echo "  Job 3 (验证结果): ${{ needs.verify.result }}"
-          echo ""
-
           # 判断整体状态
           if [ "${{ needs.prepare.result }}" == "success" ] && \
              [ "${{ needs.import.result }}" == "success" ] && \
              [ "${{ needs.verify.result }}" == "success" ]; then
-            echo "✅ 整体状态: 成功"
-            echo ""
-            echo "🎉 配置已成功部署到 ${{ inputs.env }} 环境！"
             OVERALL_STATUS="success"
+            STATUS_ICON="✅"
+            STATUS_TEXT="成功"
           else
-            echo "❌ 整体状态: 失败"
-            echo ""
-            echo "💡 失败原因分析:"
-            if [ "${{ needs.prepare.result }}" != "success" ]; then
-              echo "  - 准备配置阶段失败，请检查配置仓库是否存在或配置文件是否正确"
-            fi
-            if [ "${{ needs.import.result }}" != "success" ]; then
-              echo "  - 导入配置阶段失败，请检查 Tapdata API 是否可访问或 access_token 是否有效"
-            fi
-            if [ "${{ needs.verify.result }}" != "success" ]; then
-              echo "  - 验证结果阶段失败，请查看上方日志了解导入失败的详细原因"
-            fi
             OVERALL_STATUS="failure"
+            STATUS_ICON="❌"
+            STATUS_TEXT="失败"
           fi
 
-          echo ""
-          echo "🔗 相关链接"
-          echo "  Workflow 运行: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          if [ "${{ needs.import.outputs.record_id }}" != "" ]; then
-            echo "  导入记录 ID: ${{ needs.import.outputs.record_id }}"
+          # 输出到 GitHub Actions Summary
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          # 📊 Tapdata 配置部署报告
+
+          ## ${STATUS_ICON} 整体状态: ${STATUS_TEXT}
+
+          ### 🔧 部署信息
+          | 项目 | 值 |
+          |------|-----|
+          | 环境 | \`${{ inputs.env }}\` |
+          | 项目分组 | \`${{ inputs.project_group }}\` |
+          | 配置仓库 | \`${{ needs.prepare.outputs.config_repo }}\` |
+          | Tapdata 地址 | ${{ needs.prepare.outputs.base_url }} |
+          | 触发者 | @${{ github.actor }} |
+          | 运行编号 | #${{ github.run_number }} |
+
+          ### 📋 执行结果
+          | Job | 状态 |
+          |-----|------|
+          | 准备配置 | ${{ needs.prepare.result == 'success' && '✅ 成功' || '❌ 失败' }} |
+          | 导入配置 | ${{ needs.import.result == 'success' && '✅ 成功' || '❌ 失败' }} |
+          | 验证结果 | ${{ needs.verify.result == 'success' && '✅ 成功' || '❌ 失败' }} |
+
+          EOF
+
+          # 如果失败，添加失败原因分析
+          if [ "$OVERALL_STATUS" == "failure" ]; then
+            cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### 💡 失败原因分析
+          EOF
+            if [ "${{ needs.prepare.result }}" != "success" ]; then
+              echo "- ⚠️ **准备配置阶段失败**：请检查配置仓库是否存在或配置文件是否正确" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [ "${{ needs.import.result }}" != "success" ]; then
+              echo "- ⚠️ **导入配置阶段失败**：请检查 Tapdata API 是否可访问或 access_token 是否有效" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [ "${{ needs.verify.result }}" != "success" ]; then
+              echo "- ⚠️ **验证结果阶段失败**：请查看日志了解导入失败的详细原因" >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### 🎉 配置已成功部署到 \`${{ inputs.env }}\` 环境！" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
+
+          # 添加相关链接
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### 🔗 相关链接
+          - [Workflow 运行详情](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+
+          if [ "${{ needs.import.outputs.record_id }}" != "" ]; then
+            echo "- 导入记录 ID: \`${{ needs.import.outputs.record_id }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 添加时间信息
+          END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+
+          ### ⏰ 时间信息
+          - 结束时间: ${END_TIME}
+
+          ---
+          *报告生成时间: ${END_TIME}*
+          EOF
+
+          # 同时输出到控制台日志
+          echo "=========================================="
+          echo "📊 Tapdata 配置部署报告"
+          echo "=========================================="
           echo ""
-          echo "⏰ 时间信息"
-          echo "  开始时间: $(date -d @$((${{ github.event.repository.updated_at }} / 1000)) '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo '未知')"
-          echo "  结束时间: $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "整体状态: ${STATUS_ICON} ${STATUS_TEXT}"
+          echo "环境: ${{ inputs.env }}"
+          echo "项目分组: ${{ inputs.project_group }}"
           echo ""
+          echo "详细报告已输出到 GitHub Actions Summary"
           echo "=========================================="
 
           # 根据状态退出
