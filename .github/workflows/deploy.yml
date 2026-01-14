@@ -172,26 +172,6 @@ jobs:
 
           EOF
 
-          # 如果部署失败，添加失败原因分析
-          if [ "$OVERALL_STATUS" == "failure" ]; then
-            cat >> $GITHUB_STEP_SUMMARY << EOF
-          ### 💡 失败原因分析
-          EOF
-            if [ "${{ needs.prepare.result }}" != "success" ]; then
-              echo "- ⚠️ **准备配置阶段失败**：请检查配置仓库是否存在或配置文件是否正确" >> $GITHUB_STEP_SUMMARY
-            fi
-            if [ "${{ needs.import.result }}" != "success" ]; then
-              echo "- ⚠️ **导入配置阶段失败**：请检查 Tapdata API 是否可访问或 access_token 是否有效" >> $GITHUB_STEP_SUMMARY
-            fi
-            if [ "${{ needs.verify.result }}" != "success" ]; then
-              echo "- ⚠️ **验证结果阶段失败**：请查看日志了解导入失败的详细原因" >> $GITHUB_STEP_SUMMARY
-            fi
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### 🎉 配置已成功部署到 \`${{ inputs.env }}\` 环境！" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-
           # 添加相关链接
           cat >> $GITHUB_STEP_SUMMARY << EOF
           ### 🔗 相关链接
