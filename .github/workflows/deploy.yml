@@ -32,6 +32,7 @@ jobs:
       config_repo: ${{ steps.get_repo.outputs.repo }}
       base_url: ${{ steps.get_url.outputs.base_url }}
       tar_path: ${{ steps.create_tar.outputs.tar_path }}
+      access_token: ${{ steps.get_token.outputs.access_token }}
     steps:
       - name: 检出当前仓库代码
         uses: actions/checkout@v4
@@ -64,7 +65,7 @@ jobs:
         id: create_tar
         run: |
           cd config-repo
-          TAR_PATH="${{ env.SHARED_DIR }}/config.tar.gz"
+          TAR_PATH="${{ env.SHARED_DIR }}/config.tar"
           tar -czf "$TAR_PATH" .
           cd ..
           ls -lh "$TAR_PATH"
@@ -80,6 +81,21 @@ jobs:
           fi
           echo "Tapdata地址: $BASE_URL"
           echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
+
+      - name: 安装 Python 依赖
+        run: |
+          pip install -r requirements.txt
+
+      - name: 获取 Access Token
+        id: get_token
+        run: |
+          ACCESS_TOKEN=$(python scripts/tapdata-get-token.py "${{ steps.get_url.outputs.base_url }}")
+          if [ -z "$ACCESS_TOKEN" ]; then
+            echo "错误：获取 access_token 失败"
+            exit 1
+          fi
+          echo "✓ 成功获取 access_token"
+          echo "access_token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
 
   import:
     name: 导入配置
@@ -101,6 +117,7 @@ jobs:
         run: |
           python scripts/tapdata-import.py \
             "${{ needs.prepare.outputs.base_url }}" \
+            "${{ needs.prepare.outputs.access_token }}" \
             "${{ needs.prepare.outputs.tar_path }}"
 
   verify:
@@ -121,6 +138,7 @@ jobs:
         run: |
           python scripts/tapdata-check.py \
             "${{ needs.prepare.outputs.base_url }}" \
+            "${{ needs.prepare.outputs.access_token }}" \
             "${{ needs.import.outputs.record_id }}"
 
       - name: 清理共享目录

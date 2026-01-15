@@ -26,8 +26,11 @@ ha-cicd/
 │   │   ├── env.conf            # 环境配置（dev/lpt/preprod/prod）
 │   │   └── project.conf        # 项目分组配置
 │   ├── scripts/                 # 自动化脚本
-│   │   ├── tapdata-import.sh   # Tapdata 配置导入脚本
-│   │   └── tapdata-check.sh    # Tapdata 导入状态检查脚本
+│   │   ├── tapdata_utils.py    # Tapdata 工具模块（共享函数）
+│   │   ├── tapdata-get-token.py # 获取 Access Token 脚本
+│   │   ├── tapdata-import.py   # Tapdata 配置导入脚本
+│   │   └── tapdata-check.py    # Tapdata 导入状态检查脚本
+│   ├── requirements.txt         # Python 依赖
 │   └── README.md               # 本文档
 ├── ha-cicd-patient/             # 患者端配置仓库（示例）
 └── .github/
@@ -97,40 +100,71 @@ hospital=tapdata/ha-cicd-hospital
 
 ## 🛠️ 脚本说明
 
-### 1. tapdata-import.sh
+### 1. tapdata_utils.py
+
+**功能：** Tapdata 工具模块，提供共享函数
+
+**主要函数：**
+- `get_access_token(base_url)`: 获取 Tapdata access_token
+
+**特点：**
+- 被其他脚本导入使用
+- 统一的 token 获取逻辑
+- 完整的错误处理
+
+### 2. tapdata-get-token.py
+
+**功能：** 获取 Access Token 并输出到标准输出
+
+**使用方式：**
+```bash
+python scripts/tapdata-get-token.py <BASE_URL>
+```
+
+**参数：**
+- `BASE_URL`: Tapdata 服务地址
+
+**输出：**
+- stdout: access_token（用于 shell 捕获）
+- stderr: 日志信息
+
+### 3. tapdata-import.py
 
 **功能：** 导入配置到 Tapdata 平台
 
 **主要步骤：**
-1. 获取 Tapdata access_token
+1. 验证输入参数
 2. 上传配置 tar 包
 3. 返回导入任务 record_id
 
 **使用方式：**
 ```bash
-./scripts/tapdata-import.sh <BASE_URL> <TAR_FILE>
+python scripts/tapdata-import.py <BASE_URL> <ACCESS_TOKEN> <TAR_FILE>
 ```
 
 **参数：**
 - `BASE_URL`: Tapdata 服务地址
+- `ACCESS_TOKEN`: Tapdata 访问令牌
 - `TAR_FILE`: 配置 tar 包路径
 
-### 2. tapdata-check.sh
+### 4. tapdata-check.py
 
 **功能：** 检查 Tapdata 导入任务状态
 
 **主要步骤：**
-1. 循环检查导入状态（每5秒一次）
-2. 处理不同状态：importing（导入中）、completed（成功）、failed（失败）
-3. 格式化输出错误信息
+1. 验证输入参数
+2. 循环检查导入状态（每5秒一次）
+3. 处理不同状态：importing（导入中）、completed（成功）、failed（失败）
+4. 格式化输出错误信息
 
 **使用方式：**
 ```bash
-./scripts/tapdata-check.sh <BASE_URL> <RECORD_ID>
+python scripts/tapdata-check.py <BASE_URL> <ACCESS_TOKEN> <RECORD_ID>
 ```
 
 **参数：**
 - `BASE_URL`: Tapdata 服务地址
+- `ACCESS_TOKEN`: Tapdata 访问令牌
 - `RECORD_ID`: 导入任务 ID
 
 ---
@@ -139,9 +173,10 @@ hospital=tapdata/ha-cicd-hospital
 
 - **CI/CD 平台**: GitHub Actions
 - **运行环境**: Self-Hosted Runner
-- **脚本语言**: Bash
+- **脚本语言**: Python 3
+- **依赖管理**: pip + requirements.txt
 - **数据传递**: 共享文件系统 + Job Outputs
-- **API 调用**: curl
+- **HTTP 客户端**: requests
 
 ---
 
@@ -149,33 +184,121 @@ hospital=tapdata/ha-cicd-hospital
 
 以 Tapdata 配置部署为例：
 
+```mermaid
+graph TB
+    Start([开始部署]) --> Prepare[准备配置 Job]
+
+    Prepare --> P1[检出代码]
+    P1 --> P2[创建共享目录]
+    P2 --> P3[获取配置仓库名称<br/>从 project.conf]
+    P3 --> P4[检出配置仓库]
+    P4 --> P5[压缩为 tar.gz]
+    P5 --> P6[获取 Tapdata 地址<br/>从 env.conf]
+    P6 --> P7[安装 Python 依赖]
+    P7 --> P8[🔑 获取 Access Token]
+    P8 --> PrepareOut{输出}
+
+    PrepareOut -->|config_repo| Import
+    PrepareOut -->|base_url| Import
+    PrepareOut -->|tar_path| Import
+    PrepareOut -->|access_token| Import
+
+    Import[导入配置 Job] --> I1[检出代码]
+    I1 --> I2[安装 Python 依赖]
+    I2 --> I3[调用 tapdata-import.py<br/>使用 access_token]
+    I3 --> ImportOut{输出}
+
+    ImportOut -->|record_id| Verify
+    PrepareOut -->|access_token| Verify
+    PrepareOut -->|base_url| Verify
+
+    Verify[验证结果 Job] --> V1[检出代码]
+    V1 --> V2[安装 Python 依赖]
+    V2 --> V3[调用 tapdata-check.py<br/>使用 access_token]
+    V3 --> V4[清理共享目录]
+    V4 --> Report
+
+    Report[生成报告 Job] --> R1[汇总执行结果]
+    R1 --> R2[输出部署信息]
+    R2 --> End([部署完成])
+
+    style P8 fill:#90EE90,stroke:#333,stroke-width:3px
+    style PrepareOut fill:#FFD700,stroke:#333,stroke-width:2px
+    style I3 fill:#87CEEB,stroke:#333,stroke-width:2px
+    style V3 fill:#87CEEB,stroke:#333,stroke-width:2px
 ```
-1. 准备配置 (prepare)
-   ├─ 检出当前仓库代码
-   ├─ 创建共享目录
-   ├─ 获取配置仓库名称（从 project.conf）
-   ├─ 检出配置仓库代码
-   ├─ 压缩配置仓库为 tar.gz
-   └─ 获取 Tapdata 地址（从 env.conf）
 
-2. 导入配置 (import)
-   ├─ 检出当前仓库代码
-   ├─ 调用 tapdata-import.sh
-   ├─ 获取 access_token
-   ├─ 上传 tar 文件
-   └─ 返回 record_id
+### 详细步骤说明
 
-3. 验证结果 (verify)
-   ├─ 检出当前仓库代码
-   ├─ 调用 tapdata-check.sh
-   ├─ 循环检查导入状态
-   └─ 清理共享目录
+**1. 准备配置 (prepare)**
+- 检出当前仓库代码
+- 创建共享目录
+- 获取配置仓库名称（从 project.conf）
+- 检出配置仓库代码
+- 压缩配置仓库为 tar.gz
+- 获取 Tapdata 地址（从 env.conf）
+- 安装 Python 依赖
+- 🔑 获取 Access Token（一次性获取，传递给后续 jobs）
+- **输出**: `config_repo`, `base_url`, `tar_path`, `access_token`
 
-4. 生成报告 (report)
-   ├─ 汇总执行结果
-   ├─ 输出部署信息
-   └─ 显示相关链接
+**2. 导入配置 (import)**
+- 检出当前仓库代码
+- 安装 Python 依赖
+- 调用 `tapdata-import.py`
+  - 接收 `access_token`（来自 prepare job）
+  - 上传 tar 文件
+  - 返回 `record_id`
+- **输出**: `record_id`
+
+**3. 验证结果 (verify)**
+- 检出当前仓库代码
+- 安装 Python 依赖
+- 调用 `tapdata-check.py`
+  - 接收 `access_token`（来自 prepare job）
+  - 接收 `record_id`（来自 import job）
+  - 循环检查导入状态（每5秒一次）
+- 清理共享目录
+
+**4. 生成报告 (report)**
+- 汇总执行结果
+- 输出部署信息
+- 显示相关链接
+
+### 🔑 Access Token 优化
+
+**优化前：** 每个 job 都独立获取 token（3次 API 调用）
+
+```mermaid
+graph LR
+    P[Prepare Job] --> PT[获取 Token 1]
+    I[Import Job] --> IT[获取 Token 2]
+    V[Verify Job] --> VT[获取 Token 3]
+
+    style PT fill:#ffcccc,stroke:#333
+    style IT fill:#ffcccc,stroke:#333
+    style VT fill:#ffcccc,stroke:#333
 ```
+
+**优化后：** 只在 prepare job 获取一次，传递给后续 jobs（1次 API 调用）
+
+```mermaid
+graph LR
+    P[Prepare Job] --> PT[🔑 获取 Token]
+    PT --> |传递 token| I[Import Job]
+    PT --> |传递 token| V[Verify Job]
+    I --> IU[使用 Token]
+    V --> VU[使用 Token]
+
+    style PT fill:#90EE90,stroke:#333,stroke-width:3px
+    style IU fill:#87CEEB,stroke:#333
+    style VU fill:#87CEEB,stroke:#333
+```
+
+**优势：**
+- ⚡ 减少 66% 的 API 调用次数（3次 → 1次）
+- 🔒 保证整个工作流使用同一个 token
+- 🚀 提升执行效率，减少网络开销
+- 📦 更清晰的职责分离
 
 ---
 
@@ -211,32 +334,3 @@ hospital=tapdata/ha-cicd-hospital
 - [Self-Hosted Runner 配置指南](https://docs.github.com/en/actions/hosting-your-own-runners)
 
 ---
-
-## 🤝 贡献指南
-
-1. 新增工作流时，请在 `.github/workflows/` 目录下创建对应的 YAML 文件
-2. 新增脚本时，请在 `scripts/` 目录下创建，并添加执行权限
-3. 修改配置文件时，请确保格式正确，避免影响现有流程
-4. 建议为复杂的工作流编写独立的 README 文档
-
----
-
-## 📝 更新日志
-
-### 2024-01-13
-- ✨ 初始化项目结构
-- ✨ 添加 Tapdata 配置部署工作流
-- ✨ 添加配置导入和状态检查脚本
-- 📝 完善项目文档
-
----
-
-## 📧 联系方式
-
-如有问题或建议，请通过以下方式联系：
-- 提交 GitHub Issue
-- 联系项目维护者
-
----
-
-**License:** MIT

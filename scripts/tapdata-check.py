@@ -86,32 +86,37 @@ def print_timeout_footer(duration, max_attempts):
     print("=" * 42)
 
 
-def validate_arguments(base_url, record_id):
+def validate_arguments(base_url, access_token, record_id):
     """验证输入参数"""
     if not base_url:
         print("❌ 错误：BASE_URL 参数为空")
         sys.exit(1)
-    
+
+    if not access_token:
+        print("❌ 错误：ACCESS_TOKEN 参数为空")
+        sys.exit(1)
+
     if not record_id:
         print("❌ 错误：RECORD_ID 参数为空")
         sys.exit(1)
 
 
-def check_import_status(base_url, record_id):
+def check_import_status(base_url, access_token, record_id):
     """检查导入状态"""
+
     # 检查状态的最大次数（5秒间隔，最多检查60次 = 5分钟）
     max_attempts = 60
     attempt = 0
     start_time = time.time()
-    
+
     while attempt < max_attempts:
         attempt += 1
         current_time = datetime.now().strftime('%H:%M:%S')
         print(f"检查次数: {attempt}/{max_attempts} ({current_time})")
-        
-        # 调用状态检查接口
-        check_url = f"{base_url}/api/groupInfo/getGroupImportStatus/{record_id}"
-        
+
+        # 调用状态检查接口，添加 access_token 参数
+        check_url = f"{base_url}/api/groupInfo/getGroupImportStatus/{record_id}?access_token={access_token}"
+
         try:
             response = requests.get(check_url)
             http_code = response.status_code
@@ -172,21 +177,22 @@ def check_import_status(base_url, record_id):
 
 def main():
     """主函数"""
-    if len(sys.argv) != 3:
-        print("用法: tapdata-check.py <BASE_URL> <RECORD_ID>")
+    if len(sys.argv) != 4:
+        print("用法: tapdata-check.py <BASE_URL> <ACCESS_TOKEN> <RECORD_ID>")
         sys.exit(1)
-    
+
     base_url = sys.argv[1]
-    record_id = sys.argv[2]
-    
+    access_token = sys.argv[2]
+    record_id = sys.argv[3]
+
     # 打印头部信息
     print_header(base_url, record_id)
-    
+
     # 验证参数
-    validate_arguments(base_url, record_id)
-    
+    validate_arguments(base_url, access_token, record_id)
+
     # 检查导入状态
-    check_import_status(base_url, record_id)
+    check_import_status(base_url, access_token, record_id)
 
 
 if __name__ == "__main__":

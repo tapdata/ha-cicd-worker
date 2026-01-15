@@ -26,12 +26,16 @@ def print_footer(record_id):
     print("=" * 42)
 
 
-def validate_arguments(base_url, tar_file):
+def validate_arguments(base_url, access_token, tar_file):
     """验证输入参数"""
     if not base_url:
         print("❌ 错误：BASE_URL 参数为空")
         sys.exit(1)
-    
+
+    if not access_token:
+        print("❌ 错误：ACCESS_TOKEN 参数为空")
+        sys.exit(1)
+
     if not tar_file:
         print("❌ 错误：TAR_FILE 参数为空")
         sys.exit(1)
@@ -54,82 +58,51 @@ def validate_arguments(base_url, tar_file):
     print()
 
 
-def get_access_token(base_url):
-    """获取 access_token"""
-    print("步骤1: 获取 access_token...")
-    
-    url = f"{base_url}/api/users/generatetoken"
-    headers = {"Content-Type": "application/json"}
-    data = {"accesscode": "3324cfdf-7d3e-4792-bd32-571638d4562f"}
-    
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        http_code = response.status_code
-        
-        print(f"HTTP 状态码: {http_code}")
-        print(f"Token 响应: {response.text}")
-        
-        if http_code != 200:
-            print(f"❌ 错误：获取 token 失败，HTTP 状态码: {http_code}")
-            print(f"响应内容: {response.text}")
-            sys.exit(1)
-        
-        response_json = response.json()
-        access_token = response_json.get("data", {}).get("id")
-        
-        if not access_token:
-            print("❌ 错误：无法从响应中提取 access_token")
-            print(f"响应内容: {response.text}")
-            sys.exit(1)
-        
-        print(f"✓ 成功获取 access_token: {access_token[:20]}...")
-        print()
-        
-        return access_token
-        
-    except requests.exceptions.RequestException as e:
-        print(f"❌ 错误：请求失败: {e}")
-        sys.exit(1)
-    except json.JSONDecodeError as e:
-        print(f"❌ 错误：解析 JSON 响应失败: {e}")
-        sys.exit(1)
-
-
 def import_tar_file(base_url, access_token, tar_file):
     """上传 TAR 文件并导入配置"""
-    print("步骤2: 上传 TAR 文件并导入配置...")
-    
+    print("上传 TAR 文件并导入配置...")
+
     url = f"{base_url}/api/groupInfo/batch/import?access_token={access_token}"
-    headers = {"Content-Type": "application/octet-stream"}
-    
+    file_name = Path(tar_file).name
+
+    print(f"请求 URL: {url}")
+    print(f"请求方法: POST")
+    print(f"请求类型: multipart/form-data")
+    print(f"上传文件名: {file_name}")
+    print(f"文件路径: {tar_file}")
+    print()
+
     try:
+        # 使用 multipart/form-data 上传文件
         with open(tar_file, 'rb') as f:
-            response = requests.post(url, headers=headers, data=f)
-        
+            files = {'file': (file_name, f, 'application/octet-stream')}
+            response = requests.post(url, files=files)
+
         http_code = response.status_code
-        
+
         print(f"HTTP 状态码: {http_code}")
+        print(f"响应 Headers: {dict(response.headers)}")
         print(f"导入响应: {response.text}")
-        
+
         if http_code != 200:
             print(f"❌ 错误：导入失败，HTTP 状态码: {http_code}")
             print(f"响应内容: {response.text}")
             sys.exit(1)
-        
+
         response_json = response.json()
         record_id = response_json.get("data", {}).get("recordId")
-        
+
         if not record_id:
             print("❌ 错误：无法从响应中提取 recordId")
             print(f"响应内容: {response.text}")
             sys.exit(1)
-        
+
         print("✓ 成功提交导入任务")
         print(f"Record ID: {record_id}")
         print()
-        
+
         return record_id
-        
+
     except requests.exceptions.RequestException as e:
         print(f"❌ 错误：请求失败: {e}")
         sys.exit(1)
@@ -151,25 +124,23 @@ def write_github_output(record_id):
 
 def main():
     """主函数"""
-    if len(sys.argv) != 3:
-        print("用法: tapdata-import.py <BASE_URL> <TAR_FILE>")
+    if len(sys.argv) != 4:
+        print("用法: tapdata-import.py <BASE_URL> <ACCESS_TOKEN> <TAR_FILE>")
         sys.exit(1)
-    
+
     base_url = sys.argv[1]
-    tar_file = sys.argv[2]
-    
+    access_token = sys.argv[2]
+    tar_file = sys.argv[3]
+
     print_header()
     print(f"Base URL: {base_url}")
     print(f"TAR 文件: {tar_file}")
     print(f"开始时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
-    
+
     # 验证参数
-    validate_arguments(base_url, tar_file)
-    
-    # 获取 access_token
-    access_token = get_access_token(base_url)
-    
+    validate_arguments(base_url, access_token, tar_file)
+
     # 导入 TAR 文件
     record_id = import_tar_file(base_url, access_token, tar_file)
     
