@@ -64,11 +64,14 @@ jobs:
       - name: 压缩配置仓库为tar
         id: create_tar
         run: |
-          cd config-repo
           TAR_PATH="${{ env.SHARED_DIR }}/config.tar"
-          tar -cf "$TAR_PATH" .
+          # 进入配置仓库目录，打包所有 json 文件，确保文件在 tar 包的第一层
+          cd config-repo
+          tar -cf "$TAR_PATH" *.json
           cd ..
           ls -lh "$TAR_PATH"
+          echo "验证 tar 包内容:"
+          tar -tf "$TAR_PATH"
           echo "tar_path=$TAR_PATH" >> $GITHUB_OUTPUT
 
       - name: 获取Tapdata地址
