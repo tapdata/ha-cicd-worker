@@ -84,11 +84,39 @@ ha-cicd-worker/
 
 ---
 
+## 🐳 Docker Self-Hosted Runner
+
+本项目提供了基于 Docker 的 GitHub Actions Self-Hosted Runner 解决方案。
+
+**快速开始：**
+
+```bash
+cd docker
+cp .env.example .env
+# 编辑 .env 文件，填写 RUNNER_TOKEN
+docker-compose up -d
+```
+
+**相关文档：**
+- 🐳 [Docker Runner 快速开始](docker/README.md)
+- 📖 [Docker Runner 详细文档](docs/docker-runner-README.md)
+- 🔑 [如何生成 Runner Token](docs/generate-runner-token.md)
+
+---
+
 ## 📚 相关文档
 
+### Tapdata 配置部署
 - [Tapdata 配置部署文档](docs/deploy-README.md)
 - [如何添加新的项目分组](docs/add-new-group.md)
 - [如何添加新的Tapdata环境](docs/add-new-env.md)
+
+### Self-Hosted Runner
+- [Docker Runner 快速开始](docker/README.md)
+- [Docker Runner 详细文档](docs/docker-runner-README.md)
+- [如何生成 Runner Token](docs/generate-runner-token.md)
+
+### 官方文档
 - [GitHub Actions 官方文档](https://docs.github.com/en/actions)
 - [Self-Hosted Runner 配置指南](https://docs.github.com/en/actions/hosting-your-own-runners)
 
