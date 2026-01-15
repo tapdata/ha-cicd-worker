@@ -66,7 +66,7 @@ jobs:
         run: |
           cd config-repo
           TAR_PATH="${{ env.SHARED_DIR }}/config.tar"
-          tar -czf "$TAR_PATH" .
+          tar -cf "$TAR_PATH" .
           cd ..
           ls -lh "$TAR_PATH"
           echo "tar_path=$TAR_PATH" >> $GITHUB_OUTPUT
