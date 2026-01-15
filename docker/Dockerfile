@@ -18,6 +18,11 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
+    libicu70 \
+    liblttng-ust1 \
+    libkrb5-3 \
+    zlib1g \
+    libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建 runner 用户
