@@ -1,10 +1,10 @@
-name: Tapdata配置部署
+name: Tapdata Config Deployment
 
 on:
   workflow_dispatch:
     inputs:
       env:
-        description: '环境'
+        description: 'Environment'
         required: true
         type: choice
         options:
@@ -13,7 +13,7 @@ on:
           - preprod
           - prod
       project_group:
-        description: '项目分组'
+        description: 'Project Group'
         required: true
         type: choice
         options:
@@ -25,7 +25,7 @@ env:
 
 jobs:
   prepare:
-    name: 准备配置
+    name: Prepare Configuration
     runs-on: self-hosted
     timeout-minutes: 5
     outputs:
@@ -34,26 +34,26 @@ jobs:
       tar_path: ${{ steps.create_tar.outputs.tar_path }}
       access_token: ${{ steps.get_token.outputs.access_token }}
     steps:
-      - name: 检出当前仓库代码
+      - name: Checkout current repository
         uses: actions/checkout@v4
 
-      - name: 创建共享目录
+      - name: Create shared directory
         run: |
           mkdir -p ${{ env.SHARED_DIR }}
-          echo "共享目录: ${{ env.SHARED_DIR }}"
+          echo "Shared directory: ${{ env.SHARED_DIR }}"
 
-      - name: 获取配置仓库名称
+      - name: Get config repository name
         id: get_repo
         run: |
           REPO=$(grep "^${{ inputs.project_group }}=" conf/project.conf | cut -d'=' -f2)
           if [ -z "$REPO" ]; then
-            echo "错误：未找到项目分组 ${{ inputs.project_group }} 的配置仓库"
+            echo "Error: Config repository not found for project group ${{ inputs.project_group }}"
             exit 1
           fi
-          echo "配置仓库: $REPO"
+          echo "Config repository: $REPO"
           echo "repo=$REPO" >> $GITHUB_OUTPUT
 
-      - name: 检出配置仓库代码
+      - name: Checkout config repository
         uses: actions/checkout@v4
         with:
           repository: ${{ steps.get_repo.outputs.repo }}
@@ -61,61 +61,61 @@ jobs:
           path: config-repo
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 压缩配置仓库为tar
+      - name: Create tar archive from config repository
         id: create_tar
         run: |
           TAR_PATH="${{ env.SHARED_DIR }}/config.tar"
-          # 进入配置仓库目录，打包所有 json 文件，确保文件在 tar 包的第一层
+          # Enter config repo directory and pack all json files to ensure they are at the first level of tar
           cd config-repo
           tar -cf "$TAR_PATH" *.json
           cd ..
           ls -lh "$TAR_PATH"
-          echo "验证 tar 包内容:"
+          echo "Verify tar contents:"
           tar -tf "$TAR_PATH"
           echo "tar_path=$TAR_PATH" >> $GITHUB_OUTPUT
 
-      - name: 获取Tapdata地址
+      - name: Get Tapdata URL
         id: get_url
         run: |
           BASE_URL=$(grep "^${{ inputs.env }}=" conf/env.conf | cut -d'=' -f2)
           if [ -z "$BASE_URL" ]; then
-            echo "错误：未找到环境 ${{ inputs.env }} 的Tapdata地址"
+            echo "Error: Tapdata URL not found for environment ${{ inputs.env }}"
             exit 1
           fi
-          echo "Tapdata地址: $BASE_URL"
+          echo "Tapdata URL: $BASE_URL"
           echo "base_url=$BASE_URL" >> $GITHUB_OUTPUT
 
-      - name: 安装 Python 依赖
+      - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: 获取 Access Token
+      - name: Get Access Token
         id: get_token
         run: |
           ACCESS_TOKEN=$(python scripts/tapdata-get-token.py "${{ steps.get_url.outputs.base_url }}")
           if [ -z "$ACCESS_TOKEN" ]; then
-            echo "错误：获取 access_token 失败"
+            echo "Error: Failed to get access_token"
             exit 1
           fi
-          echo "✓ 成功获取 access_token"
+          echo "✓ Successfully obtained access_token"
           echo "access_token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
 
   import:
-    name: 导入配置
+    name: Import Configuration
     runs-on: self-hosted
     timeout-minutes: 20
     needs: prepare
     outputs:
       record_id: ${{ steps.import.outputs.record_id }}
     steps:
-      - name: 检出当前仓库代码
+      - name: Checkout current repository
         uses: actions/checkout@v4
 
-      - name: 安装 Python 依赖
+      - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: 导入配置到Tapdata
+      - name: Import configuration to Tapdata
         id: import
         run: |
           python scripts/tapdata-import.py \
@@ -124,19 +124,19 @@ jobs:
             "${{ needs.prepare.outputs.tar_path }}"
 
   verify:
-    name: 验证结果
+    name: Verify Result
     runs-on: self-hosted
     timeout-minutes: 5
     needs: [prepare, import]
     steps:
-      - name: 检出当前仓库代码
+      - name: Checkout current repository
         uses: actions/checkout@v4
 
-      - name: 安装 Python 依赖
+      - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: 检查导入状态
+      - name: Check import status
         id: verify_status
         run: |
           python scripts/tapdata-check.py \
@@ -144,58 +144,58 @@ jobs:
             "${{ needs.prepare.outputs.access_token }}" \
             "${{ needs.import.outputs.record_id }}"
 
-#      - name: 清理共享目录
+#      - name: Clean up shared directory
 #        if: always()
 #        run: |
 #          if [ -d "${{ env.SHARED_DIR }}" ]; then
 #            rm -rf "${{ env.SHARED_DIR }}"
-#            echo "已清理共享目录: ${{ env.SHARED_DIR }}"
+#            echo "Cleaned up shared directory: ${{ env.SHARED_DIR }}"
 #          fi
 
   report:
-    name: 生成报告
+    name: Generate Report
     runs-on: self-hosted
     timeout-minutes: 2
     if: always()
     needs: [prepare, import, verify]
     steps:
-      - name: 生成部署报告
+      - name: Generate deployment report
         run: |
-          # 判断整体部署状态（用于报告内容，不影响此 job 的成功/失败）
+          # Determine overall deployment status (for report content, does not affect this job's success/failure)
           if [ "${{ needs.prepare.result }}" == "success" ] && \
              [ "${{ needs.import.result }}" == "success" ] && \
              [ "${{ needs.verify.result }}" == "success" ]; then
             OVERALL_STATUS="success"
             STATUS_ICON="✅"
-            STATUS_TEXT="成功"
+            STATUS_TEXT="Success"
           else
             OVERALL_STATUS="failure"
             STATUS_ICON="❌"
-            STATUS_TEXT="失败"
+            STATUS_TEXT="Failed"
           fi
 
-          # 输出到 GitHub Actions Summary
+          # Output to GitHub Actions Summary
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          # 📊 Tapdata 配置部署报告
+          # 📊 Tapdata Configuration Deployment Report
 
-          ## ${STATUS_ICON} 整体状态: ${STATUS_TEXT}
+          ## ${STATUS_ICON} Overall Status: ${STATUS_TEXT}
 
-          ### 🔧 部署信息
-          | 项目 | 值 |
-          |------|-----|
-          | 环境 | \`${{ inputs.env }}\` |
-          | 项目分组 | \`${{ inputs.project_group }}\` |
-          | 配置仓库 | \`${{ needs.prepare.outputs.config_repo }}\` |
-          | Tapdata 地址 | ${{ needs.prepare.outputs.base_url }} |
-          | 触发者 | @${{ github.actor }} |
-          | 运行编号 | #${{ github.run_number }} |
+          ### 🔧 Deployment Information
+          | Item | Value |
+          |------|-------|
+          | Environment | \`${{ inputs.env }}\` |
+          | Project Group | \`${{ inputs.project_group }}\` |
+          | Config Repository | \`${{ needs.prepare.outputs.config_repo }}\` |
+          | Tapdata URL | ${{ needs.prepare.outputs.base_url }} |
+          | Triggered By | @${{ github.actor }} |
+          | Run Number | #${{ github.run_number }} |
 
-          ### 📋 执行结果
-          | Job | 状态 |
-          |-----|------|
-          | 准备配置 | ${{ needs.prepare.result == 'success' && '✅ 成功' || '❌ 失败' }} |
-          | 导入配置 | ${{ needs.import.result == 'success' && '✅ 成功' || '❌ 失败' }} |
-          | 验证结果 | ${{ needs.verify.result == 'success' && '✅ 成功' || '❌ 失败' }} |
+          ### 📋 Execution Results
+          | Job | Status |
+          |-----|--------|
+          | Prepare Configuration | ${{ needs.prepare.result == 'success' && '✅ Success' || '❌ Failed' }} |
+          | Import Configuration | ${{ needs.import.result == 'success' && '✅ Success' || '❌ Failed' }} |
+          | Verify Result | ${{ needs.verify.result == 'success' && '✅ Success' || '❌ Failed' }} |
 
           EOF
 
