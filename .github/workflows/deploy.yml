@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout current repository
         uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Create shared directory
         run: |
@@ -59,7 +61,7 @@ jobs:
           repository: ${{ steps.get_repo.outputs.repo }}
           ref: main
           path: config-repo
-          token: ${{ secrets.PAT_TOKEN }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Create tar archive from config repository
         id: create_tar
@@ -110,6 +112,8 @@ jobs:
     steps:
       - name: Checkout current repository
         uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Install Python dependencies
         run: |
@@ -131,6 +135,8 @@ jobs:
     steps:
       - name: Checkout current repository
         uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Install Python dependencies
         run: |
