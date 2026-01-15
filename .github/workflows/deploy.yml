@@ -141,13 +141,13 @@ jobs:
             "${{ needs.prepare.outputs.access_token }}" \
             "${{ needs.import.outputs.record_id }}"
 
-      - name: 清理共享目录
-        if: always()
-        run: |
-          if [ -d "${{ env.SHARED_DIR }}" ]; then
-            rm -rf "${{ env.SHARED_DIR }}"
-            echo "已清理共享目录: ${{ env.SHARED_DIR }}"
-          fi
+#      - name: 清理共享目录
+#        if: always()
+#        run: |
+#          if [ -d "${{ env.SHARED_DIR }}" ]; then
+#            rm -rf "${{ env.SHARED_DIR }}"
+#            echo "已清理共享目录: ${{ env.SHARED_DIR }}"
+#          fi
 
   report:
     name: 生成报告

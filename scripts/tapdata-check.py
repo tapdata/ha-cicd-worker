@@ -101,6 +101,14 @@ def validate_arguments(base_url, access_token, record_id):
         sys.exit(1)
 
 
+def mask_token(url, token):
+    """隐藏 URL 中的 access_token"""
+    if token and token in url:
+        masked = token[:8] + "..." + token[-4:] if len(token) > 12 else "***"
+        return url.replace(token, masked)
+    return url
+
+
 def check_import_status(base_url, access_token, record_id):
     """检查导入状态"""
 
@@ -112,60 +120,90 @@ def check_import_status(base_url, access_token, record_id):
     while attempt < max_attempts:
         attempt += 1
         current_time = datetime.now().strftime('%H:%M:%S')
+        print(f"\n{'='*60}")
         print(f"检查次数: {attempt}/{max_attempts} ({current_time})")
+        print(f"{'='*60}")
 
         # 调用状态检查接口，添加 access_token 参数
         check_url = f"{base_url}/api/groupInfo/getGroupImportStatus/{record_id}?access_token={access_token}"
 
+        # 打印请求详情
+        print(f"\n📤 发送请求:")
+        print(f"  方法: GET")
+        print(f"  URL: {mask_token(check_url, access_token)}")
+        print(f"  完整路径: /api/groupInfo/getGroupImportStatus/{record_id}")
+
         try:
             response = requests.get(check_url)
             http_code = response.status_code
-            
-            print(f"HTTP 状态码: {http_code}")
-            print(f"响应: {response.text}")
-            
+
+            # 打印响应详情
+            print(f"\n📥 收到响应:")
+            print(f"  HTTP 状态码: {http_code}")
+            print(f"  响应头:")
+            for header, value in response.headers.items():
+                print(f"    {header}: {value}")
+            print(f"  响应体长度: {len(response.text)} 字节")
+            print(f"  响应内容: {response.text}")
+
             # 检查 HTTP 状态码
             if http_code != 200:
-                print(f"⚠️  警告：API 返回非 200 状态码: {http_code}，将在5秒后重试...")
+                print(f"\n⚠️  警告：API 返回非 200 状态码")
+                print(f"  状态码: {http_code}")
+                print(f"  状态描述: {response.reason}")
+                print(f"  将在5秒后重试...")
                 time.sleep(5)
                 continue
-            
+
             # 解析响应
             try:
                 response_data = response.json()
-            except json.JSONDecodeError:
-                print("⚠️  警告：无法解析 JSON 响应，将在5秒后重试...")
+                print(f"\n✅ JSON 解析成功")
+            except json.JSONDecodeError as e:
+                print(f"\n⚠️  警告：无法解析 JSON 响应")
+                print(f"  错误: {e}")
+                print(f"  将在5秒后重试...")
                 time.sleep(5)
                 continue
-            
+
             # 提取状态
             status = response_data.get("data", {}).get("status")
-            
+
             if not status:
-                print("⚠️  警告：无法从响应中提取状态，将在5秒后重试...")
+                print(f"\n⚠️  警告：无法从响应中提取状态")
+                print(f"  响应数据结构: {json.dumps(response_data, indent=2, ensure_ascii=False)}")
+                print(f"  将在5秒后重试...")
                 time.sleep(5)
                 continue
-            
-            print(f"当前状态: {status}")
-            
+
+            print(f"\n📊 状态信息:")
+            print(f"  当前状态: {status}")
+
             # 处理不同状态
             if status == "importing":
-                print("⏳ 导入中，等待5秒后继续检查...")
+                print(f"  ⏳ 导入中，等待5秒后继续检查...")
                 time.sleep(5)
             elif status == "completed":
+                print(f"  ✅ 导入已完成")
                 duration = int(time.time() - start_time)
                 print_success_footer(duration)
                 sys.exit(0)
             elif status == "failed":
+                print(f"  ❌ 导入失败")
                 duration = int(time.time() - start_time)
                 print_failure_footer(duration, response_data)
                 sys.exit(1)
             else:
-                print(f"⚠️  未知状态: {status}，将在5秒后重试...")
+                print(f"  ⚠️  未知状态: {status}")
+                print(f"  将在5秒后重试...")
                 time.sleep(5)
-                
+
         except requests.exceptions.RequestException as e:
-            print(f"⚠️  警告：请求失败: {e}，将在5秒后重试...")
+            print(f"\n⚠️  警告：请求异常")
+            print(f"  异常类型: {type(e).__name__}")
+            print(f"  异常信息: {e}")
+            print(f"  请求URL: {mask_token(check_url, access_token)}")
+            print(f"  将在5秒后重试...")
             time.sleep(5)
             continue
     
