@@ -205,38 +205,38 @@ jobs:
 
           EOF
 
-          # 添加相关链接
+          # Add related links
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ### 🔗 相关链接
-          - [Workflow 运行详情](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          ### 🔗 Related Links
+          - [Workflow Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           EOF
 
           if [ "${{ needs.import.outputs.record_id }}" != "" ]; then
-            echo "- 导入记录 ID: \`${{ needs.import.outputs.record_id }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Import Record ID: \`${{ needs.import.outputs.record_id }}\`" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # 添加时间信息
+          # Add time information
           END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
           cat >> $GITHUB_STEP_SUMMARY << EOF
 
-          ### ⏰ 时间信息
-          - 结束时间: ${END_TIME}
+          ### ⏰ Time Information
+          - Completion Time: ${END_TIME}
 
           ---
-          *报告生成时间: ${END_TIME}*
+          *Report Generated At: ${END_TIME}*
           EOF
 
-          # 同时输出到控制台日志
+          # Output to console log
           echo "=========================================="
-          echo "📊 Tapdata 配置部署报告"
+          echo "📊 Tapdata Configuration Deployment Report"
           echo "=========================================="
           echo ""
-          echo "部署整体状态: ${STATUS_ICON} ${STATUS_TEXT}"
-          echo "环境: ${{ inputs.env }}"
-          echo "项目分组: ${{ inputs.project_group }}"
+          echo "Overall Deployment Status: ${STATUS_ICON} ${STATUS_TEXT}"
+          echo "Environment: ${{ inputs.env }}"
+          echo "Project Group: ${{ inputs.project_group }}"
           echo ""
-          echo "✅ 报告生成成功！详细报告已输出到 GitHub Actions Summary"
+          echo "✅ Report generated successfully! Detailed report has been output to GitHub Actions Summary"
           echo "=========================================="
 
-          # 注意：不再根据部署状态退出，只要报告生成成功，此 job 就成功
-          # 这样即使前面的步骤失败，报告 job 也会显示为成功（绿色）
+          # Note: Do not exit based on deployment status, this job succeeds as long as report generation succeeds
+          # This way, even if previous steps fail, the report job will still show as successful (green)
