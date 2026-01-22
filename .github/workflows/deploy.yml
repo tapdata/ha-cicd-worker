@@ -67,10 +67,28 @@ jobs:
         id: create_tar
         run: |
           TAR_PATH="${{ env.SHARED_DIR }}/config.tar"
-          # Enter config repo directory and pack all json files to ensure they are at the first level of tar
-          cd config-repo
+          CONFIG_SUBDIR="${{ inputs.project_group }}_tapdata_export"
+
+          # Check if the subdirectory exists
+          if [ ! -d "config-repo/$CONFIG_SUBDIR" ]; then
+            echo "❌ Error: Required subdirectory '$CONFIG_SUBDIR' not found in config repository"
+            echo "Available directories in config-repo:"
+            ls -la config-repo/
+            exit 1
+          fi
+
+          # Check if there are any JSON files in the subdirectory
+          if ! ls config-repo/$CONFIG_SUBDIR/*.json 1> /dev/null 2>&1; then
+            echo "❌ Error: No JSON files found in subdirectory '$CONFIG_SUBDIR'"
+            exit 1
+          fi
+
+          # Enter the subdirectory and pack all json files to ensure they are at the first level of tar
+          cd config-repo/$CONFIG_SUBDIR
           tar -cf "$TAR_PATH" *.json
-          cd ..
+          cd ../..
+
+          echo "✓ Successfully created tar archive from $CONFIG_SUBDIR"
           ls -lh "$TAR_PATH"
           echo "Verify tar contents:"
           tar -tf "$TAR_PATH"
