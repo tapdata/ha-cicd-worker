@@ -1,0 +1,40 @@
+name: Test Approval
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: '测试消息'
+        required: false
+        default: 'Hello from approval test'
+
+jobs:
+  pre-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 前置检查
+        run: |
+          echo "🔍 前置检查通过"
+          echo "消息: ${{ github.event.inputs.message }}"
+          echo "触发人: ${{ github.actor }}"
+          echo "时间: $(date)"
+
+  approval:
+    needs: pre-check
+    runs-on: ubuntu-latest
+    environment: approval
+    steps:
+      - name: 等待审批通过
+        run: echo "✅ 审批已通过，继续执行"
+
+  deploy:
+    needs: approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: 模拟部署
+        run: |
+          echo "🚀 开始部署..."
+          sleep 3
+          echo "✅ 部署完成！"
+          echo "消息: ${{ github.event.inputs.message }}"
+

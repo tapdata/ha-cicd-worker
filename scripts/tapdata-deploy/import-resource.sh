@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Import resource (connections/tasks/apis) via TapData API
+# Usage: import-resource.sh <resource_type>
+# resource_type: connections | tasks | apis
+# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TARGET_ENV
+set -euo pipefail
+
+RESOURCE_TYPE="${1:-}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
+
+echo "=== Importing ${RESOURCE_TYPE} via TapData API ==="
+
+# Validate inputs
+if [[ -z "${RESOURCE_TYPE}" ]]; then
+  echo "::error::Usage: import-resource.sh <connections|tasks|apis>"
+  exit 1
+fi
+
+if [[ -z "${DEPLOY_DIR:-}" ]]; then
+  echo "::error::DEPLOY_DIR is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${TAPDATA_TOKEN:-}" ]]; then
+  echo "::error::TAPDATA_TOKEN is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${TARGET_ENV:-}" ]]; then
+  echo "::error::TARGET_ENV is not set or empty"
+  exit 1
+fi
+
+# Read base URL from env.conf
+if [[ ! -f "${ENV_CONF}" ]]; then
+  echo "::error::env.conf not found at ${ENV_CONF}"
+  exit 1
+fi
+
+BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
+
+if [[ -z "${BASE_URL}" ]]; then
+  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+  exit 1
+fi
+
+# Determine API path based on resource type
+case "${RESOURCE_TYPE}" in
+  connections)
+    API_PATH="api/groupInfo/connection/import"
+    ;;
+  tasks)
+    API_PATH="api/groupInfo/task/import"
+    ;;
+  apis)
+    API_PATH="api/groupInfo/api/import"
+    ;;
+  *)
+    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis"
+    exit 1
+    ;;
+esac
+
+API_URL="${BASE_URL%/}/${API_PATH}"
+
+# Locate tar archive
+ARCHIVE="${DEPLOY_DIR}/${RESOURCE_TYPE}.tar"
+
+if [[ ! -f "${ARCHIVE}" ]]; then
+  echo "::error::Archive not found: ${ARCHIVE}"
+  exit 1
+fi
+
+echo "Target environment: ${TARGET_ENV}"
+echo "API URL: ${API_URL}"
+echo "Archive: ${ARCHIVE}"
+
+# Upload tar via POST
+RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${API_URL}" \
+  -H "Content-Type: application/octet-stream" \
+  -H "access_token: ${TAPDATA_TOKEN}" \
+  --data-binary @"${ARCHIVE}")
+
+HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+BODY=$(echo "${RESPONSE}" | sed '$d')
+
+echo "HTTP Status: ${HTTP_CODE}"
+echo "Response: ${BODY}"
+
+if [[ "${HTTP_CODE}" -ne 200 ]]; then
+  echo "::error::Import API returned HTTP ${HTTP_CODE}: ${BODY}"
+  exit 1
+fi
+
+# Check response for errors
+CODE=$(echo "${BODY}" | jq -r '.code // empty')
+if [[ -n "${CODE}" && "${CODE}" != "ok" ]]; then
+  MESSAGE=$(echo "${BODY}" | jq -r '.message // empty')
+  echo "::error::Import failed with code '${CODE}': ${MESSAGE}"
+  exit 1
+fi
+
+# Save response for downstream steps
+echo "${BODY}" > "${DEPLOY_DIR}/${RESOURCE_TYPE}-import-response.json"
+
+# Output response as changed_<resource_type> for downstream jobs
+echo "changed_${RESOURCE_TYPE}=${BODY}" >> "${GITHUB_OUTPUT}"
+
+echo "=== Import ${RESOURCE_TYPE} Complete ==="

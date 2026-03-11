@@ -1,0 +1,264 @@
+name: TapData Deploy
+
+on:
+  pull_request:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - sit
+          - lpt
+          - aat
+          - prod
+      project:
+        description: 'Project name'
+        required: true
+        type: choice
+        default: dmp
+        options:
+          - dmp
+
+env:
+  DEPLOY_DIR: /tmp/tapdata-deploy-${{ github.run_id }}
+  # PR 触发时使用 head_ref（feat 分支），手动触发时使用 ref_name
+  DEPLOY_REF: ${{ github.head_ref || github.ref_name }}
+  # PR 触发时固定 dev，手动触发时使用 inputs.target_env
+  TARGET_ENV: ${{ github.event_name == 'pull_request' && 'dev' || inputs.target_env }}
+  # PR 触发时使用默认 dmp，手动触发时使用 inputs.project
+  PROJECT: ${{ inputs.project || 'dmp' }}
+
+jobs:
+  # ============================================================
+  # Job 1: Preparation Phase
+  # ============================================================
+  preparation:
+    name: Preparation Phase
+    runs-on: self-hosted
+    timeout-minutes: 5
+    outputs:
+      tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
+      last_stable_tag: ${{ steps.get_last_stable_tag.outputs.last_stable_tag }}
+      target_env: ${{ env.TARGET_ENV }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Validate Input Parameters
+        run: bash scripts/tapdata-deploy/validate-inputs.sh
+        env:
+          DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+      - name: Get TapData Token
+        id: get_token
+        run: bash scripts/tapdata-deploy/get-token.sh
+        env:
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+          TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESSCODE }}
+
+      - name: Get Last Stable Tag
+        id: get_last_stable_tag
+        run: bash scripts/tapdata-deploy/get-last-stable-tag.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+
+  # ============================================================
+  # Job 2: Deploy Connections
+  # ============================================================
+  deploy-connections:
+    name: Deploy Connections
+    runs-on: self-hosted
+    timeout-minutes: 15
+    environment: ${{ env.TARGET_ENV }}
+    needs: preparation
+    outputs:
+      changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Generate vault.json with Connection Secrets
+        run: bash scripts/tapdata-deploy/generate-vault.sh
+        env:
+          PROJECT: ${{ env.PROJECT }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+
+      - name: Compress Connection JSON Files
+        run: bash scripts/tapdata-deploy/compress-files.sh connections
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+
+      - name: Import Connections via TapData API
+        id: import_connections
+        run: bash scripts/tapdata-deploy/import-resource.sh connections
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+
+  # ============================================================
+  # Job 3: Deploy Tasks
+  # ============================================================
+  deploy-tasks:
+    name: Deploy Tasks
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: [preparation, deploy-connections]
+    outputs:
+      changed_tasks: ${{ steps.import_tasks.outputs.changed_tasks }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Task JSON Files
+        run: bash scripts/tapdata-deploy/compress-files.sh tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+
+      - name: Import Tasks via TapData API
+        id: import_tasks
+        run: bash scripts/tapdata-deploy/import-resource.sh tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 4: Deploy APIs
+  # ============================================================
+  deploy-apis:
+    name: Deploy APIs
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: [preparation, deploy-tasks]
+    outputs:
+      changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress API JSON Files
+        run: bash scripts/tapdata-deploy/compress-files.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+
+      - name: Import APIs via TapData API
+        id: import_apis
+        run: bash scripts/tapdata-deploy/import-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Fallback: Rollback Approval
+  # ============================================================
+  rollback-approval:
+    name: Rollback Approval
+    runs-on: self-hosted
+    timeout-minutes: 30
+    if: |
+      always() && (
+        needs.deploy-connections.result == 'failure' ||
+        needs.deploy-tasks.result == 'failure' ||
+        needs.deploy-apis.result == 'failure'
+      )
+    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis]
+    environment:
+      name: rollback-approval
+    steps:
+      - name: Display Rollback Information
+        run: |
+          echo "============================================"
+          echo "Rollback confirmation required"
+          echo "============================================"
+          echo "Target Environment: ${TARGET_ENV}"
+          echo "Rollback Tag:       ${LAST_STABLE_TAG}"
+          echo "Current Ref:        ${DEPLOYMENT_REF}"
+          echo "============================================"
+          echo "Connections Result:  ${CONNECTIONS_RESULT}"
+          echo "Tasks Result:       ${TASKS_RESULT}"
+          echo "APIs Result:        ${APIS_RESULT}"
+          echo "============================================"
+        env:
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+          LAST_STABLE_TAG: ${{ needs.preparation.outputs.last_stable_tag }}
+          DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
+          CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
+          TASKS_RESULT: ${{ needs.deploy-tasks.result }}
+          APIS_RESULT: ${{ needs.deploy-apis.result }}
+
+  # ============================================================
+  # Fallback: Rollback Execution
+  # ============================================================
+  rollback:
+    name: Rollback Deployment
+    needs: [preparation, rollback-approval]
+    if: always() && needs.rollback-approval.result == 'success'
+    uses: ./.github/workflows/tapdata-rollback.yml
+    with:
+      target_env: ${{ needs.preparation.outputs.target_env || 'dev' }}
+      last_stable_tag: ${{ needs.preparation.outputs.last_stable_tag }}
+    secrets: inherit
+
+  # ============================================================
+  # Job 5: Generate Deployment Report
+  # ============================================================
+  generate-report:
+    name: Generate Deployment Report
+    runs-on: self-hosted
+    timeout-minutes: 5
+    if: always()
+    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, rollback-approval, rollback]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fetch-depth: 0
+
+      - name: Collect Deployment Results
+        run: bash scripts/tapdata-deploy/generate-report.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+          PROJECT: ${{ env.PROJECT }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          LAST_STABLE_TAG: ${{ needs.preparation.outputs.last_stable_tag }}
+          CHANGED_CONNECTIONS: ${{ needs.deploy-connections.outputs.changed_connections }}
+          CHANGED_TASKS: ${{ needs.deploy-tasks.outputs.changed_tasks }}
+          CHANGED_APIS: ${{ needs.deploy-apis.outputs.changed_apis }}
+          PREPARATION_RESULT: ${{ needs.preparation.result }}
+          CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
+          TASKS_RESULT: ${{ needs.deploy-tasks.result }}
+          APIS_RESULT: ${{ needs.deploy-apis.result }}
+          ROLLBACK_APPROVAL_RESULT: ${{ needs.rollback-approval.result }}
+          ROLLBACK_RESULT: ${{ needs.rollback.result }}
+
+      - name: Upload Deployment Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ github.run_id }}
+          path: ${{ env.DEPLOY_DIR }}/deployment-report.*
+          retention-days: 90

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Retrieve the last stable tag from GitHub API for rollback fallback
+# Required env vars: GITHUB_TOKEN, REPO
+# Output: last_stable_tag (via GITHUB_OUTPUT)
+set -euo pipefail
+
+echo "=== Getting Last Stable Tag ==="
+
+# Validate required env vars
+if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+  echo "::error::GITHUB_TOKEN is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${REPO:-}" ]]; then
+  echo "::error::REPO is not set or empty"
+  exit 1
+fi
+
+# Fetch the latest tag via GitHub API
+RESPONSE=$(curl -s -w "\n%{http_code}" \
+  -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/${REPO}/tags?per_page=1")
+
+HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+BODY=$(echo "${RESPONSE}" | sed '$d')
+
+if [[ "${HTTP_CODE}" -ne 200 ]]; then
+  echo "::error::GitHub API returned HTTP ${HTTP_CODE}: ${BODY}"
+  exit 1
+fi
+
+LAST_TAG=$(echo "${BODY}" | jq -r '.[0].name // empty')
+
+if [[ -z "${LAST_TAG}" ]]; then
+  echo "::warning::No tags found in repository ${REPO}, setting last_stable_tag to empty"
+  LAST_TAG=""
+else
+  echo "Last stable tag: ${LAST_TAG}"
+fi
+
+echo "last_stable_tag=${LAST_TAG}" >> "${GITHUB_OUTPUT}"
+echo "=== Done ==="
