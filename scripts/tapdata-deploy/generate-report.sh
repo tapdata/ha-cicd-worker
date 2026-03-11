@@ -81,57 +81,58 @@ fi
 REPORT_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
 # --- Generate report ---
-REPORT_FILE="${DEPLOY_DIR}/deployment-report.txt"
+REPORT_FILE="${DEPLOY_DIR}/deployment-summary.md"
 
 cat > "${REPORT_FILE}" <<EOF
-================================================================================
-                         TapData Deployment Report
-================================================================================
+## TapData Deployment Report
 
-Report Time:            ${REPORT_TIME}
-Operator:               ${GITHUB_ACTOR}
-Target Environment:     ${TARGET_ENV}
-Project:                ${PROJECT}
-Deployment Ref:         ${DEPLOYMENT_REF}
-Last Stable Tag:        ${LAST_STABLE_TAG:-"(none)"}
+| Item | Value |
+| --- | --- |
+| Report Time | ${REPORT_TIME} |
+| Operator | ${GITHUB_ACTOR} |
+| Target Environment | ${TARGET_ENV} |
+| Project | ${PROJECT} |
+| Deployment Ref | ${DEPLOYMENT_REF} |
+| Last Stable Tag | ${LAST_STABLE_TAG:-"(none)"} |
+| Overall Result | ${OVERALL_RESULT} |
 
---------------------------------------------------------------------------------
-                            Change Summary
---------------------------------------------------------------------------------
+### Change Summary
 
-Changed Connections:    ${CONNECTIONS_COUNT}
-Changed Tasks:          ${TASKS_COUNT}
-Changed APIs:           ${APIS_COUNT}
+| Resource | Count |
+| --- | ---: |
+| Connections | ${CONNECTIONS_COUNT} |
+| Tasks | ${TASKS_COUNT} |
+| APIs | ${APIS_COUNT} |
 
---------------------------------------------------------------------------------
-                            Commit Details
---------------------------------------------------------------------------------
+### Commit Details
 
-Commit Count:           ${COMMIT_COUNT}
-Commit IDs:             ${COMMIT_IDS}
+- Commit Count: ${COMMIT_COUNT}
+- Commit IDs: ${COMMIT_IDS}
 
---------------------------------------------------------------------------------
-                            Job Results
---------------------------------------------------------------------------------
+### Job Results
 
-Preparation:            ${PREPARATION_RESULT}
-Deploy Connections:     ${CONNECTIONS_RESULT}
-Deploy Tasks:           ${TASKS_RESULT}
-Deploy APIs:            ${APIS_RESULT}
+| Job | Result |
+| --- | --- |
+| Preparation | ${PREPARATION_RESULT} |
+| Deploy Connections | ${CONNECTIONS_RESULT} |
+| Deploy Tasks | ${TASKS_RESULT} |
+| Deploy APIs | ${APIS_RESULT} |
 
-Overall Result:         ${OVERALL_RESULT}
+### Rollback
 
---------------------------------------------------------------------------------
-                            Rollback
---------------------------------------------------------------------------------
-
-Rollback Triggered:     ${ROLLBACK_TRIGGERED}
-Rollback Approval:      ${ROLLBACK_APPROVAL}
-Rollback Result:        ${ROLLBACK_STATUS}
-
-================================================================================
+| Item | Value |
+| --- | --- |
+| Rollback Triggered | ${ROLLBACK_TRIGGERED} |
+| Rollback Approval | ${ROLLBACK_APPROVAL} |
+| Rollback Result | ${ROLLBACK_STATUS} |
 EOF
 
 echo "Report saved to ${REPORT_FILE}"
 cat "${REPORT_FILE}"
+
+if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+  cat "${REPORT_FILE}" >> "${GITHUB_STEP_SUMMARY}"
+  echo "Report appended to step summary"
+fi
+
 echo "=== Report Generated ==="

@@ -64,7 +64,7 @@ jobs:
         run: bash scripts/tapdata-deploy/get-token.sh
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
-          TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESSCODE }}
+          TAPDATA_ACCESSCODE: ${{ secrets[format('{0}_TAPDATA_ACCESSCODE', env.TARGET_ENV)] }}
 
       - name: Get Last Stable Tag
         id: get_last_stable_tag
@@ -257,10 +257,3 @@ jobs:
           APIS_RESULT: ${{ needs.deploy-apis.result }}
           ROLLBACK_APPROVAL_RESULT: ${{ needs.rollback-approval.result }}
           ROLLBACK_RESULT: ${{ needs.rollback.result }}
-
-      - name: Upload Deployment Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-report-${{ github.run_id }}
-          path: ${{ env.DEPLOY_DIR }}/deployment-report.*
-          retention-days: 90
