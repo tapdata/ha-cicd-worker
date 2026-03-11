@@ -2,7 +2,9 @@ name: TapData Deploy
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**/*tapdata_export/**'
   workflow_dispatch:
     inputs:
       target_env:
@@ -78,7 +80,7 @@ jobs:
     name: Deploy Connections
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: ${{ env.TARGET_ENV }}
+    environment: ${{ needs.preparation.outputs.target_env }}
     needs: preparation
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
