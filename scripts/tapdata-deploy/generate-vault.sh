@@ -78,7 +78,7 @@ for conn_name in "${CONNECTION_NAMES[@]}"; do
     --arg pass_key "${conn_name}_password" --arg pass_val "${PASSWORD}" \
     '. + {($host_key): $host_val, ($port_key): $port_val, ($user_key): $user_val, ($pass_key): $pass_val}')
 
-  echo "Added secrets for connection: ${conn_name}"
+  echo "Added secrets for connection: ${conn_name} (host=${HOST}, port=${PORT}, user=${USER})"
 done
 
 # Write vault.json
