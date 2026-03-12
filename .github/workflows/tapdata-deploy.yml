@@ -61,7 +61,7 @@ jobs:
 
       - name: Get TapData Token
         id: get_token
-        run: bash scripts/tapdata-deploy/get-token.sh
+        run: bash scripts/common/get-token.sh
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           TAPDATA_ACCESSCODE: ${{ secrets[format('{0}_TAPDATA_ACCESSCODE', env.TARGET_ENV)] }}
@@ -97,10 +97,11 @@ jobs:
           PROJECT: ${{ env.PROJECT }}
           ALL_SECRETS: ${{ toJSON(secrets) }}
 
-      - name: Compress Connection JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh connections
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import Connections via TapData API
         id: import_connections
@@ -128,10 +129,11 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Compress Task JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh tasks
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import Tasks via TapData API
         id: import_tasks
@@ -158,14 +160,46 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Compress API JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh apis
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import APIs via TapData API
         id: import_apis
         run: bash scripts/tapdata-deploy/import-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 5: Deploy Group Info
+  # ============================================================
+  deploy-group-info:
+    name: Deploy Group Info
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: [preparation, deploy-apis]
+    outputs:
+      changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Group Info via TapData API
+        id: import_group_info
+        run: bash scripts/tapdata-deploy/import-resource.sh groupInfo
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
@@ -182,9 +216,10 @@ jobs:
       always() && (
         needs.deploy-connections.result == 'failure' ||
         needs.deploy-tasks.result == 'failure' ||
-        needs.deploy-apis.result == 'failure'
+        needs.deploy-apis.result == 'failure' ||
+        needs.deploy-group-info.result == 'failure'
       )
-    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis]
+    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info]
     environment:
       name: rollback-approval
     steps:
@@ -200,6 +235,7 @@ jobs:
           echo "Connections Result:  ${CONNECTIONS_RESULT}"
           echo "Tasks Result:       ${TASKS_RESULT}"
           echo "APIs Result:        ${APIS_RESULT}"
+          echo "Group Info Result:  ${GROUP_INFO_RESULT}"
           echo "============================================"
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
@@ -208,6 +244,7 @@ jobs:
           CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
           TASKS_RESULT: ${{ needs.deploy-tasks.result }}
           APIS_RESULT: ${{ needs.deploy-apis.result }}
+          GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
 
   # ============================================================
   # Fallback: Rollback Execution
@@ -230,7 +267,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 5
     if: always()
-    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, rollback-approval, rollback]
+    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info, rollback-approval, rollback]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -251,9 +288,11 @@ jobs:
           CHANGED_CONNECTIONS: ${{ needs.deploy-connections.outputs.changed_connections }}
           CHANGED_TASKS: ${{ needs.deploy-tasks.outputs.changed_tasks }}
           CHANGED_APIS: ${{ needs.deploy-apis.outputs.changed_apis }}
+          CHANGED_GROUP_INFO: ${{ needs.deploy-group-info.outputs.changed_groupInfo }}
           PREPARATION_RESULT: ${{ needs.preparation.result }}
           CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
           TASKS_RESULT: ${{ needs.deploy-tasks.result }}
           APIS_RESULT: ${{ needs.deploy-apis.result }}
+          GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
           ROLLBACK_APPROVAL_RESULT: ${{ needs.rollback-approval.result }}
           ROLLBACK_RESULT: ${{ needs.rollback.result }}

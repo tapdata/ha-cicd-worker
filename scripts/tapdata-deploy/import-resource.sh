@@ -48,16 +48,19 @@ fi
 # Determine API path based on resource type
 case "${RESOURCE_TYPE}" in
   connections)
-    API_PATH="api/groupInfo/connection/import"
+    API_PATH="api/groupInfo/import/connections"
     ;;
   tasks)
-    API_PATH="api/groupInfo/task/import"
+    API_PATH="api/groupInfo/import/tasks"
     ;;
   apis)
-    API_PATH="api/groupInfo/api/import"
+    API_PATH="api/groupInfo/import/apis"
+    ;;
+  groupInfo)
+    API_PATH="api/groupInfo/import/groupInfo"
     ;;
   *)
-    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis"
+    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis|groupInfo"
     exit 1
     ;;
 esac
@@ -65,7 +68,7 @@ esac
 API_URL="${BASE_URL%/}/${API_PATH}"
 
 # Locate tar archive
-ARCHIVE="${DEPLOY_DIR}/${RESOURCE_TYPE}.tar"
+ARCHIVE="${DEPLOY_DIR}/export.tar"
 
 if [[ ! -f "${ARCHIVE}" ]]; then
   echo "::error::Archive not found: ${ARCHIVE}"
@@ -74,13 +77,26 @@ fi
 
 echo "Target environment: ${TARGET_ENV}"
 echo "API URL: ${API_URL}"
-echo "Archive: ${ARCHIVE}"
+IMPORT_MODE="${IMPORT_MODE:-REPLACE}"
 
-# Upload tar via POST
-RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${API_URL}" \
-  -H "Content-Type: application/octet-stream" \
+echo "Archive: ${ARCHIVE}"
+echo "Import mode: ${IMPORT_MODE}"
+
+# Build curl arguments for multipart/form-data upload
+CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${API_URL}" \
   -H "access_token: ${TAPDATA_TOKEN}" \
-  --data-binary @"${ARCHIVE}")
+  -F "file=@${ARCHIVE}" \
+  -F "importMode=${IMPORT_MODE}")
+
+# Optionally attach vault file
+VAULT_FILE="${DEPLOY_DIR}/vault.json"
+if [[ -f "${VAULT_FILE}" ]]; then
+  echo "Vault file found: ${VAULT_FILE}"
+  CURL_ARGS+=(-F "vault=@${VAULT_FILE}")
+fi
+
+# Upload via POST multipart/form-data
+RESPONSE=$(curl "${CURL_ARGS[@]}")
 
 HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
 BODY=$(echo "${RESPONSE}" | sed '$d')
@@ -101,10 +117,17 @@ if [[ -n "${CODE}" && "${CODE}" != "ok" ]]; then
   exit 1
 fi
 
+# Extract recordId and diff from response
+RECORD_ID=$(echo "${BODY}" | jq -r '.data.recordId // empty')
+DIFF=$(echo "${BODY}" | jq -c '.data.diff // empty')
+
+echo "Record ID: ${RECORD_ID}"
+echo "Diff: ${DIFF}"
+
 # Save response for downstream steps
 echo "${BODY}" > "${DEPLOY_DIR}/${RESOURCE_TYPE}-import-response.json"
 
-# Output response as changed_<resource_type> for downstream jobs
-echo "changed_${RESOURCE_TYPE}=${BODY}" >> "${GITHUB_OUTPUT}"
+# Output diff as changed_<resource_type> for downstream jobs
+echo "changed_${RESOURCE_TYPE}=${DIFF}" >> "${GITHUB_OUTPUT}"
 
 echo "=== Import ${RESOURCE_TYPE} Complete ==="
