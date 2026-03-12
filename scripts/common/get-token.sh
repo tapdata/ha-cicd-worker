@@ -70,8 +70,7 @@ if [[ -z "${TOKEN}" ]]; then
   exit 1
 fi
 
-# Mask token in logs and set output
-echo "::add-mask::${TOKEN}"
+# Set output for downstream jobs
 echo "tapdata_token=${TOKEN}" >> "${GITHUB_OUTPUT}"
 echo "=== Token Retrieved Successfully ==="
 

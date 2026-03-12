@@ -40,7 +40,7 @@ while IFS= read -r file; do
       CONNECTION_NAMES+=("${name}")
       echo "Found connection: ${name} (from ${file})"
     fi
-  done < <(jq -r '.[] | select(.collectionName == "Connections") | .name // empty' "${file}")
+  done < <(jq -r '.[] | select(.collectionName == "Connections") | if (.json | type) == "string" then (.json | fromjson | .name // empty) else (.json | .name // empty) end' "${file}")
 done < <(find "${CONNECTIONS_DIR}" -name "*Connection_Config.json" -type f)
 
 if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
