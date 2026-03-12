@@ -56,8 +56,11 @@ case "${RESOURCE_TYPE}" in
   apis)
     API_PATH="api/groupInfo/import/apis"
     ;;
+  groupInfo)
+    API_PATH="api/groupInfo/import/groupInfo"
+    ;;
   *)
-    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis"
+    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis|groupInfo"
     exit 1
     ;;
 esac

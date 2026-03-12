@@ -2,8 +2,8 @@
 # Collect deployment results and generate deployment report
 # Required env vars: DEPLOY_DIR, DEPLOYMENT_REF, TARGET_ENV, PROJECT,
 #   GITHUB_ACTOR, LAST_STABLE_TAG,
-#   CHANGED_CONNECTIONS, CHANGED_TASKS, CHANGED_APIS,
-#   PREPARATION_RESULT, CONNECTIONS_RESULT, TASKS_RESULT, APIS_RESULT,
+#   CHANGED_CONNECTIONS, CHANGED_TASKS, CHANGED_APIS, CHANGED_GROUP_INFO,
+#   PREPARATION_RESULT, CONNECTIONS_RESULT, TASKS_RESULT, APIS_RESULT, GROUP_INFO_RESULT,
 #   ROLLBACK_RESULT
 set -euo pipefail
 
@@ -12,7 +12,7 @@ echo "=== Generating Deployment Report ==="
 mkdir -p "${DEPLOY_DIR}"
 
 # --- Determine overall result ---
-if [[ "${CONNECTIONS_RESULT}" == "success" && "${TASKS_RESULT}" == "success" && "${APIS_RESULT}" == "success" ]]; then
+if [[ "${CONNECTIONS_RESULT}" == "success" && "${TASKS_RESULT}" == "success" && "${APIS_RESULT}" == "success" && "${GROUP_INFO_RESULT}" == "success" ]]; then
   OVERALL_RESULT="SUCCESS"
 else
   OVERALL_RESULT="FAILURE"
@@ -57,6 +57,7 @@ count_changes() {
 CONNECTIONS_COUNT=$(count_changes "${CHANGED_CONNECTIONS:-}")
 TASKS_COUNT=$(count_changes "${CHANGED_TASKS:-}")
 APIS_COUNT=$(count_changes "${CHANGED_APIS:-}")
+GROUP_INFO_COUNT=$(count_changes "${CHANGED_GROUP_INFO:-}")
 
 # --- Commits between last stable tag and current ref ---
 COMMIT_COUNT=0
@@ -103,6 +104,7 @@ cat > "${REPORT_FILE}" <<EOF
 | Connections | ${CONNECTIONS_COUNT} |
 | Tasks | ${TASKS_COUNT} |
 | APIs | ${APIS_COUNT} |
+| Group Info | ${GROUP_INFO_COUNT} |
 
 ### Commit Details
 
@@ -117,6 +119,7 @@ cat > "${REPORT_FILE}" <<EOF
 | Deploy Connections | ${CONNECTIONS_RESULT} |
 | Deploy Tasks | ${TASKS_RESULT} |
 | Deploy APIs | ${APIS_RESULT} |
+| Deploy Group Info | ${GROUP_INFO_RESULT} |
 
 ### Rollback
 
