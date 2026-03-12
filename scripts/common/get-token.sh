@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../conf/env.conf"
+ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
 echo "=== Getting TapData Token ==="
 
