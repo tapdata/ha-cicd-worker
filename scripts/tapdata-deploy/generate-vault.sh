@@ -32,15 +32,15 @@ if [[ ! -d "${CONNECTIONS_DIR}" ]]; then
 fi
 
 # Scan all *Connection_Config.json files and extract connection names
+# Each file is a JSON array; extract name where collectionName == "Connections"
 CONNECTION_NAMES=()
 while IFS= read -r file; do
-  name=$(jq -r '.name // empty' "${file}")
-  if [[ -n "${name}" ]]; then
-    CONNECTION_NAMES+=("${name}")
-    echo "Found connection: ${name} (from ${file})"
-  else
-    echo "::warning::No 'name' property found in ${file}, skipping"
-  fi
+  while IFS= read -r name; do
+    if [[ -n "${name}" ]]; then
+      CONNECTION_NAMES+=("${name}")
+      echo "Found connection: ${name} (from ${file})"
+    fi
+  done < <(jq -r '.[] | select(.collectionName == "Connections") | .name // empty' "${file}")
 done < <(find "${CONNECTIONS_DIR}" -name "*Connection_Config.json" -type f)
 
 if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
