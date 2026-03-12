@@ -23,14 +23,15 @@ if [[ -z "${ALL_SECRETS:-}" ]]; then
 fi
 
 # Locate connection files directory
-CONNECTIONS_DIR="${REPO_ROOT}/${PROJECT}_tapdata_export"
+EXPORT_DIR="${REPO_ROOT}/${PROJECT}_tapdata_export"
+CONNECTIONS_DIR="${EXPORT_DIR}/Connection"
 
 if [[ ! -d "${CONNECTIONS_DIR}" ]]; then
   echo "::error::Connections directory not found: ${CONNECTIONS_DIR}"
   exit 1
 fi
 
-# Scan all *_connection.json files and extract connection names
+# Scan all *Connection_Config.json files and extract connection names
 CONNECTION_NAMES=()
 while IFS= read -r file; do
   name=$(jq -r '.name // empty' "${file}")
@@ -40,11 +41,11 @@ while IFS= read -r file; do
   else
     echo "::warning::No 'name' property found in ${file}, skipping"
   fi
-done < <(find "${CONNECTIONS_DIR}" -name "*_connection.json" -type f)
+done < <(find "${CONNECTIONS_DIR}" -name "*Connection_Config.json" -type f)
 
 if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
   echo "::warning::No connection files found in ${CONNECTIONS_DIR}"
-  echo "{}" > "${CONNECTIONS_DIR}/vault.json"
+  echo "{}" > "${EXPORT_DIR}/vault.json"
   echo "=== Generated empty vault.json ==="
   exit 0
 fi
@@ -81,7 +82,7 @@ for conn_name in "${CONNECTION_NAMES[@]}"; do
 done
 
 # Write vault.json
-VAULT_FILE="${CONNECTIONS_DIR}/vault.json"
+VAULT_FILE="${EXPORT_DIR}/vault.json"
 echo "${VAULT_JSON}" | jq '.' > "${VAULT_FILE}"
 
 echo "vault.json written to ${VAULT_FILE}"
