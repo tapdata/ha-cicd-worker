@@ -58,6 +58,7 @@ jobs:
         env:
           DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Get TapData Token
         id: get_token
