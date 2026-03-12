@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
+ENV_CONF="${SCRIPT_DIR}/../conf/env.conf"
 
 echo "=== Getting TapData Token ==="
 
@@ -67,3 +67,4 @@ fi
 echo "::add-mask::${TOKEN}"
 echo "tapdata_token=${TOKEN}" >> "${GITHUB_OUTPUT}"
 echo "=== Token Retrieved Successfully ==="
+

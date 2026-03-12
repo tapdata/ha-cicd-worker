@@ -61,7 +61,7 @@ jobs:
 
       - name: Get TapData Token
         id: get_token
-        run: bash scripts/tapdata-deploy/get-token.sh
+        run: bash scripts/common/get-token.sh
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           TAPDATA_ACCESSCODE: ${{ secrets[format('{0}_TAPDATA_ACCESSCODE', env.TARGET_ENV)] }}
@@ -97,10 +97,11 @@ jobs:
           PROJECT: ${{ env.PROJECT }}
           ALL_SECRETS: ${{ toJSON(secrets) }}
 
-      - name: Compress Connection JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh connections
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import Connections via TapData API
         id: import_connections
@@ -128,10 +129,11 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Compress Task JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh tasks
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import Tasks via TapData API
         id: import_tasks
@@ -158,10 +160,11 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Compress API JSON Files
-        run: bash scripts/tapdata-deploy/compress-files.sh apis
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          PROJECT: ${{ env.PROJECT }}
 
       - name: Import APIs via TapData API
         id: import_apis
