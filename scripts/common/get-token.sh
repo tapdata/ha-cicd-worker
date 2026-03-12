@@ -55,8 +55,15 @@ if [[ "${HTTP_CODE}" -ne 200 ]]; then
   exit 1
 fi
 
+# Check response code
+CODE=$(echo "${BODY}" | jq -r '.code // empty')
+if [[ -n "${CODE}" && "${CODE}" != "ok" ]]; then
+  echo "::error::Token API returned code '${CODE}': ${BODY}"
+  exit 1
+fi
+
 # Extract token from response
-TOKEN=$(echo "${BODY}" | jq -r '.id // empty')
+TOKEN=$(echo "${BODY}" | jq -r '.data.id // empty')
 
 if [[ -z "${TOKEN}" ]]; then
   echo "::error::Failed to extract token from response: ${BODY}"
