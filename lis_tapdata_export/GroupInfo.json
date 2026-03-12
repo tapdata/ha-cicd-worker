@@ -1,0 +1,5 @@
+[ {
+  "binaryData" : null,
+  "collectionName" : "GroupInfo",
+  "json" : "{\"id\":\"69b32789dd70420ca660fba1\",\"name\":\"lis\",\"description\":\"\",\"resourceItemList\":[{\"id\":\"69a94fb25ea666daafbff2bd\",\"type\":\"MIGRATE_TASK\"},{\"id\":\"69a9de815ea666daafbff30b\",\"type\":\"SYNC_TASK\"},{\"id\":\"69b18484a0c0e6460120318f\",\"type\":\"MODULE\"},{\"id\":\"69ae6d44f031ea9d091b211d\",\"type\":\"MODULE\"}],\"resetTaskList\":[],\"gitInfo\":{\"repoUrl\":\"https://github.com/ljvv7/ha-cicd-worker.git\",\"branch\":\"main\"},\"createTime\":1773253122978,\"last_updated\":1773253122978}"
+} ]
