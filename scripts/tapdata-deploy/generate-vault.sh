@@ -2,8 +2,14 @@
 # Generate vault.json with connection secrets from GitHub Secrets
 # Required env vars: PROJECT, ALL_SECRETS
 # ALL_SECRETS comes from ${{ toJSON(secrets) }}
-# Naming convention in GitHub Secrets: {CONNECTION_NAME}_HOST, {CONNECTION_NAME}_PORT,
-#                                      {CONNECTION_NAME}_USER, {CONNECTION_NAME}_PASSWORD
+# Naming convention in GitHub Secrets:
+#   preferred: {CONNECTION_NAME}_uri
+#   fallback:  {CONNECTION_NAME}_host, {CONNECTION_NAME}_port,
+#              {CONNECTION_NAME}_user, {CONNECTION_NAME}_password
+# Example:
+#   if mysql_uri exists, vault.json will contain only mysql_uri
+#   otherwise vault.json will contain mysql_host/mysql_port/
+#   mysql_user/mysql_password
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -51,10 +57,22 @@ if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
 fi
 
 # Build vault.json from secrets
-# For each connection name, extract {NAME}_HOST, {NAME}_PORT, {NAME}_USER, {NAME}_PASSWORD
+# For each connection name, prefer {NAME}_uri; if absent, fallback to
+# {NAME}_host, {NAME}_port, {NAME}_user, {NAME}_password
 VAULT_JSON="{}"
 
 for conn_name in "${CONNECTION_NAMES[@]}"; do
+  URI=$(echo "${ALL_SECRETS}" | jq -r --arg k "${conn_name}_uri" '.[$k] // empty')
+
+  if [[ -n "${URI}" ]]; then
+    VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
+      --arg uri_key "${conn_name}_uri" --arg uri_val "${URI}" \
+      '. + {($uri_key): $uri_val}')
+
+    echo "Added secrets for connection: ${conn_name} (using uri)"
+    continue
+  fi
+
   HOST=$(echo "${ALL_SECRETS}" | jq -r --arg k "${conn_name}_host" '.[$k] // empty')
   PORT=$(echo "${ALL_SECRETS}" | jq -r --arg k "${conn_name}_port" '.[$k] // empty')
   USER=$(echo "${ALL_SECRETS}" | jq -r --arg k "${conn_name}_user" '.[$k] // empty')
