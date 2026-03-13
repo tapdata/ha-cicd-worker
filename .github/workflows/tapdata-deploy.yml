@@ -306,3 +306,11 @@ jobs:
           GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
           ROLLBACK_APPROVAL_RESULT: ${{ needs.rollback-approval.result }}
           ROLLBACK_RESULT: ${{ needs.rollback.result }}
+
+      - name: Cleanup Old Deploy Temp Directories
+        if: always()
+        run: bash scripts/common/cleanup-temp-dirs.sh
+        env:
+          BASE_DIR: /tmp
+          DIR_PATTERN: tapdata-deploy*
+          KEEP_COUNT: 5
