@@ -3,6 +3,7 @@
 # Usage: import-resource.sh <resource_type>
 # resource_type: connections | tasks | apis
 # Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TARGET_ENV
+# Optional env vars: ARCHIVE_NAME
 set -euo pipefail
 
 RESOURCE_TYPE="${1:-}"
@@ -75,7 +76,8 @@ else
 fi
 
 # Locate tar archive
-ARCHIVE="${DEPLOY_DIR}/export.tar"
+ARCHIVE_NAME="${ARCHIVE_NAME:-export.tar}"
+ARCHIVE="${DEPLOY_DIR}/${ARCHIVE_NAME}"
 
 if [[ ! -f "${ARCHIVE}" ]]; then
   echo "::error::Archive not found: ${ARCHIVE}"
