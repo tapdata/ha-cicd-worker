@@ -66,6 +66,13 @@ case "${RESOURCE_TYPE}" in
 esac
 
 API_URL="${BASE_URL%/}/${API_PATH}"
+ACCESS_TOKEN_ENCODED=$(jq -nr --arg v "${TAPDATA_TOKEN}" '$v|@uri')
+
+if [[ "${API_URL}" == *\?* ]]; then
+  IMPORT_URL="${API_URL}&access_token=${ACCESS_TOKEN_ENCODED}"
+else
+  IMPORT_URL="${API_URL}?access_token=${ACCESS_TOKEN_ENCODED}"
+fi
 
 # Locate tar archive
 ARCHIVE="${DEPLOY_DIR}/export.tar"
@@ -83,8 +90,7 @@ echo "Archive: ${ARCHIVE}"
 echo "Import mode: ${IMPORT_MODE}"
 
 # Build curl arguments for multipart/form-data upload
-CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${API_URL}" \
-  -H "access_token: ${TAPDATA_TOKEN}" \
+CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${IMPORT_URL}" \
   -F "file=@${ARCHIVE}" \
   -F "importMode=${IMPORT_MODE}")
 
