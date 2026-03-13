@@ -2,6 +2,7 @@
 # Compress all files in export directory into a tar archive
 # Usage: compress-files.sh
 # Required env vars: DEPLOY_DIR, PROJECT
+# Optional env vars: ARCHIVE_NAME
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -29,6 +30,8 @@ fi
 # Create deploy directory
 mkdir -p "${DEPLOY_DIR}"
 
+ARCHIVE_NAME="${ARCHIVE_NAME:-export.tar}"
+
 # Collect all files in export directory
 FILES=()
 while IFS= read -r f; do
@@ -41,8 +44,15 @@ if [[ ${#FILES[@]} -eq 0 ]]; then
 fi
 
 # Create tar archive
-ARCHIVE="${DEPLOY_DIR}/export.tar"
+ARCHIVE="${DEPLOY_DIR}/${ARCHIVE_NAME}"
 tar -cf "${ARCHIVE}" -C "${EXPORT_DIR}" "${FILES[@]/#${EXPORT_DIR}\//}"
+
+VAULT_SOURCE="${EXPORT_DIR}/vault.json"
+VAULT_TARGET="${DEPLOY_DIR}/vault.json"
+if [[ -f "${VAULT_SOURCE}" ]]; then
+  cp "${VAULT_SOURCE}" "${VAULT_TARGET}"
+  echo "Vault copied: ${VAULT_TARGET}"
+fi
 
 echo "Archive created: ${ARCHIVE}"
 echo "Files included: ${#FILES[@]}"

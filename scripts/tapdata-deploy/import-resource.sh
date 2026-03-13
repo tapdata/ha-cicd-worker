@@ -3,6 +3,7 @@
 # Usage: import-resource.sh <resource_type>
 # resource_type: connections | tasks | apis
 # Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TARGET_ENV
+# Optional env vars: ARCHIVE_NAME
 set -euo pipefail
 
 RESOURCE_TYPE="${1:-}"
@@ -66,9 +67,17 @@ case "${RESOURCE_TYPE}" in
 esac
 
 API_URL="${BASE_URL%/}/${API_PATH}"
+ACCESS_TOKEN_ENCODED=$(jq -nr --arg v "${TAPDATA_TOKEN}" '$v|@uri')
+
+if [[ "${API_URL}" == *\?* ]]; then
+  IMPORT_URL="${API_URL}&access_token=${ACCESS_TOKEN_ENCODED}"
+else
+  IMPORT_URL="${API_URL}?access_token=${ACCESS_TOKEN_ENCODED}"
+fi
 
 # Locate tar archive
-ARCHIVE="${DEPLOY_DIR}/export.tar"
+ARCHIVE_NAME="${ARCHIVE_NAME:-export.tar}"
+ARCHIVE="${DEPLOY_DIR}/${ARCHIVE_NAME}"
 
 if [[ ! -f "${ARCHIVE}" ]]; then
   echo "::error::Archive not found: ${ARCHIVE}"
@@ -81,10 +90,10 @@ IMPORT_MODE="${IMPORT_MODE:-REPLACE}"
 
 echo "Archive: ${ARCHIVE}"
 echo "Import mode: ${IMPORT_MODE}"
+echo "Request URL: ${IMPORT_URL}"
 
 # Build curl arguments for multipart/form-data upload
-CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${API_URL}" \
-  -H "access_token: ${TAPDATA_TOKEN}" \
+CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${IMPORT_URL}" \
   -F "file=@${ARCHIVE}" \
   -F "importMode=${IMPORT_MODE}")
 
