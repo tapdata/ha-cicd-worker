@@ -258,7 +258,7 @@ jobs:
     with:
       target_env: ${{ needs.preparation.outputs.target_env || 'dev' }}
       last_stable_tag: ${{ needs.preparation.outputs.last_stable_tag }}
-      project: ${{ env.PROJECT }}
+      project: ${{ inputs.project || 'dmp' }}
     secrets: inherit
 
   # ============================================================
