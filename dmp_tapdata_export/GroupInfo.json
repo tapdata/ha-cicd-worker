@@ -1,1 +1,37 @@
-[{"collectionName":"GroupInfo","json":"{\"id\":\"69b28bb73e856b705511a5f0\",\"name\":\"dmp\",\"description\":\"\",\"resourceItemList\":[{\"id\":\"695498ab35a6fa17173139f7\",\"type\":\"MODULE\"},{\"id\":\"6954a2bc35a6fa1717313ac4\",\"type\":\"MODULE\"},{\"id\":\"688867744819e6751295d10b\",\"type\":\"MIGRATE_TASK\"},{\"id\":\"6886f4664819e67512956d92\",\"type\":\"MIGRATE_TASK\"},{\"id\":\"686f3f930f63593100039250\",\"type\":\"MIGRATE_TASK\"},{\"id\":\"688980fc143e5b4bfd479caa\",\"type\":\"SYNC_TASK\"},{\"id\":\"69a24de6bae5bbcd4aa0d539\",\"type\":\"SYNC_TASK\"}],\"resetTaskList\":[],\"gitInfo\":{\"repoUrl\":\"https://github.com/tapdata/ha-cicd-worker.git\",\"branch\":\"main\"},\"createTime\":1773308736836,\"last_updated\":1773308736836}"}]
+[ {
+  "collectionName" : "GroupInfo",
+  "json" : {
+    "description" : "",
+    "gitInfo" : {
+      "branch" : "main",
+      "repoUrl" : "https://github.com/tapdata/ha-cicd-worker.git"
+    },
+    "name" : "dmp",
+    "resetTaskList" : [ ],
+    "resourceItemList" : [ {
+      "id" : "695498ab35a6fa17173139f7",
+      "name" : "cpi-case",
+      "type" : "MODULE"
+    }, {
+      "id" : "6954a2bc35a6fa1717313ac4",
+      "name" : "cpi-case2",
+      "type" : "MODULE"
+    }, {
+      "id" : "688867744819e6751295d10b",
+      "name" : "CMS (cms_h1a_pgs1) _TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "6886f4664819e67512956d92",
+      "name" : "HPI (pas_vh_pgs1) _TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "686f3f930f63593100039250",
+      "name" : "HKPMI (pas_hkpmi_pgs1) _TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "688980fc143e5b4bfd479caa",
+      "name" : "MDM_CPI_CASE_MODEL",
+      "type" : "SYNC_TASK"
+    } ]
+  }
+} ]
