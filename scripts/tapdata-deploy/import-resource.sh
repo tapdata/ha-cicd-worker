@@ -88,6 +88,7 @@ IMPORT_MODE="${IMPORT_MODE:-REPLACE}"
 
 echo "Archive: ${ARCHIVE}"
 echo "Import mode: ${IMPORT_MODE}"
+echo "Request URL: ${IMPORT_URL}"
 
 # Build curl arguments for multipart/form-data upload
 CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${IMPORT_URL}" \
