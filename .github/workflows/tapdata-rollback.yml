@@ -79,16 +79,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
 
-      - name: Checkout Rollback Tag
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.resolve_tag.outputs.last_stable_tag }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Stop All Tasks
-        run: bash scripts/tapdata-rollback/stop-tasks.sh
+        run: bash scripts/common/stop-tasks.sh
         env:
-          ROLLBACK_DIR: ${{ env.ROLLBACK_DIR }}
           TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
 

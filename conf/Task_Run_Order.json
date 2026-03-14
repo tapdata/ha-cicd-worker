@@ -1,0 +1,30 @@
+{
+  "nodes": [
+    {
+      "name": "CMS (cms_h1a_pgs1) _TO_FDM"
+    },
+    {
+      "name": "HPI (pas_vh_pgs1) _TO_FDM"
+    },
+    {
+      "name": "HKPMI (pas_hkpmi_pgs1) _TO_FDM"
+    },
+    {
+      "name": "MDM_CPI_CASE_MODEL"
+    }
+  ],
+  "edges": [
+    {
+      "source": "CMS (cms_h1a_pgs1) _TO_FDM",
+      "target": "MDM_CPI_CASE_MODEL"
+    },
+    {
+      "source": "HPI (pas_vh_pgs1) _TO_FDM",
+      "target": "MDM_CPI_CASE_MODEL"
+    },
+    {
+      "source": "HKPMI (pas_hkpmi_pgs1) _TO_FDM",
+      "target": "MDM_CPI_CASE_MODEL"
+    }
+  ]
+}
