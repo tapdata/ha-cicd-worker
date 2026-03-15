@@ -8,7 +8,7 @@
     "alarmRules" : [ {
       "equalsFlag" : 1,
       "key" : "TASK_INCREMENT_DELAY",
-      "ms" : 10000,
+      "ms" : 60000,
       "point" : 60,
       "times" : 0
     }, {
@@ -16,12 +16,12 @@
       "key" : "TASK_RETRY_WARN",
       "ms" : 0,
       "point" : 0,
-      "times" : 1
+      "times" : 10
     } ],
     "alarmSettings" : [ {
       "interval" : 300,
       "key" : "TASK_STATUS_ERROR",
-      "notify" : [ "SYSTEM", "EMAIL" ],
+      "notify" : [ "SYSTEM" ],
       "open" : true,
       "sort" : 1,
       "type" : "TASK",
@@ -30,22 +30,22 @@
       "interval" : 300,
       "key" : "TASK_FULL_COMPLETE",
       "notify" : [ "SYSTEM" ],
-      "open" : false,
+      "open" : true,
       "sort" : 3,
       "type" : "TASK",
       "unit" : "SECOND"
     }, {
       "interval" : 300,
       "key" : "TASK_INCREMENT_START",
-      "notify" : [ "SYSTEM", "EMAIL" ],
-      "open" : false,
+      "notify" : [ "SYSTEM" ],
+      "open" : true,
       "sort" : 4,
       "type" : "TASK",
       "unit" : "SECOND"
     }, {
       "interval" : 300,
       "key" : "TASK_INCREMENT_DELAY",
-      "notify" : [ "SYSTEM", "EMAIL" ],
+      "notify" : [ "SYSTEM" ],
       "open" : true,
       "sort" : 6,
       "type" : "TASK",
@@ -53,23 +53,26 @@
     }, {
       "interval" : 300,
       "key" : "TASK_INSPECT_DIFFERENCE",
-      "notify" : [ "SYSTEM", "EMAIL" ],
+      "notify" : [ "SYSTEM" ],
       "open" : true,
       "sort" : 1,
       "type" : "TASK",
       "unit" : "SECOND"
     }, {
-      "interval" : 0,
-      "notify" : [ "SYSTEM", "EMAIL" ],
+      "interval" : 300,
+      "key" : "TASK_RETRY_WARN",
+      "notify" : [ "SYSTEM" ],
       "open" : true,
-      "sort" : 0
+      "sort" : 4,
+      "type" : "TASK",
+      "unit" : "SECOND"
     } ],
     "attrs" : { },
     "autoInspect" : false,
     "blankLog" : false,
     "canOpenInspect" : false,
     "cdctask" : false,
-    "createTime" : 1768803675837,
+    "createTime" : 1773577253163,
     "crontabExpression" : "",
     "crontabExpressionFlag" : false,
     "crontabScheduleMsg" : "",
@@ -136,9 +139,6 @@
           "accessNodeProcessId" : "",
           "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
           "capabilities" : [ {
-            "id" : "source_incremental_update_event_have_before",
-            "type" : 20
-          }, {
             "id" : "execute_command_function",
             "type" : 11
           }, {
@@ -222,7 +222,7 @@
           "connectionName" : "FDM",
           "connectionTags" : [ "schema-free", "Database", "doubleActive" ],
           "connectionType" : "source_and_target",
-          "db_version" : "7.0.16",
+          "db_version" : "8.0.9",
           "pdkHash" : "4335aaa005ec1a74a4e2166bded2962e939ad50239f48b023b884f35b54129a5",
           "pdkType" : "pdk",
           "position" : [ 610, 50 ]
@@ -231,7 +231,7 @@
         "cdcConcurrent" : false,
         "compareIgnoreCase" : false,
         "concurrentReadThreadNumber" : 0,
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "databaseType" : "MongoDB",
         "disabled" : false,
         "dmlPolicy" : {
@@ -492,7 +492,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1768803675859",
+    "editVersion" : "1773484229070",
     "emailReceivers" : [ "ngswr@ha.org.hk", "KHL609@ha.org.hk", "mjp207@ho.ha.org.hk" ],
     "enforceShareCdc" : true,
     "fdmMain" : true,
@@ -515,7 +515,7 @@
     "name" : "CMS (cms_h1a_pgs1) _TO_FDM",
     "normalTask" : true,
     "oldVersionTimezone" : false,
-    "pageVersion" : "1768286020840",
+    "pageVersion" : "1773484226725",
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -554,7 +554,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "transformTaskId" : "688867744819e6751295d10a",
-    "transformUuid" : "1768803675867",
+    "transformUuid" : "1773577253332",
     "transformed" : true,
     "type" : "initial_sync+cdc",
     "writeBatchSize" : 0,
@@ -568,8 +568,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803676896,
-    "databaseId" : "6967136b2902e61eb551dc1e",
+    "createTime" : 1773577254172,
+    "databaseId" : "69b6a40236f7c0a052b3eb61",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -1105,7 +1105,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5cc085cb3a64932741",
+    "id" : "69b6a42636f7c0a052b3f1d7",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -1142,8 +1142,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362875251,
-    "last_updated" : 1768803676896,
+    "lastUpdate" : 1773577226230,
+    "last_updated" : 1773577254599,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_CMSIP_discharge_information",
@@ -1167,21 +1167,21 @@
       "loadCount" : 1,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
-      "loadSchemaField" : false,
+      "loadSchemaField" : true,
       "name" : "CMS",
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "614160c1-39c6-438b-8772-5721a9ce3098",
+      "schemaVersion" : "ebaa25cd-94f4-4686-9848-c21495c89a72",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 1,
-      "testTime" : 1768473227424,
-      "transformed" : true
+      "testTime" : 1773577226211,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "688867744819e6751295d10b",
-    "transformUuid" : "1768362907332",
+    "transformUuid" : "1773577253332",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1191,8 +1191,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803677334,
-    "databaseId" : "69549862aedd5fe4733b3966",
+    "createTime" : 1773577254601,
+    "databaseId" : "69b6a3ed36f7c0a052b3e8fe",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -1750,7 +1750,7 @@
     "findPossibleDataTypes" : {
       "admit_doctor" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "admit_mode" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -1758,47 +1758,53 @@
       },
       "admit_physician" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "admit_team" : {
-        "dataTypes" : [ "NULL", "STRING(5)" ]
+        "dataTypes" : [ "NULL", "STRING(5)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "case_no" : {
-        "dataTypes" : [ "NULL", "STRING(12)" ]
+        "dataTypes" : [ "NULL", "STRING(12)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "create_by" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "discharge_destination" : {
-        "dataTypes" : [ "NULL", "STRING(5)" ]
+        "dataTypes" : [ "NULL", "STRING(5)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "discharge_mode" : {
-        "dataTypes" : [ "NULL", "STRING(1)" ]
+        "dataTypes" : [ "NULL", "STRING(1)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "discharge_physician" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "discharge_team" : {
-        "dataTypes" : [ "NULL", "STRING(5)" ]
+        "dataTypes" : [ "NULL", "STRING(5)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "expected_discharge_date" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "ho_id" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "hospital_code" : {
-        "dataTypes" : [ "NULL", "STRING(3)" ]
+        "dataTypes" : [ "NULL", "STRING(3)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "mo_in_charge_id" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "sick_leave_from_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
@@ -1808,17 +1814,18 @@
       },
       "specialist_ic" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "specialty" : {
-        "dataTypes" : [ "NULL", "STRING(4)" ]
+        "dataTypes" : [ "NULL", "STRING(4)" ],
+        "lastMatchedDataType" : "NULL"
       },
       "timestamp" : {
         "dataTypes" : [ "BINARY" ]
       },
       "update_by" : {
         "dataTypes" : [ "NULL", "STRING(12)" ],
-        "lastMatchedDataType" : "STRING(12)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
@@ -1828,7 +1835,7 @@
     "hasTransformEx" : true,
     "hasUnionIndex" : true,
     "hasUpdateField" : true,
-    "id" : "696dcd5dc085cb3a64932752",
+    "id" : "69b6a42636f7c0a052b3f24c",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -1865,31 +1872,31 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362875251,
-    "last_updated" : 1768803677334,
+    "lastUpdate" : 1773577226230,
+    "last_updated" : 1773577254601,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_CMSIP_discharge_information",
     "nodeId" : "2ac3acf4-b852-4077-98cd-25341c1709ed",
     "original_name" : "FDM_CMSIP_discharge_information",
     "partitionSet" : [ ],
-    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_CMSIP_discharge_information_695497a235a6fa1717313957_688867744819e6751295d10b",
+    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_CMSIP_discharge_information_69b6a3ea51b1bc0ffa3972bc_688867744819e6751295d10b",
     "source" : {
-      "_id" : "695497a235a6fa1717313957",
+      "_id" : "69b6a3ea51b1bc0ffa3972bc",
       "agentTags" : [ ],
       "connection_type" : "source_and_target",
       "createUser" : "admin@admin.com",
       "database_type" : "MongoDB",
       "database_uri" : "mongodb://null/null",
-      "db_version" : "4.4.23",
+      "db_version" : "7.0.30",
       "everLoadSchema" : true,
-      "id" : "695497a235a6fa1717313957",
+      "id" : "69b6a3ea51b1bc0ffa3972bc",
       "kafkaAcks" : "-1",
       "kafkaCompressionType" : "",
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 96,
+      "loadCount" : 15,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -1897,16 +1904,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "8b3dec60-f765-45b0-84ef-86276d64af9a",
+      "schemaVersion" : "e9061fec-1af3-4274-8912-9071c641bb59",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 96,
-      "testTime" : 1768413601145,
-      "transformed" : true
+      "tableCount" : 15,
+      "testTime" : 1773577197483,
+      "transformed" : true,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "688867744819e6751295d10b",
-    "transformUuid" : "1768362907332",
+    "transformUuid" : "1773577253332",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1916,8 +1924,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803676065,
-    "databaseId" : "6967136b2902e61eb551dc1e",
+    "createTime" : 1773577253782,
+    "databaseId" : "69b6a40236f7c0a052b3eb61",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -2453,7 +2461,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5cc085cb3a64932718",
+    "id" : "69b6a42536f7c0a052b3f156",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -2490,8 +2498,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362875251,
-    "last_updated" : 1768803676065,
+    "lastUpdate" : 1773577226230,
+    "last_updated" : 1773577254597,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "discharge_information",
@@ -2515,21 +2523,21 @@
       "loadCount" : 1,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
-      "loadSchemaField" : false,
+      "loadSchemaField" : true,
       "name" : "CMS",
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "614160c1-39c6-438b-8772-5721a9ce3098",
+      "schemaVersion" : "ebaa25cd-94f4-4686-9848-c21495c89a72",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 1,
-      "testTime" : 1768473227424,
-      "transformed" : true
+      "testTime" : 1773577226211,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "688867744819e6751295d10b",
-    "transformUuid" : "1768362907332",
+    "transformUuid" : "1773577253332",
     "username" : "admin@admin.com"
   }
 } ]

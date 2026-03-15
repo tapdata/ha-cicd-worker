@@ -21,11 +21,10 @@
     } ],
     "browserTimezoneOffset" : 0,
     "cdcDuration" : 0,
-    "checkTableThreadNum" : 10,
     "difference_number" : 0,
     "enabled" : true,
     "flowId" : "686f3f930f63593100039250",
-    "id" : "699d7f74594db47ae5c81478",
+    "id" : "69b6a42751b1bc0ffa39732e",
     "inspectDifferenceMode" : "All",
     "inspectMethod" : "field",
     "limit" : {
@@ -33,7 +32,6 @@
     },
     "mode" : "manual",
     "name" : "HKPMI (pas_hkpmi_pgs1) _TO_FDM - 表全字段值校验",
-    "roundingMode" : "HALF_UP",
     "tasks" : [ {
       "fullMatch" : true,
       "script" : "",
@@ -55,7 +53,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -68,7 +66,7 @@
         "sortColumn" : "record_id",
         "table" : "FDM_HKPMI_address_detail"
       },
-      "taskId" : "d71d384c81694d16934b33d0449b9364",
+      "taskId" : "ec5c26f279124279af7590ea755c80c3",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -91,7 +89,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -104,7 +102,7 @@
         "sortColumn" : "record_id",
         "table" : "FDM_HKPMI_address_detail2"
       },
-      "taskId" : "8790bae4512c4ed48ef6af51a8149d8e",
+      "taskId" : "6e9932d3045743739454366391592d92",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -127,7 +125,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -140,7 +138,7 @@
         "sortColumn" : "district_code",
         "table" : "FDM_HKPMI_district"
       },
-      "taskId" : "cd76e2318df04340ba3b6d16b67a1c15",
+      "taskId" : "47afcc0f07a64991b62ec2a8bd24e914",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -163,7 +161,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -176,7 +174,7 @@
         "sortColumn" : "area_code",
         "table" : "FDM_HKPMI_district_area"
       },
-      "taskId" : "1f3efed621b04e0fad13a28d5b0429fb",
+      "taskId" : "2eaeb1850bdb4d8987a2d517c8a76a7b",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -199,7 +197,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -212,7 +210,7 @@
         "sortColumn" : "document_code",
         "table" : "FDM_HKPMI_document_type"
       },
-      "taskId" : "b61de1d8b15b436e972c8b8fe06d1d52",
+      "taskId" : "a6bc00d530c94caab67e5659bd135748",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -235,7 +233,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -248,7 +246,7 @@
         "sortColumn" : "eh_code",
         "table" : "FDM_HKPMI_elderly_home_table"
       },
-      "taskId" : "45c48769e5c14e608677908a1b7c0c13",
+      "taskId" : "1cab8ec9a074477888f5ecb8ca99d3eb",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -271,7 +269,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -284,7 +282,7 @@
         "sortColumn" : "hospital_code,case_no",
         "table" : "FDM_HKPMI_pmi_case"
       },
-      "taskId" : "7a7a967589a54c2bb4ff7a689f9048c9",
+      "taskId" : "a5c34fd5e77e4959996e7813172b39d1",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -307,7 +305,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -320,7 +318,7 @@
         "sortColumn" : "patient_type",
         "table" : "FDM_HKPMI_patient_type"
       },
-      "taskId" : "072332e4edcd4109882478915e783c3c",
+      "taskId" : "b4e73eef3bb54c739f1b4b80aad1f854",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -343,7 +341,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -356,7 +354,7 @@
         "sortColumn" : "patient_key,hospital_code",
         "table" : "FDM_HKPMI_patient_hospital_data"
       },
-      "taskId" : "6b9f92bb05644259a6e761e3f345adc2",
+      "taskId" : "f950b1a551b94dc399f8a4b15c874e42",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -379,7 +377,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -392,7 +390,7 @@
         "sortColumn" : "patient_key",
         "table" : "FDM_HKPMI_patient"
       },
-      "taskId" : "803beb4aafcf4e73a2f9388ce72f4174",
+      "taskId" : "1581db44dbf8493fa3765b49ffb762a6",
       "webScript" : ""
     }, {
       "fullMatch" : true,
@@ -415,7 +413,7 @@
       },
       "target" : {
         "conditions" : [ ],
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "connectionName" : "FDM",
         "customNullSort" : 0,
         "databaseType" : "MongoDB",
@@ -428,7 +426,7 @@
         "sortColumn" : "patient_key,info_type,upd_dtm",
         "table" : "FDM_HKPMI_hkpmi_patient_info_log"
       },
-      "taskId" : "e7a94b2ab9cc46899af460a44f49b1cc",
+      "taskId" : "2d46ad680a714e4a9d86f9d6115d6d3f",
       "webScript" : ""
     } ],
     "timing" : {
