@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# Unpublish all TapData APIs for rollback
-# 1. Query all API ids and tableNames via GET /api/Modules
+# Unpublish TapData APIs for rollback
+# 1. Query API ids and tableNames via GET /api/Modules
 # 2. Unpublish each API via PATCH /api/Modules
 # Required env vars: TAPDATA_TOKEN, TARGET_ENV
+# Optional env vars: API_NAMES (comma separated, if empty unpublishes all APIs)
+# Output: unpublished_api_ids (comma separated, via GITHUB_OUTPUT)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
-echo "=== Unpublishing All APIs ==="
+echo "=== Unpublishing APIs ==="
 
 # Read base URL from env.conf
 BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
@@ -19,13 +21,39 @@ fi
 
 API_BASE="${BASE_URL%/}/api"
 
-# ── Step 1: Query all API ids and tableNames ──
-FILTER=$(jq -n -c '{"fields": {"id": true, "tableName": true}}')
+# ── Step 1: Build filter and query API ids and tableNames ──
+if [[ -n "${API_NAMES:-}" ]]; then
+  echo "Mode: unpublish specified APIs"
+
+  IFS=',' read -ra RAW_APIS <<< "${API_NAMES}"
+  TRIMMED_APIS=()
+  for api in "${RAW_APIS[@]}"; do
+    trimmed=$(echo "${api}" | xargs)
+    if [[ -n "${trimmed}" ]]; then
+      TRIMMED_APIS+=("${trimmed}")
+    fi
+  done
+
+  if [[ ${#TRIMMED_APIS[@]} -eq 0 ]]; then
+    echo "::error::No valid API names provided"
+    exit 1
+  fi
+
+  INQ_ARRAY=$(printf '%s\n' "${TRIMMED_APIS[@]}" | jq -R . | jq -s .)
+  FILTER=$(jq -n -c --argjson inq "${INQ_ARRAY}" '{
+    "fields": {"id": true, "tableName": true},
+    "where": {"name": {"$inq": $inq}}
+  }')
+
+  echo "Querying API IDs for: ${TRIMMED_APIS[*]}"
+else
+  echo "Mode: unpublish all APIs"
+  FILTER=$(jq -n -c '{"fields": {"id": true, "tableName": true}}')
+  echo "Querying all APIs..."
+fi
+
 ENCODED_FILTER=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "${FILTER}")
-
 QUERY_URL="${API_BASE}/Modules?access_token=${TAPDATA_TOKEN}&filter=${ENCODED_FILTER}"
-
-echo "Querying all APIs..."
 
 RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "${QUERY_URL}")
 HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
@@ -40,6 +68,7 @@ API_COUNT=$(echo "${BODY}" | jq '.data.items | length')
 
 if [[ "${API_COUNT}" -eq 0 ]]; then
   echo "No APIs found, skipping unpublish"
+  echo "unpublished_api_ids=" >> "${GITHUB_OUTPUT}"
   echo "=== Unpublish APIs Complete ==="
   exit 0
 fi
@@ -49,9 +78,8 @@ echo "${BODY}" | jq -r '.data.items[] | "  - \(.tableName) (id: \(.id))"'
 
 # ── Step 2: Unpublish each API ──
 PATCH_URL="${API_BASE}/Modules?access_token=${TAPDATA_TOKEN}"
-FAIL_COUNT=0
 
-echo "${BODY}" | jq -c '.data.items[]' | while IFS= read -r item; do
+while IFS= read -r item; do
   API_ID=$(echo "${item}" | jq -r '.id')
   TABLE_NAME=$(echo "${item}" | jq -r '.tableName')
 
@@ -81,7 +109,11 @@ echo "${BODY}" | jq -c '.data.items[]' | while IFS= read -r item; do
   fi
 
   echo "  API '${TABLE_NAME}' unpublished successfully"
-done
+done < <(echo "${BODY}" | jq -c '.data.items[]')
+
+# Output unpublished API IDs
+UNPUBLISHED_IDS=$(echo "${BODY}" | jq -r '[.data.items[].id] | join(",")')
+echo "unpublished_api_ids=${UNPUBLISHED_IDS}" >> "${GITHUB_OUTPUT}"
 
 echo "All ${API_COUNT} API(s) unpublished successfully"
 echo "=== Unpublish APIs Complete ==="
