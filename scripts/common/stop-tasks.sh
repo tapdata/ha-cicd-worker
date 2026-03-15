@@ -6,6 +6,7 @@
 # 2. Batch stop tasks via PUT /api/Task/batchStop
 # Required env vars: TAPDATA_TOKEN, TARGET_ENV
 # Optional env vars: TASK_NAMES (comma separated, if empty stops all tasks)
+# Output: stopped_task_ids (comma separated, via GITHUB_OUTPUT)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -122,6 +123,10 @@ if [[ "${STOP_HTTP_CODE}" -ne 200 ]]; then
   echo "::error::Failed to batch stop tasks: HTTP ${STOP_HTTP_CODE} - ${STOP_BODY}"
   exit 1
 fi
+
+# Output stopped task IDs
+STOPPED_IDS=$(echo "${BODY}" | jq -r '[.data.items[].id] | join(",")')
+echo "stopped_task_ids=${STOPPED_IDS}" >> "${GITHUB_OUTPUT}"
 
 echo "All tasks stopped successfully"
 echo "=== Stop Tasks Complete ==="

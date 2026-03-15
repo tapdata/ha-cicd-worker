@@ -79,25 +79,41 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
 
+      - name: Collect Resource Names
+        id: collect_names
+        run: bash scripts/tapdata-rollback/collect-resource-names.sh
+        env:
+          PROJECT: ${{ env.PROJECT }}
+
       - name: Stop All Tasks
+        id: stop_tasks
         run: bash scripts/common/stop-tasks.sh
         env:
           TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
+          TASK_NAMES: ${{ steps.collect_names.outputs.task_names }}
 
       - name: Unpublish All APIs
+        id: unpublish_apis
         run: bash scripts/tapdata-rollback/unpublish-apis.sh
         env:
-          ROLLBACK_DIR: ${{ env.ROLLBACK_DIR }}
           TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
+          API_NAMES: ${{ steps.collect_names.outputs.api_names }}
 
       - name: Clean All Resources
         run: bash scripts/tapdata-rollback/clean-resources.sh
         env:
-          ROLLBACK_DIR: ${{ env.ROLLBACK_DIR }}
           TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
+          TASK_IDS: ${{ steps.stop_tasks.outputs.stopped_task_ids }}
+          API_IDS: ${{ steps.unpublish_apis.outputs.unpublished_api_ids }}
+
+      - name: Checkout Last Stable Tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve_tag.outputs.last_stable_tag }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Import All Resources
         run: bash scripts/tapdata-rollback/import-resources.sh
