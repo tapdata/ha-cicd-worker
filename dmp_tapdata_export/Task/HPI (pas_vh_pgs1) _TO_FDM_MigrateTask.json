@@ -72,7 +72,7 @@
     "blankLog" : false,
     "canOpenInspect" : false,
     "cdctask" : false,
-    "createTime" : 1768803675711,
+    "createTime" : 1773577253242,
     "crontabExpression" : "",
     "crontabExpressionFlag" : false,
     "dag" : {
@@ -443,10 +443,11 @@
         "cdcConcurrent" : false,
         "compareIgnoreCase" : false,
         "concurrentReadThreadNumber" : 0,
-        "connectionId" : "695497a235a6fa1717313957",
+        "connectionId" : "69b6a3ea51b1bc0ffa3972bc",
         "databaseType" : "MongoDB",
         "disabled" : false,
         "dmlPolicy" : {
+          "deletePolicy" : "ignore_on_nonexists",
           "insertPolicy" : "update_on_exists",
           "updatePolicy" : "ignore_on_nonexists"
         },
@@ -500,7 +501,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1769674799802",
+    "editVersion" : "1773484214203",
     "emailReceivers" : [ "ngswr@ha.org.hk", "KHL609@ha.org.hk", "mjp207@ho.ha.org.hk" ],
     "enforceShareCdc" : true,
     "fdmMain" : true,
@@ -523,7 +524,7 @@
     "name" : "HPI (pas_vh_pgs1) _TO_FDM",
     "normalTask" : true,
     "oldVersionTimezone" : false,
-    "pageVersion" : "1769674152775",
+    "pageVersion" : "1773484211895",
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -562,7 +563,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "transformTaskId" : "6886f4664819e67512956d91",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "transformed" : true,
     "type" : "initial_sync+cdc",
     "writeBatchSize" : 0,
@@ -575,9 +576,9 @@
     "ancestorsName" : "cpi_case",
     "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803677107,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254261,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -1257,7 +1258,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5dc085cb3a6493274a",
+    "id" : "69b6a42636f7c0a052b3f1ef",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -1334,8 +1335,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1768803677107,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254597,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_case",
@@ -1356,7 +1357,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -1364,16 +1365,16 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "7f9305ae-3297-4b63-8f14-6324510d4b45",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768362851051,
-      "transformed" : true
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1382,9 +1383,9 @@
     "ancestorsName" : "cpi_patient",
     "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803677292,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254400,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -2622,7 +2623,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5dc085cb3a64932750",
+    "id" : "69b6a42636f7c0a052b3f20e",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -2695,8 +2696,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1768803677292,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254599,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient",
@@ -2717,7 +2718,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -2725,16 +2726,16 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "7f9305ae-3297-4b63-8f14-6324510d4b45",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768362851051,
-      "transformed" : true
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2743,9 +2744,9 @@
     "ancestorsName" : "cpi_patient_hospital_data",
     "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803677322,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254422,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -2969,7 +2970,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5dc085cb3a64932751",
+    "id" : "69b6a42636f7c0a052b3f211",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -2996,8 +2997,8 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1768803677322,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254601,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient_hospital_data",
@@ -3018,7 +3019,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -3026,16 +3027,16 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "7f9305ae-3297-4b63-8f14-6324510d4b45",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768362851051,
-      "transformed" : true
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3045,8 +3046,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803676558,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createTime" : 1773577254031,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -3726,7 +3727,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5cc085cb3a64932731",
+    "id" : "69b6a42636f7c0a052b3f1aa",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -3803,8 +3804,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1769674800037,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254603,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_case",
@@ -3825,7 +3826,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -3833,17 +3834,16 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "9193147d-6492-410a-bc6b-bed1bb1fa010",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768803953956,
-      "transformed" : true,
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3853,8 +3853,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803676607,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createTime" : 1773577254042,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -5092,7 +5092,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5cc085cb3a64932733",
+    "id" : "69b6a42636f7c0a052b3f1ad",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -5165,8 +5165,8 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1769674800038,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254604,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient",
@@ -5187,7 +5187,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -5195,17 +5195,16 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "9193147d-6492-410a-bc6b-bed1bb1fa010",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768803953956,
-      "transformed" : true,
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
@@ -5215,8 +5214,8 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1768803677091,
-    "databaseId" : "6967134f2902e61eb5518f39",
+    "createTime" : 1773577254250,
+    "databaseId" : "69b6a40236f7c0a052b3eb70",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -5440,7 +5439,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "696dcd5dc085cb3a64932749",
+    "id" : "69b6a42636f7c0a052b3f1ec",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -5467,8 +5466,8 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1768362851074,
-    "last_updated" : 1769674800042,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254605,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient_hospital_data",
@@ -5489,7 +5488,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 4,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -5497,27 +5496,27 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "9193147d-6492-410a-bc6b-bed1bb1fa010",
+      "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 3,
-      "testTime" : 1768803953956,
-      "transformed" : true,
+      "tableCount" : 4,
+      "testTime" : 1773577228888,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
   "collectionName" : "MetadataInstances",
   "json" : {
     "ancestorsName" : "cpi_case",
+    "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803676274,
-    "databaseId" : "69549862aedd5fe4733b3966",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254611,
+    "databaseId" : "69b6a3ed36f7c0a052b3e8fe",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -5528,7 +5527,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "_id",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case__id",
+      "id" : "172c0123-b695-4ab8-868c-7ee58128bfe5_FDM_HPI_cpi_case__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5551,7 +5550,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "hospital_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_hospital_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_hospital_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5575,7 +5574,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "case_no",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_case_no",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_case_no",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5599,7 +5598,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "patient_key",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_patient_key",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_patient_key",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5623,7 +5622,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "case_type",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_case_type",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_case_type",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5647,7 +5646,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "admission_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_admission_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_admission_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5671,7 +5670,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "source_indicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_source_indicator",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5695,7 +5694,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "source_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_source_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5719,7 +5718,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "patient_type",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_patient_type",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_patient_type",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -5743,7 +5742,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "discharge_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_discharge_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_discharge_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5767,7 +5766,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "discharge_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_discharge_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_discharge_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5791,7 +5790,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "destination_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_destination_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_destination_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5815,7 +5814,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "last_specialty",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_specialty",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_last_specialty",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5839,7 +5838,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "last_sub_specialty",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_sub_specialty",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_last_sub_specialty",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5863,7 +5862,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "last_ward_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_ward_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_last_ward_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5887,7 +5886,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "last_ward_class",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_ward_class",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_last_ward_class",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5911,7 +5910,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "last_bed_no",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_bed_no",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_last_bed_no",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5935,7 +5934,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "pp_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_pp_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_pp_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5959,7 +5958,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "access_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_access_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_access_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -5983,7 +5982,7 @@
       "data_type" : "STRING(4)",
       "default_value" : null,
       "field_name" : "status_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_status_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_status_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6007,7 +6006,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "create_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_create_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_create_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6031,7 +6030,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "create_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_create_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_create_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6055,7 +6054,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "update_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_update_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_update_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6079,7 +6078,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "update_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_update_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_update_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6103,7 +6102,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "row_update_datetime",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_row_update_datetime",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_row_update_datetime",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6127,7 +6126,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "movement_count",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_movement_count",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_movement_count",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6151,7 +6150,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "district_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_district_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_district_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6175,7 +6174,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "mrt_indicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_mrt_indicator",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_mrt_indicator",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6199,7 +6198,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "document_flag",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_document_flag",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_case_document_flag",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6226,61 +6225,61 @@
       },
       "case_no" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "case_type" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_by" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "destination_code" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "discharge_code" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "discharge_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "district_code" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "document_flag" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "hospital_code" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "last_bed_no" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "last_specialty" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "last_sub_specialty" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "last_ward_class" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "last_ward_code" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "movement_count" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -6288,38 +6287,38 @@
       },
       "mrt_indicator" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_key" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_type" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "pp_code" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "row_update_datetime" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "source_code" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "source_indicator" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "status_code" : {
         "dataTypes" : [ "NULL", "STRING(4)" ],
-        "lastMatchedDataType" : "STRING(4)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_by" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
@@ -6329,7 +6328,7 @@
     "hasTransformEx" : true,
     "hasUnionIndex" : true,
     "hasUpdateField" : true,
-    "id" : "696dcd5cc085cb3a64932721",
+    "id" : "69b6a42636f7c0a052b3f264",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -6406,31 +6405,31 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1767151714419,
-    "last_updated" : 1768803676274,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254611,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_HPI_cpi_case",
     "nodeId" : "43e920c9-962c-4600-aadb-4b922b7d2af1",
     "original_name" : "FDM_HPI_cpi_case",
     "partitionSet" : [ ],
-    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_case_695497a235a6fa1717313957_6886f4664819e67512956d92",
+    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_case_69b6a3ea51b1bc0ffa3972bc_6886f4664819e67512956d92",
     "source" : {
-      "_id" : "695497a235a6fa1717313957",
+      "_id" : "69b6a3ea51b1bc0ffa3972bc",
       "agentTags" : [ ],
       "connection_type" : "source_and_target",
       "createUser" : "admin@admin.com",
       "database_type" : "MongoDB",
       "database_uri" : "mongodb://null/null",
-      "db_version" : "4.4.23",
+      "db_version" : "7.0.30",
       "everLoadSchema" : true,
-      "id" : "695497a235a6fa1717313957",
+      "id" : "69b6a3ea51b1bc0ffa3972bc",
       "kafkaAcks" : "-1",
       "kafkaCompressionType" : "",
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 96,
+      "loadCount" : 15,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -6438,34 +6437,28 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "8b3dec60-f765-45b0-84ef-86276d64af9a",
+      "schemaVersion" : "e9061fec-1af3-4274-8912-9071c641bb59",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 96,
-      "testTime" : 1768413601145,
-      "transformed" : true
+      "tableCount" : 15,
+      "testTime" : 1773577197483,
+      "transformed" : true,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
-    "tableAttr" : {
-      "avgObjSize" : 588,
-      "capped" : false,
-      "ns" : "FDM.FDM_HPI_cpi_case",
-      "shard" : { },
-      "size" : 748876644,
-      "storageSize" : 107823104
-    },
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
   "collectionName" : "MetadataInstances",
   "json" : {
     "ancestorsName" : "cpi_patient",
+    "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803676628,
-    "databaseId" : "69549862aedd5fe4733b3966",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254608,
+    "databaseId" : "69b6a3ed36f7c0a052b3e8fe",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -6476,7 +6469,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "_id",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient__id",
+      "id" : "172c0123-b695-4ab8-868c-7ee58128bfe5_FDM_HPI_cpi_patient__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6499,7 +6492,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "patient_key",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_patient_key",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_patient_key",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6523,7 +6516,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "hkid",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hkid",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hkid",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6547,7 +6540,7 @@
       "data_type" : "STRING(96)",
       "default_value" : null,
       "field_name" : "patient_name",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_patient_name",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_patient_name",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6571,7 +6564,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "sex",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_sex",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_sex",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6595,7 +6588,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode1",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode1",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6619,7 +6612,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode2",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode2",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6643,7 +6636,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode3",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode3",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode3",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6667,7 +6660,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode4",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode4",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode4",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6691,7 +6684,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode5",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode5",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode5",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6715,7 +6708,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "cccode6",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_cccode6",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_cccode6",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6739,7 +6732,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "chi_name",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_chi_name",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_chi_name",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6763,7 +6756,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "dob",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_dob",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_dob",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6787,7 +6780,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "exact_dob_flag",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_exact_dob_flag",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_exact_dob_flag",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6811,7 +6804,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "marital_status",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_marital_status",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_marital_status",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6835,7 +6828,7 @@
       "data_type" : "STRING(4)",
       "default_value" : null,
       "field_name" : "race",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_race",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_race",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -6859,7 +6852,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "other_doc_no",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_other_doc_no",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_other_doc_no",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6883,7 +6876,7 @@
       "data_type" : "STRING(40)",
       "default_value" : null,
       "field_name" : "reference",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_reference",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_reference",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6907,7 +6900,7 @@
       "data_type" : "STRING(94)",
       "default_value" : null,
       "field_name" : "building",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_building",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_building",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6931,7 +6924,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "room",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_room",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_room",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6955,7 +6948,7 @@
       "data_type" : "STRING(4)",
       "default_value" : null,
       "field_name" : "floor",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_floor",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_floor",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -6979,7 +6972,7 @@
       "data_type" : "STRING(4)",
       "default_value" : null,
       "field_name" : "block",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_block",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_block",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7003,7 +6996,7 @@
       "data_type" : "STRING(10)",
       "default_value" : null,
       "field_name" : "district",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_district",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_district",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7027,7 +7020,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "religion",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_religion",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_religion",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7051,7 +7044,7 @@
       "data_type" : "STRING(20)",
       "default_value" : null,
       "field_name" : "phone1",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_phone1",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_phone1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7075,7 +7068,7 @@
       "data_type" : "STRING(20)",
       "default_value" : null,
       "field_name" : "phone2",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_phone2",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_phone2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7099,7 +7092,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "address_indicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_address_indicator",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_address_indicator",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7123,7 +7116,7 @@
       "data_type" : "STRING(20)",
       "default_value" : null,
       "field_name" : "mobile_phone",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_mobile_phone",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_mobile_phone",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7147,7 +7140,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "sms_language",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_sms_language",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_sms_language",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7171,7 +7164,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "death_indicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_death_indicator",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_death_indicator",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7195,7 +7188,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "death_date",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_death_date",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_death_date",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7219,7 +7212,7 @@
       "data_type" : "STRING(8)",
       "default_value" : null,
       "field_name" : "death_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_death_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_death_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7243,7 +7236,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "card_holder",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_card_holder",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_card_holder",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7267,7 +7260,7 @@
       "data_type" : "INT32",
       "default_value" : 2147483647,
       "field_name" : "access_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_access_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_access_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7292,7 +7285,7 @@
       "data_type" : "INT32",
       "default_value" : 0,
       "field_name" : "security",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_security",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_security",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7317,7 +7310,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "patient_no",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_patient_no",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_patient_no",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7341,7 +7334,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "create_hospital",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_create_hospital",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_create_hospital",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7365,7 +7358,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "create_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_create_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_create_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7389,7 +7382,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "create_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_create_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_create_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7413,7 +7406,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "update_hospital",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_update_hospital",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_update_hospital",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7437,7 +7430,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "update_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_update_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_update_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7461,7 +7454,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "update_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_update_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_update_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7485,7 +7478,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "rep_clusters",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_rep_clusters",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_rep_clusters",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7509,7 +7502,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "init_hospital",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_init_hospital",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_init_hospital",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7533,7 +7526,7 @@
       "data_type" : "INT32",
       "default_value" : null,
       "field_name" : "init_source",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_init_source",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_init_source",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7557,7 +7550,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "row_update_datetime",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_row_update_datetime",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_row_update_datetime",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7581,7 +7574,7 @@
       "data_type" : "INT32",
       "default_value" : 1,
       "field_name" : "rep_hosp1",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_rep_hosp1",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_rep_hosp1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7606,7 +7599,7 @@
       "data_type" : "INT32",
       "default_value" : 0,
       "field_name" : "rep_hosp2",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_rep_hosp2",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_rep_hosp2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7631,7 +7624,7 @@
       "data_type" : "INT32",
       "default_value" : 0,
       "field_name" : "rep_clinic1",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_rep_clinic1",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_rep_clinic1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7656,7 +7649,7 @@
       "data_type" : "INT32",
       "default_value" : 0,
       "field_name" : "rep_clinic2",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_rep_clinic2",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_rep_clinic2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -7681,7 +7674,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "body_category",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_body_category",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_body_category",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7705,7 +7698,7 @@
       "data_type" : "STRING(2)",
       "default_value" : null,
       "field_name" : "hkic_symbol",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hkic_symbol",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hkic_symbol",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -7729,19 +7722,19 @@
       },
       "address_indicator" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "block" : {
         "dataTypes" : [ "NULL", "STRING(4)" ],
-        "lastMatchedDataType" : "STRING(4)"
+        "lastMatchedDataType" : "NULL"
       },
       "body_category" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "building" : {
         "dataTypes" : [ "NULL", "STRING(94)" ],
-        "lastMatchedDataType" : "STRING(94)"
+        "lastMatchedDataType" : "NULL"
       },
       "card_holder" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -7749,76 +7742,76 @@
       },
       "cccode1" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "cccode2" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "cccode3" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "cccode4" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "cccode5" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "cccode6" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "chi_name" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_by" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "create_hospital" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "death_code" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "death_date" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "death_indicator" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "district" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "dob" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "exact_dob_flag" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "floor" : {
         "dataTypes" : [ "NULL", "STRING(4)" ],
-        "lastMatchedDataType" : "STRING(4)"
+        "lastMatchedDataType" : "NULL"
       },
       "hkic_symbol" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "hkid" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "init_hospital" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -7830,23 +7823,23 @@
       },
       "marital_status" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "mobile_phone" : {
         "dataTypes" : [ "NULL", "STRING(20)" ],
-        "lastMatchedDataType" : "STRING(20)"
+        "lastMatchedDataType" : "NULL"
       },
       "other_doc_no" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_key" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_name" : {
         "dataTypes" : [ "NULL", "STRING(96)" ],
-        "lastMatchedDataType" : "STRING(96)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_no" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -7854,23 +7847,23 @@
       },
       "phone1" : {
         "dataTypes" : [ "NULL", "STRING(20)" ],
-        "lastMatchedDataType" : "STRING(20)"
+        "lastMatchedDataType" : "NULL"
       },
       "phone2" : {
         "dataTypes" : [ "NULL", "STRING(20)" ],
-        "lastMatchedDataType" : "STRING(20)"
+        "lastMatchedDataType" : "NULL"
       },
       "race" : {
         "dataTypes" : [ "NULL", "STRING(4)" ],
-        "lastMatchedDataType" : "STRING(4)"
+        "lastMatchedDataType" : "NULL"
       },
       "reference" : {
         "dataTypes" : [ "NULL", "STRING(40)" ],
-        "lastMatchedDataType" : "STRING(40)"
+        "lastMatchedDataType" : "NULL"
       },
       "religion" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "rep_clinic1" : {
         "dataTypes" : [ "DECIMAL128", "DOUBLE", "INT64", "INT32" ],
@@ -7894,7 +7887,7 @@
       },
       "room" : {
         "dataTypes" : [ "NULL", "STRING(10)" ],
-        "lastMatchedDataType" : "STRING(10)"
+        "lastMatchedDataType" : "NULL"
       },
       "row_update_datetime" : {
         "dataTypes" : [ "DATE_TIME" ]
@@ -7905,29 +7898,29 @@
       },
       "sex" : {
         "dataTypes" : [ "NULL", "STRING(2)" ],
-        "lastMatchedDataType" : "STRING(2)"
+        "lastMatchedDataType" : "NULL"
       },
       "sms_language" : {
         "dataTypes" : [ "NULL", "STRING(8)" ],
-        "lastMatchedDataType" : "STRING(8)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_by" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "update_hospital" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       }
     },
     "hasPrimaryKey" : false,
     "hasTransformEx" : true,
     "hasUnionIndex" : true,
     "hasUpdateField" : true,
-    "id" : "696dcd5cc085cb3a64932734",
+    "id" : "69b6a42636f7c0a052b3f262",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -8000,31 +7993,31 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1767151714419,
-    "last_updated" : 1768803676628,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254608,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_HPI_cpi_patient",
     "nodeId" : "43e920c9-962c-4600-aadb-4b922b7d2af1",
     "original_name" : "FDM_HPI_cpi_patient",
     "partitionSet" : [ ],
-    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_patient_695497a235a6fa1717313957_6886f4664819e67512956d92",
+    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_patient_69b6a3ea51b1bc0ffa3972bc_6886f4664819e67512956d92",
     "source" : {
-      "_id" : "695497a235a6fa1717313957",
+      "_id" : "69b6a3ea51b1bc0ffa3972bc",
       "agentTags" : [ ],
       "connection_type" : "source_and_target",
       "createUser" : "admin@admin.com",
       "database_type" : "MongoDB",
       "database_uri" : "mongodb://null/null",
-      "db_version" : "4.4.23",
+      "db_version" : "7.0.30",
       "everLoadSchema" : true,
-      "id" : "695497a235a6fa1717313957",
+      "id" : "69b6a3ea51b1bc0ffa3972bc",
       "kafkaAcks" : "-1",
       "kafkaCompressionType" : "",
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 96,
+      "loadCount" : 15,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -8032,34 +8025,28 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "8b3dec60-f765-45b0-84ef-86276d64af9a",
+      "schemaVersion" : "e9061fec-1af3-4274-8912-9071c641bb59",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 96,
-      "testTime" : 1768413601145,
-      "transformed" : true
+      "tableCount" : 15,
+      "testTime" : 1773577197483,
+      "transformed" : true,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
-    "tableAttr" : {
-      "avgObjSize" : 790,
-      "capped" : false,
-      "ns" : "FDM.FDM_HPI_cpi_patient",
-      "shard" : { },
-      "size" : 158097290,
-      "storageSize" : 23674880
-    },
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 }, {
   "collectionName" : "MetadataInstances",
   "json" : {
     "ancestorsName" : "cpi_patient_hospital_data",
+    "comment" : "",
     "constraints" : [ ],
-    "createSource" : "auto",
-    "createTime" : 1768803676764,
-    "databaseId" : "69549862aedd5fe4733b3966",
+    "createSource" : "job_analyze",
+    "createTime" : 1773577254610,
+    "databaseId" : "69b6a3ed36f7c0a052b3e8fe",
     "dev_version" : 1,
     "fields" : [ {
       "autoincrement" : "NO",
@@ -8070,7 +8057,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "_id",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data__id",
+      "id" : "172c0123-b695-4ab8-868c-7ee58128bfe5_FDM_HPI_cpi_patient_hospital_data__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8093,7 +8080,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "patient_key",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_patient_key",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_patient_key",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -8117,7 +8104,7 @@
       "data_type" : "STRING(6)",
       "default_value" : null,
       "field_name" : "hospital_code",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_hospital_code",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_hospital_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -8141,7 +8128,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "mrn",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_mrn",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_mrn",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -8165,7 +8152,7 @@
       "data_type" : "STRING(510)",
       "default_value" : null,
       "field_name" : "remark",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_remark",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_remark",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8189,7 +8176,7 @@
       "data_type" : "STRING(16)",
       "default_value" : null,
       "field_name" : "create_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_create_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_create_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8213,7 +8200,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "create_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_create_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_create_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
@@ -8237,7 +8224,7 @@
       "data_type" : "STRING(24)",
       "default_value" : null,
       "field_name" : "update_by",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_update_by",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_update_by",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8261,7 +8248,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "update_dtm",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_update_dtm",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_update_dtm",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8285,7 +8272,7 @@
       "data_type" : "DATE_TIME",
       "default_value" : null,
       "field_name" : "row_update_datetime",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data_row_update_datetime",
+      "id" : "6967134e35bb3bfc3cf38f9c_cpi_patient_hospital_data_row_update_datetime",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -8305,33 +8292,33 @@
     "findPossibleDataTypes" : {
       "create_by" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "create_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "hospital_code" : {
         "dataTypes" : [ "NULL", "STRING(6)" ],
-        "lastMatchedDataType" : "STRING(6)"
+        "lastMatchedDataType" : "NULL"
       },
       "mrn" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "patient_key" : {
         "dataTypes" : [ "NULL", "STRING(16)" ],
-        "lastMatchedDataType" : "STRING(16)"
+        "lastMatchedDataType" : "NULL"
       },
       "remark" : {
         "dataTypes" : [ "NULL", "STRING(510)" ],
-        "lastMatchedDataType" : "STRING(510)"
+        "lastMatchedDataType" : "NULL"
       },
       "row_update_datetime" : {
         "dataTypes" : [ "DATE_TIME" ]
       },
       "update_by" : {
         "dataTypes" : [ "NULL", "STRING(24)" ],
-        "lastMatchedDataType" : "STRING(24)"
+        "lastMatchedDataType" : "NULL"
       },
       "update_dtm" : {
         "dataTypes" : [ "DATE_TIME" ]
@@ -8341,7 +8328,7 @@
     "hasTransformEx" : true,
     "hasUnionIndex" : true,
     "hasUpdateField" : true,
-    "id" : "696dcd5cc085cb3a6493273b",
+    "id" : "69b6a42636f7c0a052b3f263",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -8368,31 +8355,31 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1767151714419,
-    "last_updated" : 1768803676764,
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577254610,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_HPI_cpi_patient_hospital_data",
     "nodeId" : "43e920c9-962c-4600-aadb-4b922b7d2af1",
     "original_name" : "FDM_HPI_cpi_patient_hospital_data",
     "partitionSet" : [ ],
-    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_patient_hospital_data_695497a235a6fa1717313957_6886f4664819e67512956d92",
+    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_HPI_cpi_patient_hospital_data_69b6a3ea51b1bc0ffa3972bc_6886f4664819e67512956d92",
     "source" : {
-      "_id" : "695497a235a6fa1717313957",
+      "_id" : "69b6a3ea51b1bc0ffa3972bc",
       "agentTags" : [ ],
       "connection_type" : "source_and_target",
       "createUser" : "admin@admin.com",
       "database_type" : "MongoDB",
       "database_uri" : "mongodb://null/null",
-      "db_version" : "4.4.23",
+      "db_version" : "7.0.30",
       "everLoadSchema" : true,
-      "id" : "695497a235a6fa1717313957",
+      "id" : "69b6a3ea51b1bc0ffa3972bc",
       "kafkaAcks" : "-1",
       "kafkaCompressionType" : "",
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 96,
+      "loadCount" : 15,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -8400,24 +8387,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "8b3dec60-f765-45b0-84ef-86276d64af9a",
+      "schemaVersion" : "e9061fec-1af3-4274-8912-9071c641bb59",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 96,
-      "testTime" : 1768413601145,
-      "transformed" : true
+      "tableCount" : 15,
+      "testTime" : 1773577197483,
+      "transformed" : true,
+      "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
-    "tableAttr" : {
-      "avgObjSize" : 216,
-      "capped" : false,
-      "ns" : "FDM.FDM_HPI_cpi_patient_hospital_data",
-      "shard" : { },
-      "size" : 78738637,
-      "storageSize" : 12361728
-    },
     "taskId" : "6886f4664819e67512956d92",
-    "transformUuid" : "1769674799829",
+    "transformUuid" : "1773577253413",
     "username" : "admin@admin.com"
   }
 } ]

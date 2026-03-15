@@ -6,11 +6,8 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='FDM', connection_type='source_and_target', retry=0, status='ready', tableCount=17, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
+    "alarmInfo" : "DataSourceConnectionDto{name='FDM', connection_type='source_and_target', retry=0, status='ready', tableCount=15, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
-      "id" : "source_incremental_update_event_have_before",
-      "type" : 20
-    }, {
       "id" : "execute_command_function",
       "type" : 11
     }, {
@@ -100,10 +97,10 @@
       "ssl" : false
     },
     "connection_type" : "source_and_target",
-    "createTime" : 1768803675243,
+    "createTime" : 1773577194857,
     "database_type" : "MongoDB",
     "database_uri" : "mongodb://null/null",
-    "db_version" : "8.0.9",
+    "db_version" : "7.0.30",
     "definitionBuildNumber" : "null",
     "definitionGroup" : "io.tapdata",
     "definitionPdkAPIVersion" : "2.0.6-SNAPSHOT",
@@ -113,7 +110,7 @@
     "definitionVersion" : "1.0-SNAPSHOT",
     "everLoadSchema" : true,
     "heartbeatEnable" : false,
-    "id" : "695497a235a6fa1717313957",
+    "id" : "69b6a3ea51b1bc0ffa3972bc",
     "isInit" : false,
     "kafkaAcks" : "-1",
     "kafkaBatchSize" : 0,
@@ -136,10 +133,10 @@
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
     "lastStatus" : "ready",
-    "lastUpdate" : 1773390641609,
-    "last_updated" : 1768803675243,
+    "lastUpdate" : 1773511200981,
+    "last_updated" : 1773577218632,
     "loadAllTables" : true,
-    "loadCount" : 17,
+    "loadCount" : 15,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
     "name" : "FDM",
@@ -149,13 +146,12 @@
     "plain_password" : "",
     "project" : "",
     "retry" : 0,
-    "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "96f332bb-30ae-4000-9e55-b168ac9e7562",
+    "schemaVersion" : "e9061fec-1af3-4274-8912-9071c641bb59",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "status" : "ready",
     "submit" : true,
-    "tableCount" : 17
+    "tableCount" : 15
   }
 } ]

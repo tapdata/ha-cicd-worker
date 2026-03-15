@@ -6,7 +6,7 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='HPI', connection_type='source_and_target', retry=0, status='ready', tableCount=3, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
+    "alarmInfo" : "DataSourceConnectionDto{name='HPI', connection_type='source_and_target', retry=0, status='ready', tableCount=4, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
       "id" : "count_raw_command_function",
       "type" : 11
@@ -166,10 +166,10 @@
       "timezone" : ""
     },
     "connection_type" : "source_and_target",
-    "createTime" : 1768803675321,
+    "createTime" : 1773577218731,
     "dataSourceMonitor" : false,
     "database_type" : "PostgreSQL",
-    "datasourceInstanceTag" : "192.168.1.184:25432",
+    "datasourceInstanceTag" : "113.98.206.142:25432",
     "definitionBuildNumber" : "null",
     "definitionGroup" : "io.tapdata",
     "definitionPdkAPIVersion" : "2.0.5-SNAPSHOT",
@@ -201,14 +201,14 @@
     "kafkaProducerRequestTimeout" : 0,
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
-    "lastStatus" : "ready",
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1768803675321,
+    "lastStatus" : "invalid",
+    "lastUpdate" : 1773577228900,
+    "last_updated" : 1773577218731,
     "loadAllTables" : true,
-    "loadCount" : 3,
+    "loadCount" : 4,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
-    "multiConnectionInstanceId" : "b3a358f75fd89cec750cc6012ebf6798",
+    "multiConnectionInstanceId" : "25ac0f9cee336054297445ffed0cc032",
     "name" : "HPI",
     "namespace" : [ "hpi" ],
     "openTableExcludeFilter" : false,
@@ -219,11 +219,11 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "9488eb45-7356-4b4b-ac93-b9947b3f3f21",
-    "shareCDCExternalStorageId" : "696dccf3c085cb3a6493261e",
+    "schemaVersion" : "50bbfe0f-fbd7-44cf-b4b3-bb399764d44f",
+    "shareCDCExternalStorageId" : "69b6a36436f7c0a052b3dc93",
     "shareCdcEnable" : true,
     "status" : "ready",
     "submit" : true,
-    "tableCount" : 3
+    "tableCount" : 4
   }
 } ]

@@ -9,14 +9,6 @@
     "name" : "dmp",
     "resetTaskList" : [ ],
     "resourceItemList" : [ {
-      "id" : "695498ab35a6fa17173139f7",
-      "name" : "cpi-case",
-      "type" : "MODULE"
-    }, {
-      "id" : "6954a2bc35a6fa1717313ac4",
-      "name" : "cpi-case2",
-      "type" : "MODULE"
-    }, {
       "id" : "688867744819e6751295d10b",
       "name" : "CMS (cms_h1a_pgs1) _TO_FDM",
       "type" : "MIGRATE_TASK"
@@ -32,6 +24,18 @@
       "id" : "688980fc143e5b4bfd479caa",
       "name" : "MDM_CPI_CASE_MODEL",
       "type" : "SYNC_TASK"
+    }, {
+      "id" : "69b53e7a6e48129a6ded816e",
+      "name" : "cpi-case",
+      "type" : "MODULE"
+    }, {
+      "id" : "69b53e886e48129a6ded816f",
+      "name" : "cpi-case2",
+      "type" : "MODULE"
+    }, {
+      "id" : "69b5511136ddc7ee8d699312",
+      "name" : "cpi-case3",
+      "type" : "MODULE"
     } ]
   }
 } ]
