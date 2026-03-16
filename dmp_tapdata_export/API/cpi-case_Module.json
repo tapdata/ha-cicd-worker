@@ -1317,7 +1317,7 @@
     "prefix" : "cpi-case",
     "readConcern" : "",
     "readPreference" : "",
-    "status" : "pending",
+    "status" : "active",
     "tableName" : "MDM_HPI_cpi_case"
   }
 } ]
