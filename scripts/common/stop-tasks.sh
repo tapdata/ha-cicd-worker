@@ -7,6 +7,7 @@
 # Required env vars: TAPDATA_TOKEN, TARGET_ENV
 # Optional env vars: TASK_NAMES (comma separated, if empty stops all tasks)
 # Output: stopped_task_ids (comma separated, via GITHUB_OUTPUT)
+#         stopped_tasks_file (path to JSON file with id, attrs and status, via GITHUB_OUTPUT)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -47,7 +48,7 @@ if [[ -n "${TASK_NAMES:-}" ]]; then
 
   # Build filter with name condition
   FILTER=$(jq -n -c --argjson inq "${INQ_ARRAY}" '{
-    "fields": {"id": true, "name": true},
+    "fields": {"id": true, "name": true, "attrs": true, "status": true},
     "where": {"name": {"$inq": $inq}}
   }')
 
@@ -57,7 +58,7 @@ else
   echo "Mode: stop all tasks"
 
   FILTER=$(jq -n -c '{
-    "fields": {"id": true, "name": true}
+    "fields": {"id": true, "name": true, "attrs": true, "status": true}
   }')
 
   echo "Querying all task IDs..."
@@ -87,7 +88,7 @@ if [[ "${TASK_COUNT}" -eq 0 ]]; then
 fi
 
 echo "Found ${TASK_COUNT} task(s):"
-echo "${BODY}" | jq -r '.data.items[] | "  - \(.name) (id: \(.id))"'
+echo "${BODY}" | jq -r '.data.items[] | "  - \(.name) (id: \(.id), status: \(.status))"'
 
 # In rebuild mode, verify all requested tasks were found
 if [[ -n "${TASK_NAMES:-}" ]]; then
@@ -100,33 +101,49 @@ if [[ -n "${TASK_NAMES:-}" ]]; then
   done
 fi
 
-# ── Step 3: Batch stop tasks via PUT /api/Task/batchStop ──
-# Build query string with multiple taskIds params
-TASK_IDS_PARAMS=""
-while IFS= read -r tid; do
-  if [[ -n "${TASK_IDS_PARAMS}" ]]; then
-    TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${tid}"
-  else
-    TASK_IDS_PARAMS="taskIds=${tid}"
+# ── Step 3: Batch stop only running tasks via PUT /api/Task/batchStop ──
+RUNNING_IDS=$(echo "${BODY}" | jq -r '[.data.items[] | select(.status == "running") | .id] | join("\n")')
+RUNNING_COUNT=$(echo "${BODY}" | jq '[.data.items[] | select(.status == "running")] | length')
+
+if [[ "${RUNNING_COUNT}" -eq 0 ]]; then
+  echo "No running tasks found, skipping batch stop"
+else
+  # Build query string with multiple taskIds params
+  TASK_IDS_PARAMS=""
+  while IFS= read -r tid; do
+    if [[ -z "${tid}" ]]; then continue; fi
+    if [[ -n "${TASK_IDS_PARAMS}" ]]; then
+      TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${tid}"
+    else
+      TASK_IDS_PARAMS="taskIds=${tid}"
+    fi
+  done <<< "${RUNNING_IDS}"
+
+  STOP_URL="${API_BASE}/Task/batchStop?${TASK_IDS_PARAMS}&access_token=${TAPDATA_TOKEN}"
+
+  echo "Batch stopping ${RUNNING_COUNT} running task(s)..."
+
+  STOP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${STOP_URL}")
+  STOP_HTTP_CODE=$(echo "${STOP_RESPONSE}" | tail -n1)
+  STOP_BODY=$(echo "${STOP_RESPONSE}" | sed '$d')
+
+  if [[ "${STOP_HTTP_CODE}" -ne 200 ]]; then
+    echo "::error::Failed to batch stop tasks: HTTP ${STOP_HTTP_CODE} - ${STOP_BODY}"
+    exit 1
   fi
-done < <(echo "${BODY}" | jq -r '.data.items[].id')
 
-STOP_URL="${API_BASE}/Task/batchStop?${TASK_IDS_PARAMS}&access_token=${TAPDATA_TOKEN}"
-
-echo "Batch stopping ${TASK_COUNT} task(s)..."
-
-STOP_RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${STOP_URL}")
-STOP_HTTP_CODE=$(echo "${STOP_RESPONSE}" | tail -n1)
-STOP_BODY=$(echo "${STOP_RESPONSE}" | sed '$d')
-
-if [[ "${STOP_HTTP_CODE}" -ne 200 ]]; then
-  echo "::error::Failed to batch stop tasks: HTTP ${STOP_HTTP_CODE} - ${STOP_BODY}"
-  exit 1
+  echo "Running tasks stopped successfully"
 fi
 
-# Output stopped task IDs
+# Output all task IDs (not just running ones)
 STOPPED_IDS=$(echo "${BODY}" | jq -r '[.data.items[].id] | join(",")')
 echo "stopped_task_ids=${STOPPED_IDS}" >> "${GITHUB_OUTPUT}"
+
+# Save id, attrs and status to a temporary JSON file
+STOPPED_TASKS_FILE="/tmp/stopped-tasks-${GITHUB_RUN_ID:-$$}.json"
+echo "${BODY}" | jq '[.data.items[] | {id, attrs, status}]' > "${STOPPED_TASKS_FILE}"
+echo "Stopped tasks file: ${STOPPED_TASKS_FILE}"
+echo "stopped_tasks_file=${STOPPED_TASKS_FILE}" >> "${GITHUB_OUTPUT}"
 
 echo "All tasks stopped successfully"
 echo "=== Stop Tasks Complete ==="

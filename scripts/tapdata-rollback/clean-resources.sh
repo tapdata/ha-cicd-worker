@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Clean TapData resources (tasks, APIs) for rollback
-# 1. Batch delete tasks via DELETE /api/Task/batchDelete
+# 1. Read task IDs from STOPPED_TASKS_FILE and batch delete via DELETE /api/Task/batchDelete
 # 2. Delete each API via DELETE /api/Modules/{id}
 # Required env vars: TAPDATA_TOKEN, TARGET_ENV
-# Optional env vars: TASK_IDS (comma separated), API_IDS (comma separated)
+# Optional env vars: STOPPED_TASKS_FILE (path to JSON file with task id/attrs/status), API_IDS (comma separated)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,25 +20,26 @@ fi
 
 API_BASE="${BASE_URL%/}/api"
 
-# ── Step 1: Batch delete tasks ──
-if [[ -n "${TASK_IDS:-}" ]]; then
-  echo "Deleting tasks..."
+# ── Step 1: Batch delete tasks from stopped tasks file ──
+if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
+  TASK_COUNT=$(jq 'length' "${STOPPED_TASKS_FILE}")
 
-  IFS=',' read -ra TID_ARRAY <<< "${TASK_IDS}"
-  TASK_IDS_PARAMS=""
-  for tid in "${TID_ARRAY[@]}"; do
-    tid=$(echo "${tid}" | xargs)
-    if [[ -z "${tid}" ]]; then
-      continue
-    fi
-    if [[ -n "${TASK_IDS_PARAMS}" ]]; then
-      TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${tid}"
-    else
-      TASK_IDS_PARAMS="taskIds=${tid}"
-    fi
-  done
+  if [[ "${TASK_COUNT}" -eq 0 ]]; then
+    echo "No tasks in stopped tasks file, skipping task deletion"
+  else
+    echo "Deleting ${TASK_COUNT} task(s) from ${STOPPED_TASKS_FILE}..."
+    jq -r '.[] | "  - id: \(.id), status: \(.status)"' "${STOPPED_TASKS_FILE}"
 
-  if [[ -n "${TASK_IDS_PARAMS}" ]]; then
+    TASK_IDS_PARAMS=""
+    while IFS= read -r tid; do
+      if [[ -z "${tid}" ]]; then continue; fi
+      if [[ -n "${TASK_IDS_PARAMS}" ]]; then
+        TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${tid}"
+      else
+        TASK_IDS_PARAMS="taskIds=${tid}"
+      fi
+    done < <(jq -r '.[].id' "${STOPPED_TASKS_FILE}")
+
     DELETE_TASK_URL="${API_BASE}/Task/batchDelete?${TASK_IDS_PARAMS}&access_token=${TAPDATA_TOKEN}"
 
     RESPONSE=$(curl -s -w "\n%{http_code}" -X DELETE "${DELETE_TASK_URL}")
@@ -50,10 +51,10 @@ if [[ -n "${TASK_IDS:-}" ]]; then
       exit 1
     fi
 
-    echo "Tasks deleted successfully (${#TID_ARRAY[@]} task(s))"
+    echo "Tasks deleted successfully (${TASK_COUNT} task(s))"
   fi
 else
-  echo "No task IDs provided, skipping task deletion"
+  echo "No stopped tasks file provided or file not found, skipping task deletion"
 fi
 
 # ── Step 2: Delete APIs one by one ──

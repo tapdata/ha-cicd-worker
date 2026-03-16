@@ -3,8 +3,7 @@
 # Required env vars: DEPLOY_DIR, DEPLOYMENT_REF, TARGET_ENV, PROJECT,
 #   GITHUB_ACTOR, LAST_STABLE_TAG,
 #   CHANGED_CONNECTIONS, CHANGED_TASKS, CHANGED_APIS, CHANGED_GROUP_INFO,
-#   PREPARATION_RESULT, CONNECTIONS_RESULT, TASKS_RESULT, APIS_RESULT, GROUP_INFO_RESULT,
-#   ROLLBACK_RESULT
+#   PREPARATION_RESULT, CONNECTIONS_RESULT, TASKS_RESULT, APIS_RESULT, GROUP_INFO_RESULT
 set -euo pipefail
 
 echo "=== Generating Deployment Report ==="
@@ -16,29 +15,6 @@ if [[ "${CONNECTIONS_RESULT}" == "success" && "${TASKS_RESULT}" == "success" && 
   OVERALL_RESULT="SUCCESS"
 else
   OVERALL_RESULT="FAILURE"
-fi
-
-# --- Rollback info ---
-APPROVAL_RESULT="${ROLLBACK_APPROVAL_RESULT:-skipped}"
-
-if [[ "${APPROVAL_RESULT}" == "skipped" ]]; then
-  ROLLBACK_TRIGGERED="No"
-  ROLLBACK_APPROVAL="Not required"
-  ROLLBACK_STATUS="-"
-elif [[ "${APPROVAL_RESULT}" == "cancelled" ]]; then
-  ROLLBACK_TRIGGERED="Yes (rejected)"
-  ROLLBACK_APPROVAL="Rejected"
-  ROLLBACK_STATUS="Cancelled"
-else
-  ROLLBACK_TRIGGERED="Yes"
-  ROLLBACK_APPROVAL="Approved"
-  if [[ "${ROLLBACK_RESULT}" == "success" ]]; then
-    ROLLBACK_STATUS="SUCCESS"
-  elif [[ "${ROLLBACK_RESULT}" == "skipped" ]]; then
-    ROLLBACK_STATUS="Skipped"
-  else
-    ROLLBACK_STATUS="FAILURE"
-  fi
 fi
 
 # --- Count changes from import responses ---
@@ -120,14 +96,6 @@ cat > "${REPORT_FILE}" <<EOF
 | Deploy Tasks | ${TASKS_RESULT} |
 | Deploy APIs | ${APIS_RESULT} |
 | Deploy Group Info | ${GROUP_INFO_RESULT} |
-
-### Rollback
-
-| Item | Value |
-| --- | --- |
-| Rollback Triggered | ${ROLLBACK_TRIGGERED} |
-| Rollback Approval | ${ROLLBACK_APPROVAL} |
-| Rollback Result | ${ROLLBACK_STATUS} |
 EOF
 
 echo "Report saved to ${REPORT_FILE}"

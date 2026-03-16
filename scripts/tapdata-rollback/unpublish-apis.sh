@@ -5,6 +5,7 @@
 # Required env vars: TAPDATA_TOKEN, TARGET_ENV
 # Optional env vars: API_NAMES (comma separated, if empty unpublishes all APIs)
 # Output: unpublished_api_ids (comma separated, via GITHUB_OUTPUT)
+#         unpublished_apis_file (path to JSON file with id, status, tableName, via GITHUB_OUTPUT)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -41,14 +42,14 @@ if [[ -n "${API_NAMES:-}" ]]; then
 
   INQ_ARRAY=$(printf '%s\n' "${TRIMMED_APIS[@]}" | jq -R . | jq -s .)
   FILTER=$(jq -n -c --argjson inq "${INQ_ARRAY}" '{
-    "fields": {"id": true, "tableName": true},
+    "fields": {"id": true, "tableName": true, "status": true},
     "where": {"name": {"$inq": $inq}}
   }')
 
   echo "Querying API IDs for: ${TRIMMED_APIS[*]}"
 else
   echo "Mode: unpublish all APIs"
-  FILTER=$(jq -n -c '{"fields": {"id": true, "tableName": true}}')
+  FILTER=$(jq -n -c '{"fields": {"id": true, "tableName": true, "status": true}}')
   echo "Querying all APIs..."
 fi
 
@@ -74,46 +75,60 @@ if [[ "${API_COUNT}" -eq 0 ]]; then
 fi
 
 echo "Found ${API_COUNT} API(s):"
-echo "${BODY}" | jq -r '.data.items[] | "  - \(.tableName) (id: \(.id))"'
+echo "${BODY}" | jq -r '.data.items[] | "  - \(.tableName) (id: \(.id), status: \(.status))"'
 
-# ── Step 2: Unpublish each API ──
-PATCH_URL="${API_BASE}/Modules?access_token=${TAPDATA_TOKEN}"
+# ── Step 2: Unpublish only active APIs ──
+ACTIVE_COUNT=$(echo "${BODY}" | jq '[.data.items[] | select(.status == "active")] | length')
 
-while IFS= read -r item; do
-  API_ID=$(echo "${item}" | jq -r '.id')
-  TABLE_NAME=$(echo "${item}" | jq -r '.tableName')
+if [[ "${ACTIVE_COUNT}" -eq 0 ]]; then
+  echo "No active APIs found, skipping unpublish"
+else
+  echo "Unpublishing ${ACTIVE_COUNT} active API(s)..."
+  PATCH_URL="${API_BASE}/Modules?access_token=${TAPDATA_TOKEN}"
 
-  echo "Unpublishing API: ${TABLE_NAME} (id: ${API_ID})..."
+  while IFS= read -r item; do
+    API_ID=$(echo "${item}" | jq -r '.id')
+    TABLE_NAME=$(echo "${item}" | jq -r '.tableName')
 
-  PAYLOAD=$(jq -n -c \
-    --arg id "${API_ID}" \
-    --arg tableName "${TABLE_NAME}" \
-    '{id: $id, tableName: $tableName, status: "pending"}')
+    echo "Unpublishing API: ${TABLE_NAME} (id: ${API_ID})..."
 
-  PATCH_RESPONSE=$(curl -s -w "\n%{http_code}" -X PATCH "${PATCH_URL}" \
-    -H "Content-Type: application/json" \
-    -d "${PAYLOAD}")
+    PAYLOAD=$(jq -n -c \
+      --arg id "${API_ID}" \
+      --arg tableName "${TABLE_NAME}" \
+      '{id: $id, tableName: $tableName, status: "pending"}')
 
-  PATCH_HTTP_CODE=$(echo "${PATCH_RESPONSE}" | tail -n1)
-  PATCH_BODY=$(echo "${PATCH_RESPONSE}" | sed '$d')
+    PATCH_RESPONSE=$(curl -s -w "\n%{http_code}" -X PATCH "${PATCH_URL}" \
+      -H "Content-Type: application/json" \
+      -d "${PAYLOAD}")
 
-  if [[ "${PATCH_HTTP_CODE}" -ne 200 ]]; then
-    echo "::error::Failed to unpublish API '${TABLE_NAME}': HTTP ${PATCH_HTTP_CODE} - ${PATCH_BODY}"
-    exit 1
-  fi
+    PATCH_HTTP_CODE=$(echo "${PATCH_RESPONSE}" | tail -n1)
+    PATCH_BODY=$(echo "${PATCH_RESPONSE}" | sed '$d')
 
-  RESP_CODE=$(echo "${PATCH_BODY}" | jq -r '.code // empty')
-  if [[ "${RESP_CODE}" != "ok" ]]; then
-    echo "::error::Failed to unpublish API '${TABLE_NAME}': response code '${RESP_CODE}' - ${PATCH_BODY}"
-    exit 1
-  fi
+    if [[ "${PATCH_HTTP_CODE}" -ne 200 ]]; then
+      echo "::error::Failed to unpublish API '${TABLE_NAME}': HTTP ${PATCH_HTTP_CODE} - ${PATCH_BODY}"
+      exit 1
+    fi
 
-  echo "  API '${TABLE_NAME}' unpublished successfully"
-done < <(echo "${BODY}" | jq -c '.data.items[]')
+    RESP_CODE=$(echo "${PATCH_BODY}" | jq -r '.code // empty')
+    if [[ "${RESP_CODE}" != "ok" ]]; then
+      echo "::error::Failed to unpublish API '${TABLE_NAME}': response code '${RESP_CODE}' - ${PATCH_BODY}"
+      exit 1
+    fi
 
-# Output unpublished API IDs
+    echo "  API '${TABLE_NAME}' unpublished successfully"
+  done < <(echo "${BODY}" | jq -c '.data.items[] | select(.status == "active")')
+
+  echo "All ${ACTIVE_COUNT} active API(s) unpublished successfully"
+fi
+
+# Output all API IDs
 UNPUBLISHED_IDS=$(echo "${BODY}" | jq -r '[.data.items[].id] | join(",")')
 echo "unpublished_api_ids=${UNPUBLISHED_IDS}" >> "${GITHUB_OUTPUT}"
 
-echo "All ${API_COUNT} API(s) unpublished successfully"
+# Save id, status, tableName to a temporary JSON file
+UNPUBLISHED_APIS_FILE="/tmp/unpublished-apis-${GITHUB_RUN_ID:-$$}.json"
+echo "${BODY}" | jq '[.data.items[] | {id, status, tableName}]' > "${UNPUBLISHED_APIS_FILE}"
+echo "Unpublished APIs file: ${UNPUBLISHED_APIS_FILE}"
+echo "unpublished_apis_file=${UNPUBLISHED_APIS_FILE}" >> "${GITHUB_OUTPUT}"
+
 echo "=== Unpublish APIs Complete ==="
