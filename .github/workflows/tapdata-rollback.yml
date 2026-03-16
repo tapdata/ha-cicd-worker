@@ -46,10 +46,18 @@ env:
   PROJECT: ${{ inputs.project }}
 
 jobs:
-  rollback:
-    name: Rollback
+  # ============================================================
+  # Job 1: Preparation Phase
+  # ============================================================
+  preparation:
+    name: Preparation Phase
     runs-on: self-hosted
-    timeout-minutes: 60
+    timeout-minutes: 5
+    outputs:
+      tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
+      last_stable_tag: ${{ steps.resolve_tag.outputs.last_stable_tag }}
+      task_names: ${{ steps.collect_names.outputs.task_names }}
+      api_names: ${{ steps.collect_names.outputs.api_names }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -85,46 +93,167 @@ jobs:
         env:
           PROJECT: ${{ env.PROJECT }}
 
+  # ============================================================
+  # Job 2: Stop and Clean Resources
+  # ============================================================
+  stop-and-clean:
+    name: Stop and Clean Resources
+    runs-on: self-hosted
+    timeout-minutes: 30
+    needs: preparation
+    outputs:
+      stopped_tasks_file: ${{ steps.stop_tasks.outputs.stopped_tasks_file }}
+      unpublished_apis_file: ${{ steps.unpublish_apis.outputs.unpublished_apis_file }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Stop All Tasks
         id: stop_tasks
         run: bash scripts/common/stop-tasks.sh
         env:
-          TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
-          TASK_NAMES: ${{ steps.collect_names.outputs.task_names }}
+          TASK_NAMES: ${{ needs.preparation.outputs.task_names }}
 
       - name: Unpublish All APIs
         id: unpublish_apis
         run: bash scripts/tapdata-rollback/unpublish-apis.sh
         env:
-          TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
-          API_NAMES: ${{ steps.collect_names.outputs.api_names }}
+          API_NAMES: ${{ needs.preparation.outputs.api_names }}
 
       - name: Clean All Resources
         run: bash scripts/tapdata-rollback/clean-resources.sh
         env:
-          TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
-          TASK_IDS: ${{ steps.stop_tasks.outputs.stopped_task_ids }}
+          STOPPED_TASKS_FILE: ${{ steps.stop_tasks.outputs.stopped_tasks_file }}
           API_IDS: ${{ steps.unpublish_apis.outputs.unpublished_api_ids }}
 
+  # ============================================================
+  # Job 3: Import and Activate Resources
+  # ============================================================
+  import-and-activate:
+    name: Import and Activate Resources
+    runs-on: self-hosted
+    timeout-minutes: 30
+    needs: [preparation, stop-and-clean]
+    steps:
       - name: Checkout Last Stable Tag
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.resolve_tag.outputs.last_stable_tag }}
+          ref: ${{ needs.preparation.outputs.last_stable_tag }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Import All Resources
-        run: bash scripts/tapdata-rollback/import-resources.sh
+      - name: Generate vault.json with Connection Secrets
+        run: bash scripts/tapdata-deploy/generate-vault.sh
         env:
-          ROLLBACK_DIR: ${{ env.ROLLBACK_DIR }}
-          TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
+          PROJECT: ${{ env.PROJECT }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+
+      - name: Compress Connections
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: connections-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Connections
+        run: bash scripts/common/import-resource.sh connections
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: connections-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ inputs.target_env }}
+
+      - name: Compress Tasks
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Tasks
+        run: bash scripts/common/import-resource.sh tasks
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TARGET_ENV: ${{ inputs.target_env }}
+
+      - name: Compress APIs
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import APIs
+        run: bash scripts/common/import-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.ROLLBACK_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
 
       - name: Start Tasks and Publish APIs
         run: bash scripts/tapdata-rollback/start-and-publish.sh
         env:
-          ROLLBACK_DIR: ${{ env.ROLLBACK_DIR }}
-          TAPDATA_TOKEN: ${{ steps.get_token.outputs.tapdata_token }}
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ inputs.target_env }}
+          STOPPED_TASKS_FILE: ${{ needs.stop-and-clean.outputs.stopped_tasks_file }}
+          UNPUBLISHED_APIS_FILE: ${{ needs.stop-and-clean.outputs.unpublished_apis_file }}
+
+
+  # ============================================================
+  # Job 4: Generate Rollback Report
+  # ============================================================
+  generate-report:
+    name: Generate Rollback Report
+    runs-on: self-hosted
+    timeout-minutes: 5
+    if: always()
+    needs: [preparation, stop-and-clean, import-and-activate]
+    steps:
+      - name: Generate Rollback Report
+        run: |
+          REPORT_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          # Determine overall result
+          if [[ "${PREPARATION_RESULT}" == "success" && "${STOP_AND_CLEAN_RESULT}" == "success" && "${IMPORT_AND_ACTIVATE_RESULT}" == "success" ]]; then
+            OVERALL_RESULT="✅ SUCCESS"
+          else
+            OVERALL_RESULT="❌ FAILURE"
+          fi
+
+          cat >> "${GITHUB_STEP_SUMMARY}" <<EOF
+          ## TapData Rollback Report
+
+          | Item | Value |
+          | --- | --- |
+          | Report Time | ${REPORT_TIME} |
+          | Operator | ${GITHUB_ACTOR} |
+          | Target Environment | ${TARGET_ENV} |
+          | Project | ${PROJECT} |
+          | Rollback Tag | ${LAST_STABLE_TAG} |
+          | Overall Result | ${OVERALL_RESULT} |
+
+          ### Job Results
+
+          | Job | Result |
+          | --- | --- |
+          | Preparation | ${PREPARATION_RESULT} |
+          | Stop and Clean | ${STOP_AND_CLEAN_RESULT} |
+          | Import and Activate | ${IMPORT_AND_ACTIVATE_RESULT} |
+          EOF
+        env:
+          TARGET_ENV: ${{ inputs.target_env }}
+          PROJECT: ${{ env.PROJECT }}
+          LAST_STABLE_TAG: ${{ needs.preparation.outputs.last_stable_tag }}
+          PREPARATION_RESULT: ${{ needs.preparation.result }}
+          STOP_AND_CLEAN_RESULT: ${{ needs.stop-and-clean.result }}
+          IMPORT_AND_ACTIVATE_RESULT: ${{ needs.import-and-activate.result }}

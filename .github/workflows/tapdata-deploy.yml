@@ -110,7 +110,7 @@ jobs:
 
       - name: Import Connections via TapData API
         id: import_connections
-        run: bash scripts/tapdata-deploy/import-resource.sh connections
+        run: bash scripts/common/import-resource.sh connections
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
@@ -144,7 +144,7 @@ jobs:
 
       - name: Import Tasks via TapData API
         id: import_tasks
-        run: bash scripts/tapdata-deploy/import-resource.sh tasks
+        run: bash scripts/common/import-resource.sh tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -177,7 +177,7 @@ jobs:
 
       - name: Import APIs via TapData API
         id: import_apis
-        run: bash scripts/tapdata-deploy/import-resource.sh apis
+        run: bash scripts/common/import-resource.sh apis
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
@@ -210,67 +210,12 @@ jobs:
 
       - name: Import Group Info via TapData API
         id: import_group_info
-        run: bash scripts/tapdata-deploy/import-resource.sh groupInfo
+        run: bash scripts/common/import-resource.sh groupInfo
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
-
-  # ============================================================
-  # Fallback: Rollback Approval
-  # ============================================================
-  rollback-approval:
-    name: Rollback Approval
-    runs-on: self-hosted
-    timeout-minutes: 30
-    if: |
-      always() && (
-        needs.deploy-connections.result == 'failure' ||
-        needs.deploy-tasks.result == 'failure' ||
-        needs.deploy-apis.result == 'failure' ||
-        needs.deploy-group-info.result == 'failure'
-      )
-    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info]
-    environment:
-      name: rollback-approval
-    steps:
-      - name: Display Rollback Information
-        run: |
-          echo "============================================"
-          echo "Rollback confirmation required"
-          echo "============================================"
-          echo "Target Environment: ${TARGET_ENV}"
-          echo "Rollback Tag:       ${LAST_STABLE_TAG}"
-          echo "Current Ref:        ${DEPLOYMENT_REF}"
-          echo "============================================"
-          echo "Connections Result:  ${CONNECTIONS_RESULT}"
-          echo "Tasks Result:       ${TASKS_RESULT}"
-          echo "APIs Result:        ${APIS_RESULT}"
-          echo "Group Info Result:  ${GROUP_INFO_RESULT}"
-          echo "============================================"
-        env:
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-          LAST_STABLE_TAG: ${{ needs.preparation.outputs.last_stable_tag }}
-          DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
-          CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
-          TASKS_RESULT: ${{ needs.deploy-tasks.result }}
-          APIS_RESULT: ${{ needs.deploy-apis.result }}
-          GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
-
-  # ============================================================
-  # Fallback: Rollback Execution
-  # ============================================================
-  rollback:
-    name: Rollback Deployment
-    needs: [preparation, rollback-approval]
-    if: always() && needs.rollback-approval.result == 'success'
-    uses: ./.github/workflows/tapdata-rollback.yml
-    with:
-      target_env: ${{ needs.preparation.outputs.target_env || 'dev' }}
-      last_stable_tag: ${{ needs.preparation.outputs.last_stable_tag }}
-      project: ${{ inputs.project || 'dmp' }}
-    secrets: inherit
 
   # ============================================================
   # Job 5: Generate Deployment Report
@@ -280,7 +225,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 5
     if: always()
-    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info, rollback-approval, rollback]
+    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -307,5 +252,4 @@ jobs:
           TASKS_RESULT: ${{ needs.deploy-tasks.result }}
           APIS_RESULT: ${{ needs.deploy-apis.result }}
           GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
-          ROLLBACK_APPROVAL_RESULT: ${{ needs.rollback-approval.result }}
-          ROLLBACK_RESULT: ${{ needs.rollback.result }}
+
