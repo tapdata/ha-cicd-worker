@@ -1370,6 +1370,14 @@
           "operand" : "true",
           "primary_key_position" : 0,
           "type" : "STRING(6)"
+        }, {
+          "field" : "source_indicator",
+          "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
+          "label" : "source_indicator",
+          "op" : "REMOVE",
+          "operand" : "true",
+          "primary_key_position" : 0,
+          "type" : "STRING(2)"
         } ],
         "type" : "field_add_del_processor"
       }, {
@@ -2234,7 +2242,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1773632975570",
+    "editVersion" : "1773637242158",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
     "fileLog" : false,
@@ -2256,7 +2264,7 @@
     "name" : "MDM_CPI_CASE_MODEL - v2",
     "normalTask" : true,
     "oldVersionTimezone" : false,
-    "pageVersion" : "1773632938987",
+    "pageVersion" : "1773637200012",
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -2326,7 +2334,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "transformTaskId" : "69b77da9848f0dec1d695120",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "transformed" : true,
     "type" : "initial_sync+cdc",
     "writeBatchSize" : 0,
@@ -2470,7 +2478,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980172,
+    "last_updated" : 1773637246798,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient_hospital_data",
@@ -2511,7 +2519,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2755,30 +2763,6 @@
       "source" : "auto",
       "sourceDbType" : "MongoDB",
       "tapType" : "{\"bytes\":6,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
-      "columnPosition" : 6,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(2)",
-      "data_type" : "STRING(2)",
-      "default_value" : null,
-      "field_name" : "sourceIndicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : true,
-      "originalDataType" : "STRING(2)",
-      "original_field_name" : "source_indicator",
-      "previousDataType" : "STRING(2)",
-      "previousFieldName" : "sourceIndicator",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":2,\"type\":10}",
       "unique" : false,
       "useDefaultValue" : true
     }, {
@@ -3447,7 +3431,7 @@
     "indices" : [ ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980173,
+    "last_updated" : 1773637246799,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_CMSIP_discharge_information",
@@ -3488,7 +3472,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -4783,7 +4767,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980161,
+    "last_updated" : 1773637246785,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient",
@@ -4824,7 +4808,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -5106,7 +5090,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980162,
+    "last_updated" : 1773637246787,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient",
@@ -5147,7 +5131,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -6491,7 +6475,7 @@
       "storageSize" : 23674880
     },
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -7785,7 +7769,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980159,
+    "last_updated" : 1773637246784,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient",
@@ -7826,7 +7810,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8110,7 +8094,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980171,
+    "last_updated" : 1773637246797,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient_hospital_data",
@@ -8151,7 +8135,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8756,7 +8740,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980164,
+    "last_updated" : 1773637246789,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_CMSIP_discharge_information",
@@ -8797,7 +8781,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -9042,7 +9026,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980165,
+    "last_updated" : 1773637246790,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_CMSIP_discharge_information",
@@ -9083,7 +9067,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -9633,7 +9617,7 @@
       "field_name" : "source_indicator",
       "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
       "is_auto_allowed" : true,
-      "is_deleted" : false,
+      "is_deleted" : true,
       "is_nullable" : true,
       "originalDataType" : "STRING(2)",
       "original_field_name" : "source_indicator",
@@ -9824,7 +9808,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980167,
+    "last_updated" : 1773637246793,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_case",
@@ -9865,7 +9849,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -9951,6 +9935,54 @@
       "useDefaultValue" : true
     }, {
       "autoincrement" : "NO",
+      "columnPosition" : 12,
+      "createSource" : "auto",
+      "dataTypeTemp" : "STRING(8)",
+      "data_type" : "STRING(8)",
+      "default_value" : null,
+      "field_name" : "lastSpecCode",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_specialty",
+      "is_auto_allowed" : true,
+      "is_deleted" : false,
+      "is_nullable" : true,
+      "originalDataType" : "STRING(8)",
+      "original_field_name" : "last_specialty",
+      "previousDataType" : "STRING(8)",
+      "previousFieldName" : "last_specialty",
+      "primaryKey" : false,
+      "primary_key_position" : 0,
+      "pure_data_type" : "character varying",
+      "source" : "auto",
+      "sourceDbType" : "MongoDB",
+      "tapType" : "{\"bytes\":8,\"type\":10}",
+      "unique" : false,
+      "useDefaultValue" : true
+    }, {
+      "autoincrement" : "NO",
+      "columnPosition" : 16,
+      "createSource" : "auto",
+      "dataTypeTemp" : "STRING(10)",
+      "data_type" : "STRING(10)",
+      "default_value" : null,
+      "field_name" : "lastBedNum",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_bed_no",
+      "is_auto_allowed" : true,
+      "is_deleted" : false,
+      "is_nullable" : true,
+      "originalDataType" : "STRING(10)",
+      "original_field_name" : "last_bed_no",
+      "previousDataType" : "STRING(10)",
+      "previousFieldName" : "last_bed_no",
+      "primaryKey" : false,
+      "primary_key_position" : 0,
+      "pure_data_type" : "character varying",
+      "source" : "auto",
+      "sourceDbType" : "MongoDB",
+      "tapType" : "{\"bytes\":10,\"type\":10}",
+      "unique" : false,
+      "useDefaultValue" : true
+    }, {
+      "autoincrement" : "NO",
       "columnPosition" : 5,
       "createSource" : "auto",
       "dataTypeTemp" : "DATE_TIME",
@@ -9999,102 +10031,6 @@
       "useDefaultValue" : true
     }, {
       "autoincrement" : "NO",
-      "columnPosition" : 4,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(2)",
-      "data_type" : "STRING(2)",
-      "default_value" : null,
-      "field_name" : "caseType",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_case_type",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : false,
-      "originalDataType" : "STRING(2)",
-      "original_field_name" : "case_type",
-      "previousDataType" : "STRING(2)",
-      "previousFieldName" : "case_type",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":2,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
-      "columnPosition" : 12,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(8)",
-      "data_type" : "STRING(8)",
-      "default_value" : null,
-      "field_name" : "lastSpecCode",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_specialty",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : true,
-      "originalDataType" : "STRING(8)",
-      "original_field_name" : "last_specialty",
-      "previousDataType" : "STRING(8)",
-      "previousFieldName" : "last_specialty",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":8,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
-      "columnPosition" : 6,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(2)",
-      "data_type" : "STRING(2)",
-      "default_value" : null,
-      "field_name" : "sourceIndicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : true,
-      "originalDataType" : "STRING(2)",
-      "original_field_name" : "source_indicator",
-      "previousDataType" : "STRING(2)",
-      "previousFieldName" : "source_indicator",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":2,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
-      "columnPosition" : 16,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(10)",
-      "data_type" : "STRING(10)",
-      "default_value" : null,
-      "field_name" : "lastBedNum",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_last_bed_no",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : true,
-      "originalDataType" : "STRING(10)",
-      "original_field_name" : "last_bed_no",
-      "previousDataType" : "STRING(10)",
-      "previousFieldName" : "last_bed_no",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":10,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
       "columnPosition" : 1,
       "createSource" : "auto",
       "dataTypeTemp" : "STRING(6)",
@@ -10115,6 +10051,30 @@
       "source" : "auto",
       "sourceDbType" : "MongoDB",
       "tapType" : "{\"bytes\":6,\"type\":10}",
+      "unique" : false,
+      "useDefaultValue" : true
+    }, {
+      "autoincrement" : "NO",
+      "columnPosition" : 4,
+      "createSource" : "auto",
+      "dataTypeTemp" : "STRING(2)",
+      "data_type" : "STRING(2)",
+      "default_value" : null,
+      "field_name" : "caseType",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_case_type",
+      "is_auto_allowed" : true,
+      "is_deleted" : false,
+      "is_nullable" : false,
+      "originalDataType" : "STRING(2)",
+      "original_field_name" : "case_type",
+      "previousDataType" : "STRING(2)",
+      "previousFieldName" : "case_type",
+      "primaryKey" : false,
+      "primary_key_position" : 0,
+      "pure_data_type" : "character varying",
+      "source" : "auto",
+      "sourceDbType" : "MongoDB",
+      "tapType" : "{\"bytes\":2,\"type\":10}",
       "unique" : false,
       "useDefaultValue" : true
     }, {
@@ -10246,7 +10206,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980169,
+    "last_updated" : 1773637246795,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_case",
@@ -10287,7 +10247,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -10295,7 +10255,7 @@
   "json" : {
     "ancestorsName" : "FDM_HPI_cpi_case",
     "constraints" : [ ],
-    "createSource" : "job_analyze",
+    "createSource" : "auto",
     "createTime" : 1773632980174,
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
@@ -10330,7 +10290,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "cpiPatient._id",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient__id",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -10353,7 +10313,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "cpiPatient.hospitalData._id",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_patient_hospital_data__id",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -10375,7 +10335,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "dischargeInformation._id",
-      "id" : "695497a235a6fa1717313957_FDM_CMSIP_discharge_information__id",
+      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -10836,30 +10796,6 @@
       "useDefaultValue" : true
     }, {
       "autoincrement" : "NO",
-      "columnPosition" : 6,
-      "createSource" : "auto",
-      "dataTypeTemp" : "STRING(2)",
-      "data_type" : "STRING(2)",
-      "default_value" : null,
-      "field_name" : "sourceIndicator",
-      "id" : "695497a235a6fa1717313957_FDM_HPI_cpi_case_source_indicator",
-      "is_auto_allowed" : true,
-      "is_deleted" : false,
-      "is_nullable" : true,
-      "originalDataType" : "STRING(2)",
-      "original_field_name" : "source_indicator",
-      "previousDataType" : "STRING(2)",
-      "previousFieldName" : "sourceIndicator",
-      "primaryKey" : false,
-      "primary_key_position" : 0,
-      "pure_data_type" : "character varying",
-      "source" : "auto",
-      "sourceDbType" : "MongoDB",
-      "tapType" : "{\"bytes\":2,\"type\":10}",
-      "unique" : false,
-      "useDefaultValue" : true
-    }, {
-      "autoincrement" : "NO",
       "columnPosition" : 7,
       "createSource" : "auto",
       "dataTypeTemp" : "DATE_TIME",
@@ -11283,7 +11219,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -11566,7 +11502,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980170,
+    "last_updated" : 1773637246796,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_patient_hospital_data",
@@ -11607,7 +11543,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -12397,7 +12333,7 @@
       "storageSize" : 107823104
     },
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -13137,7 +13073,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980166,
+    "last_updated" : 1773637246791,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_HPI_cpi_case",
@@ -13178,7 +13114,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -13511,7 +13447,7 @@
       "storageSize" : 12361728
     },
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -14166,7 +14102,7 @@
       "storageSize" : 6090752
     },
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 }, {
@@ -14770,7 +14706,7 @@
     } ],
     "is_deleted" : false,
     "lastUpdate" : 1773390641609,
-    "last_updated" : 1773632980163,
+    "last_updated" : 1773637246788,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_CMSIP_discharge_information",
@@ -14811,7 +14747,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b77da9848f0dec1d695121",
-    "transformUuid" : "1773632975581",
+    "transformUuid" : "1773637242169",
     "username" : "admin@admin.com"
   }
 } ]

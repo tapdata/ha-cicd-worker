@@ -753,7 +753,6 @@
       "comment" : "",
       "data_type" : "STRING(8)",
       "default_value" : null,
-      "field_alias" : "",
       "field_name" : "lastWardCode",
       "id" : "695497a235a6fa171731395e_MDM_HPI_cpi_case_v2_lastWardCode",
       "is_auto_allowed" : true,
@@ -948,6 +947,7 @@
       "value" : "API"
     } ],
     "name" : "cpi-case-v3",
+    "operationType" : "GET",
     "pathAccessMethod" : "customize",
     "pathSetting" : [ {
       "method" : "POST",
@@ -1759,29 +1759,6 @@
         "useDefaultValue" : true
       }, {
         "autoincrement" : "NO",
-        "columnPosition" : 14,
-        "data_type" : "STRING(8)",
-        "default_value" : null,
-        "field_alias" : "",
-        "field_name" : "lastWardCode",
-        "id" : "695497a235a6fa171731395e_MDM_HPI_cpi_case_v2_lastWardCode",
-        "is_auto_allowed" : true,
-        "is_deleted" : false,
-        "is_nullable" : true,
-        "originalDataType" : "STRING(8)",
-        "original_field_name" : "lastWardCode",
-        "previousDataType" : "STRING(8)",
-        "previousFieldName" : "lastWardCode",
-        "primaryKey" : false,
-        "primary_key_position" : 0,
-        "pure_data_type" : "character varying",
-        "source" : "auto",
-        "sourceDbType" : "MongoDB",
-        "tapType" : "{\"bytes\":8,\"type\":10}",
-        "unique" : false,
-        "useDefaultValue" : true
-      }, {
-        "autoincrement" : "NO",
         "columnPosition" : 15,
         "data_type" : "STRING(2)",
         "default_value" : null,
@@ -1851,6 +1828,7 @@
         "useDefaultValue" : true
       } ],
       "fullCustomQuery" : false,
+      "method" : "GET",
       "name" : "findPage",
       "params" : [ {
         "defaultvalue" : "1",
@@ -1871,6 +1849,7 @@
         "required" : false,
         "type" : "object"
       } ],
+      "path" : "",
       "result" : "Page<Document>",
       "sort" : [ ],
       "type" : "preset",

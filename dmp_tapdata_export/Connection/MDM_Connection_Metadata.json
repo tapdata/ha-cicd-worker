@@ -216,7 +216,7 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "last_updated" : 1773632992666,
+    "last_updated" : 1773639546212,
     "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "_TAP_EXACTLY_ONCE_CACHE",
