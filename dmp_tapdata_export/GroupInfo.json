@@ -32,6 +32,14 @@
       "id" : "688980fc143e5b4bfd479caa",
       "name" : "MDM_CPI_CASE_MODEL",
       "type" : "SYNC_TASK"
+    }, {
+      "id" : "69b77da9848f0dec1d695121",
+      "name" : "MDM_CPI_CASE_MODEL - v2",
+      "type" : "SYNC_TASK"
+    }, {
+      "id" : "69b77dfe848f0dec1d6951c4",
+      "name" : "cpi-case-v3",
+      "type" : "MODULE"
     } ]
   }
 } ]
