@@ -86,7 +86,7 @@ fi
 
 echo "Target environment: ${TARGET_ENV}"
 echo "API URL: ${API_URL}"
-IMPORT_MODE="${IMPORT_MODE:-REPLACE}"
+IMPORT_MODE="${IMPORT_MODE:-replace}"
 
 echo "Archive: ${ARCHIVE}"
 echo "Import mode: ${IMPORT_MODE}"
