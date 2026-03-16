@@ -47,7 +47,6 @@ jobs:
     timeout-minutes: 5
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
-      last_stable_tag: ${{ steps.get_last_stable_tag.outputs.last_stable_tag }}
       target_env: ${{ env.TARGET_ENV }}
     steps:
       - name: Checkout Repository
@@ -70,12 +69,6 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           TAPDATA_ACCESSCODE: ${{ secrets[format('{0}_TAPDATA_ACCESSCODE', env.TARGET_ENV)] }}
 
-      - name: Get Last Stable Tag
-        id: get_last_stable_tag
-        run: bash scripts/tapdata-deploy/get-last-stable-tag.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
 
   # ============================================================
   # Job 2: Deploy Connections
@@ -242,7 +235,6 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           PROJECT: ${{ env.PROJECT }}
           GITHUB_ACTOR: ${{ github.actor }}
-          LAST_STABLE_TAG: ${{ needs.preparation.outputs.last_stable_tag }}
           CHANGED_CONNECTIONS: ${{ needs.deploy-connections.outputs.changed_connections }}
           CHANGED_TASKS: ${{ needs.deploy-tasks.outputs.changed_tasks }}
           CHANGED_APIS: ${{ needs.deploy-apis.outputs.changed_apis }}
