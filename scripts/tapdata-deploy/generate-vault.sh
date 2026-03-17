@@ -3,11 +3,11 @@
 # Required env vars: PROJECT, ALL_SECRETS, ALL_VARS
 # ALL_SECRETS comes from ${{ toJSON(secrets) }}
 # ALL_VARS comes from ${{ toJSON(vars) }}
-# Naming convention:
-#   URI:      {CONNECTION_NAME}_URI in Variables (ALL_VARS)
-#   Password: {CONNECTION_NAME}_PASSWORD in Secrets (ALL_SECRETS)
-# Fallback: if not found, truncate connection name to prefix before the second underscore
-#   e.g. A_B_C_D -> A_B, then retry {PREFIX}_URI and {PREFIX}_PASSWORD
+# Lookup priority (stop at first match):
+#   1. {CONNECTION_NAME}_URI in Secrets
+#   2. {CONNECTION_NAME}_URL in Variables + {CONNECTION_NAME}_PASSWORD in Secrets
+#   3. Truncate name to prefix before the 2nd underscore (e.g. A_B_C_D -> A_B),
+#      then {PREFIX}_URL in Variables + {PREFIX}_PASSWORD in Secrets
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -60,17 +60,16 @@ if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
   exit 0
 fi
 
-# Build vault.json from variables and secrets
-# For each uppercase connection name:
-#   1. Look up {NAME}_URI in Variables, {NAME}_PASSWORD in Secrets
-#   2. If not found, truncate name to prefix before the 2nd underscore (e.g. A_B_C_D -> A_B)
-#      then retry {PREFIX}_URI in Variables, {PREFIX}_PASSWORD in Secrets
+# Build vault.json from secrets and variables
+# Lookup priority (stop at first match):
+#   1. {NAME}_URI in Secrets
+#   2. {NAME}_URL in Variables + {NAME}_PASSWORD in Secrets
+#   3. Truncate to prefix (A_B_C_D -> A_B), then {PREFIX}_URL + {PREFIX}_PASSWORD
 VAULT_JSON="{}"
 
 # Extract prefix before the second underscore: A_B_C_D -> A_B
 get_prefix() {
   local name="$1"
-  # Split by underscore, take first two parts
   local part1 part2
   part1=$(echo "${name}" | cut -d'_' -f1)
   part2=$(echo "${name}" | cut -d'_' -f2)
@@ -83,52 +82,75 @@ get_prefix() {
   fi
 }
 
-# Try to find URI (from Variables) and PASSWORD (from Secrets) for a given lookup key
-# Returns: sets FOUND_URI, FOUND_PASSWORD, FOUND_LOOKUP_KEY
-try_lookup() {
+# Try to find {key}_URI in Secrets
+try_lookup_uri() {
   local lookup_key="$1"
-  FOUND_URI=$(echo "${ALL_VARS}" | jq -r --arg k "${lookup_key}_URI" '.[$k] // empty')
+  echo "${ALL_SECRETS}" | jq -r --arg k "${lookup_key}_URI" '.[$k] // empty'
+}
+
+# Try to find {key}_URL in Variables and {key}_PASSWORD in Secrets
+try_lookup_url_password() {
+  local lookup_key="$1"
+  FOUND_URL=$(echo "${ALL_VARS}" | jq -r --arg k "${lookup_key}_URL" '.[$k] // empty')
   FOUND_PASSWORD=$(echo "${ALL_SECRETS}" | jq -r --arg k "${lookup_key}_PASSWORD" '.[$k] // empty')
-  FOUND_LOOKUP_KEY="${lookup_key}"
 }
 
 for conn_name in "${CONNECTION_NAMES[@]}"; do
+  MATCH_TYPE=""
   FOUND_URI=""
+  FOUND_URL=""
   FOUND_PASSWORD=""
-  FOUND_LOOKUP_KEY=""
+  FOUND_LOOKUP_KEY="${conn_name}"
 
-  # Step 1: Try with full connection name
-  try_lookup "${conn_name}"
+  # Priority 1: {conn_name}_URI in Secrets
+  FOUND_URI=$(try_lookup_uri "${conn_name}")
+  if [[ -n "${FOUND_URI}" ]]; then
+    MATCH_TYPE="uri"
+  fi
 
-  # Step 2: If not found, try with truncated prefix
-  if [[ -z "${FOUND_URI}" || -z "${FOUND_PASSWORD}" ]]; then
-    PREFIX=$(get_prefix "${conn_name}")
-    if [[ -n "${PREFIX}" && "${PREFIX}" != "${conn_name}" ]]; then
-      echo "Retrying lookup with prefix: ${PREFIX} (original: ${conn_name})"
-      try_lookup "${PREFIX}"
+  # Priority 2: {conn_name}_URL in Variables + {conn_name}_PASSWORD in Secrets
+  if [[ -z "${MATCH_TYPE}" ]]; then
+    try_lookup_url_password "${conn_name}"
+    if [[ -n "${FOUND_URL}" && -n "${FOUND_PASSWORD}" ]]; then
+      MATCH_TYPE="url_password"
     fi
   fi
 
-  # Validate results
-  MISSING=()
-  [[ -z "${FOUND_URI}" ]] && MISSING+=("${FOUND_LOOKUP_KEY}_URI (in Variables)")
-  [[ -z "${FOUND_PASSWORD}" ]] && MISSING+=("${FOUND_LOOKUP_KEY}_PASSWORD (in Secrets)")
+  # Priority 3: truncated prefix _URL + _PASSWORD
+  if [[ -z "${MATCH_TYPE}" ]]; then
+    PREFIX=$(get_prefix "${conn_name}")
+    if [[ -n "${PREFIX}" && "${PREFIX}" != "${conn_name}" ]]; then
+      echo "Retrying lookup with prefix: ${PREFIX} (original: ${conn_name})"
+      try_lookup_url_password "${PREFIX}"
+      if [[ -n "${FOUND_URL}" && -n "${FOUND_PASSWORD}" ]]; then
+        MATCH_TYPE="url_password"
+        FOUND_LOOKUP_KEY="${PREFIX}"
+      fi
+    fi
+  fi
 
-  if [[ ${#MISSING[@]} -gt 0 ]]; then
-    echo "::error::Missing config for connection '${conn_name}': ${MISSING[*]}"
+  # Validate: at least one priority must have matched
+  if [[ -z "${MATCH_TYPE}" ]]; then
+    echo "::error::Missing config for connection '${conn_name}': could not find ${conn_name}_URI (Secrets), ${conn_name}_URL (Variables) + ${conn_name}_PASSWORD (Secrets), or truncated prefix equivalents"
     exit 1
   fi
 
   # Add to vault using the original connection name as key prefix
-  VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
-    --arg uri_key "${conn_name}_URI" --arg uri_val "${FOUND_URI}" \
-    --arg pass_key "${conn_name}_PASSWORD" --arg pass_val "${FOUND_PASSWORD}" \
-    '. + {($uri_key): $uri_val, ($pass_key): $pass_val}')
+  if [[ "${MATCH_TYPE}" == "uri" ]]; then
+    VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
+      --arg uri_key "${conn_name}_URI" --arg uri_val "${FOUND_URI}" \
+      '. + {($uri_key): $uri_val}')
+  else
+    VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
+      --arg url_key "${conn_name}_URL" --arg url_val "${FOUND_URL}" \
+      --arg pass_key "${conn_name}_PASSWORD" --arg pass_val "${FOUND_PASSWORD}" \
+      '. + {($url_key): $url_val, ($pass_key): $pass_val}')
+  fi
 
   if [[ "${FOUND_LOOKUP_KEY}" != "${conn_name}" ]]; then
-    echo "Added vault for connection: ${conn_name} (matched via prefix ${FOUND_LOOKUP_KEY})"
+    echo "Added vault for connection: ${conn_name} [${MATCH_TYPE}] (matched via prefix ${FOUND_LOOKUP_KEY})"
   else
-    echo "Added vault for connection: ${conn_name}"
+    echo "Added vault for connection: ${conn_name} [${MATCH_TYPE}]"
   fi
 done
 
