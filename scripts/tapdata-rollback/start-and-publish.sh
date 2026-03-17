@@ -159,40 +159,29 @@ if [[ -n "${UNPUBLISHED_APIS_FILE:-}" && -f "${UNPUBLISHED_APIS_FILE}" ]]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Publishing ${ACTIVE_COUNT} previously-active API(s)..."
     PATCH_URL="${API_BASE}/Modules/batchUpdate?access_token=${TAPDATA_TOKEN}"
 
-    API_INDEX=0
-    while IFS= read -r item; do
-      API_ID=$(echo "${item}" | jq -r '.id')
-      TABLE_NAME=$(echo "${item}" | jq -r '.tableName')
-      API_INDEX=$((API_INDEX + 1))
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] APIs to publish:"
+    echo "${ACTIVE_APIS}" | jq -r '.[] | "  - \(.tableName) (id: \(.id))"'
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Request URL: PATCH ${PATCH_URL}"
 
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] Publishing API: ${TABLE_NAME} (id: ${API_ID})..."
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] Request URL: PATCH ${PATCH_URL}"
+    PAYLOAD=$(echo "${ACTIVE_APIS}" | jq -c '[.[] | {id, status: "active", tableName}]')
 
-      PAYLOAD=$(jq -n -c \
-        --arg id "${API_ID}" \
-        --arg tableName "${TABLE_NAME}" \
-        '{id: $id, status: "active", tableName: $tableName}')
+    RESPONSE=$(curl -s -w "\n%{http_code}" -X PATCH "${PATCH_URL}" \
+      -H "Content-Type: application/json" \
+      -d "${PAYLOAD}")
 
-      RESPONSE=$(curl -s -w "\n%{http_code}" -X PATCH "${PATCH_URL}" \
-        -H "Content-Type: application/json" \
-        -d "${PAYLOAD}")
+    HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+    BODY=$(echo "${RESPONSE}" | sed '$d')
 
-      HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
-      BODY=$(echo "${RESPONSE}" | sed '$d')
+    if [[ "${HTTP_CODE}" -ne 200 ]]; then
+      echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish APIs: HTTP ${HTTP_CODE} - ${BODY}"
+      exit 1
+    fi
 
-      if [[ "${HTTP_CODE}" -ne 200 ]]; then
-        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish API '${TABLE_NAME}': HTTP ${HTTP_CODE} - ${BODY}"
-        exit 1
-      fi
-
-      RESP_CODE=$(echo "${BODY}" | jq -r '.code // empty')
-      if [[ -n "${RESP_CODE}" && "${RESP_CODE}" != "ok" ]]; then
-        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish API '${TABLE_NAME}': response code '${RESP_CODE}' - ${BODY}"
-        exit 1
-      fi
-
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] API '${TABLE_NAME}' published successfully ✓"
-    done < <(echo "${ACTIVE_APIS}" | jq -c '.[]')
+    RESP_CODE=$(echo "${BODY}" | jq -r '.code // empty')
+    if [[ -n "${RESP_CODE}" && "${RESP_CODE}" != "ok" ]]; then
+      echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish APIs: response code '${RESP_CODE}' - ${BODY}"
+      exit 1
+    fi
 
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] All ${ACTIVE_COUNT} API(s) published successfully ✓"
   fi
