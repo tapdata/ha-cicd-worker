@@ -92,29 +92,41 @@ else
   else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found ${#TASK_NAMES[@]} task(s) in export directory"
 
-    # Look up task IDs from stopped tasks file by name
+    # Look up task IDs from stopped tasks file by name, only start previously-running tasks
     TASK_IDS_PARAMS=""
-    MATCHED_COUNT=0
+    START_COUNT=0
+    SKIP_COUNT=0
     for tname in "${TASK_NAMES[@]}"; do
-      TASK_ID=$(jq -r --arg name "${tname}" '.[] | select(.name == $name) | .id' "${STOPPED_TASKS_FILE}")
-      if [[ -n "${TASK_ID}" ]]; then
-        MATCHED_COUNT=$((MATCHED_COUNT + 1))
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   Matched: ${tname} → id: ${TASK_ID}"
+      TASK_RECORD=$(jq -c --arg name "${tname}" '.[] | select(.name == $name)' "${STOPPED_TASKS_FILE}")
+      if [[ -z "${TASK_RECORD}" ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   WARNING: Task '${tname}' not found in stopped tasks file, skipping"
+        continue
+      fi
+
+      TASK_ID=$(echo "${TASK_RECORD}" | jq -r '.id')
+      PREV_STATUS=$(echo "${TASK_RECORD}" | jq -r '.status')
+
+      if [[ "${PREV_STATUS}" == "running" ]]; then
+        START_COUNT=$((START_COUNT + 1))
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   Matched: ${tname} → id: ${TASK_ID} (previous status: ${PREV_STATUS}, will start)"
         if [[ -n "${TASK_IDS_PARAMS}" ]]; then
           TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${TASK_ID}"
         else
           TASK_IDS_PARAMS="taskIds=${TASK_ID}"
         fi
       else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   WARNING: Task '${tname}' not found in stopped tasks file, skipping"
+        SKIP_COUNT=$((SKIP_COUNT + 1))
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   Matched: ${tname} → id: ${TASK_ID} (previous status: ${PREV_STATUS}, skip start)"
       fi
     done
 
-    if [[ "${MATCHED_COUNT}" -eq 0 ]]; then
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] No matching tasks found in stopped tasks file, skipping batch start"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Summary: ${START_COUNT} task(s) to start, ${SKIP_COUNT} task(s) skipped (not previously running)"
+
+    if [[ "${START_COUNT}" -eq 0 ]]; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] No previously-running tasks to start, skipping batch start"
     else
       START_URL="${API_BASE}/task/batchStart?access_token=${TAPDATA_TOKEN}&${TASK_IDS_PARAMS}"
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting ${MATCHED_COUNT} task(s)..."
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting ${START_COUNT} task(s)..."
       echo "[$(date '+%Y-%m-%d %H:%M:%S')] Request URL: PUT ${START_URL}"
 
       RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${START_URL}")
@@ -126,7 +138,7 @@ else
         exit 1
       fi
 
-      echo "[$(date '+%Y-%m-%d %H:%M:%S')] All ${MATCHED_COUNT} task(s) started successfully ✓"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] All ${START_COUNT} task(s) started successfully ✓"
     fi
   fi
 fi
