@@ -43,10 +43,10 @@ jobs:
     name: Preparation Phase
     runs-on: self-hosted
     timeout-minutes: 5
-    environment: ${{ env.TARGET_ENV }}
+    environment: ${{ github.event_name == 'pull_request' && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
-      target_env: ${{ env.TARGET_ENV }}
+      target_env: ${{ github.event_name == 'pull_request' && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
