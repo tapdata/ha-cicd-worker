@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 # Restore task attrs, start previously-running tasks, and publish previously-active APIs after rollback
-# Required env vars: TAPDATA_TOKEN, TARGET_ENV
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: STOPPED_TASKS_FILE (JSON with id, attrs, status)
 #                    UNPUBLISHED_APIS_FILE (JSON with id, status, tableName)
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
-
 echo "=== Starting Tasks and Publishing APIs ==="
 
-# Read base URL from env.conf
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
 
 API_BASE="${BASE_URL%/}/api"
 

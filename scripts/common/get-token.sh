@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 # Get TapData access token via authentication API
-# Required env vars: TARGET_ENV, TAPDATA_ACCESSCODE
+# Required env vars: TAPDATA_BASE_URL, TAPDATA_ACCESSCODE
 # Output: tapdata_token (via GITHUB_OUTPUT)
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
 echo "=== Getting TapData Token ==="
 
 # Validate required env vars
-if [[ -z "${TARGET_ENV:-}" ]]; then
-  echo "::error::TARGET_ENV is not set or empty"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
 
@@ -20,18 +17,7 @@ if [[ -z "${TAPDATA_ACCESSCODE:-}" ]]; then
   exit 1
 fi
 
-# Read base URL from conf/env.conf
-if [[ ! -f "${ENV_CONF}" ]]; then
-  echo "::error::env.conf not found at ${ENV_CONF}"
-  exit 1
-fi
-
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
-  exit 1
-fi
+BASE_URL="${TAPDATA_BASE_URL}"
 
 # Build full API URL
 API_URL="${BASE_URL%/}/api/users/generatetoken"

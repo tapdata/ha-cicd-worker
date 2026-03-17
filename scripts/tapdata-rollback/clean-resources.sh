@@ -2,21 +2,18 @@
 # Clean TapData resources (tasks, APIs) for rollback
 # 1. Read task IDs from STOPPED_TASKS_FILE and batch delete via DELETE /api/Task/batchDelete
 # 2. Delete each API via DELETE /api/Modules/{id}
-# Required env vars: TAPDATA_TOKEN, TARGET_ENV
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: STOPPED_TASKS_FILE (path to JSON file with task id/attrs/status), API_IDS (comma separated)
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
-
 echo "=== Cleaning Resources ==="
 
-# Read base URL from env.conf
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
 
 API_BASE="${BASE_URL%/}/api"
 

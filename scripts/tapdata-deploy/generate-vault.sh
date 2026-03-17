@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Generate vault.json with connection secrets from GitHub Secrets
-# Required env vars: PROJECT, ALL_SECRETS
+# Generate vault.json with connection secrets from GitHub Secrets and Variables
+# Required env vars: PROJECT, ALL_SECRETS, ALL_VARS
 # ALL_SECRETS comes from ${{ toJSON(secrets) }}
-# Naming convention in GitHub Secrets:
-#   preferred: {CONNECTION_NAME}_URI
-#   fallback:  {CONNECTION_NAME}_HOST, {CONNECTION_NAME}_PORT,
-#              {CONNECTION_NAME}_USER, {CONNECTION_NAME}_PASSWORD
-# vault.json keeps the same uppercase keys, for example:
-#   MYSQL_URI
-#   MYSQL_HOST / MYSQL_PORT / MYSQL_USER / MYSQL_PASSWORD
+# ALL_VARS comes from ${{ toJSON(vars) }}
+# Naming convention:
+#   URI:      {CONNECTION_NAME}_URI in Variables (ALL_VARS)
+#   Password: {CONNECTION_NAME}_PASSWORD in Secrets (ALL_SECRETS)
+# Fallback: if not found, truncate connection name to prefix before the second underscore
+#   e.g. A_B_C_D -> A_B, then retry {PREFIX}_URI and {PREFIX}_PASSWORD
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,6 +23,11 @@ fi
 
 if [[ -z "${ALL_SECRETS:-}" ]]; then
   echo "::error::ALL_SECRETS is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${ALL_VARS:-}" ]]; then
+  echo "::error::ALL_VARS is not set or empty"
   exit 1
 fi
 
@@ -56,53 +60,76 @@ if [[ ${#CONNECTION_NAMES[@]} -eq 0 ]]; then
   exit 0
 fi
 
-# Build vault.json from secrets
-# For each uppercase connection name, prefer {NAME}_URI; if absent,
-# fallback to {NAME}_HOST, {NAME}_PORT, {NAME}_USER, {NAME}_PASSWORD
+# Build vault.json from variables and secrets
+# For each uppercase connection name:
+#   1. Look up {NAME}_URI in Variables, {NAME}_PASSWORD in Secrets
+#   2. If not found, truncate name to prefix before the 2nd underscore (e.g. A_B_C_D -> A_B)
+#      then retry {PREFIX}_URI in Variables, {PREFIX}_PASSWORD in Secrets
 VAULT_JSON="{}"
 
+# Extract prefix before the second underscore: A_B_C_D -> A_B
+get_prefix() {
+  local name="$1"
+  # Split by underscore, take first two parts
+  local part1 part2
+  part1=$(echo "${name}" | cut -d'_' -f1)
+  part2=$(echo "${name}" | cut -d'_' -f2)
+  local parts_count
+  parts_count=$(echo "${name}" | awk -F'_' '{print NF}')
+  if [[ "${parts_count}" -ge 3 && -n "${part1}" && -n "${part2}" ]]; then
+    echo "${part1}_${part2}"
+  else
+    echo ""
+  fi
+}
+
+# Try to find URI (from Variables) and PASSWORD (from Secrets) for a given lookup key
+# Returns: sets FOUND_URI, FOUND_PASSWORD, FOUND_LOOKUP_KEY
+try_lookup() {
+  local lookup_key="$1"
+  FOUND_URI=$(echo "${ALL_VARS}" | jq -r --arg k "${lookup_key}_URI" '.[$k] // empty')
+  FOUND_PASSWORD=$(echo "${ALL_SECRETS}" | jq -r --arg k "${lookup_key}_PASSWORD" '.[$k] // empty')
+  FOUND_LOOKUP_KEY="${lookup_key}"
+}
+
 for conn_name in "${CONNECTION_NAMES[@]}"; do
-  URI_SECRET_KEY="${conn_name}_URI"
-  HOST_SECRET_KEY="${conn_name}_HOST"
-  PORT_SECRET_KEY="${conn_name}_PORT"
-  USER_SECRET_KEY="${conn_name}_USER"
-  PASSWORD_SECRET_KEY="${conn_name}_PASSWORD"
+  FOUND_URI=""
+  FOUND_PASSWORD=""
+  FOUND_LOOKUP_KEY=""
 
-  URI=$(echo "${ALL_SECRETS}" | jq -r --arg k "${URI_SECRET_KEY}" '.[$k] // empty')
+  # Step 1: Try with full connection name
+  try_lookup "${conn_name}"
 
-  if [[ -n "${URI}" ]]; then
-    VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
-      --arg uri_key "${URI_SECRET_KEY}" --arg uri_val "${URI}" \
-      '. + {($uri_key): $uri_val}')
-
-    echo "Added secrets for connection: ${conn_name} (using ${URI_SECRET_KEY})"
-    continue
+  # Step 2: If not found, try with truncated prefix
+  if [[ -z "${FOUND_URI}" || -z "${FOUND_PASSWORD}" ]]; then
+    PREFIX=$(get_prefix "${conn_name}")
+    if [[ -n "${PREFIX}" && "${PREFIX}" != "${conn_name}" ]]; then
+      echo "Retrying lookup with prefix: ${PREFIX} (original: ${conn_name})"
+      try_lookup "${PREFIX}"
+    fi
   fi
 
-  HOST=$(echo "${ALL_SECRETS}" | jq -r --arg k "${HOST_SECRET_KEY}" '.[$k] // empty')
-  PORT=$(echo "${ALL_SECRETS}" | jq -r --arg k "${PORT_SECRET_KEY}" '.[$k] // empty')
-  USER=$(echo "${ALL_SECRETS}" | jq -r --arg k "${USER_SECRET_KEY}" '.[$k] // empty')
-  PASSWORD=$(echo "${ALL_SECRETS}" | jq -r --arg k "${PASSWORD_SECRET_KEY}" '.[$k] // empty')
-
+  # Validate results
   MISSING=()
-  [[ -z "${HOST}" ]] && MISSING+=("${HOST_SECRET_KEY}")
-  [[ -z "${PORT}" ]] && MISSING+=("${PORT_SECRET_KEY}")
-  [[ -z "${USER}" ]] && MISSING+=("${USER_SECRET_KEY}")
-  [[ -z "${PASSWORD}" ]] && MISSING+=("${PASSWORD_SECRET_KEY}")
+  [[ -z "${FOUND_URI}" ]] && MISSING+=("${FOUND_LOOKUP_KEY}_URI (in Variables)")
+  [[ -z "${FOUND_PASSWORD}" ]] && MISSING+=("${FOUND_LOOKUP_KEY}_PASSWORD (in Secrets)")
 
   if [[ ${#MISSING[@]} -gt 0 ]]; then
-    echo "::error::Missing secrets for connection '${conn_name}': ${MISSING[*]}"
+    echo "::error::Missing config for connection '${conn_name}': ${MISSING[*]}"
     exit 1
   fi
 
+  # Add to vault using the original connection name as key prefix
   VAULT_JSON=$(echo "${VAULT_JSON}" | jq \
-    --arg host_key "${HOST_SECRET_KEY}" --arg host_val "${HOST}" \
-    --arg port_key "${PORT_SECRET_KEY}" --arg port_val "${PORT}" \
-    --arg user_key "${USER_SECRET_KEY}" --arg user_val "${USER}" \
-    --arg pass_key "${PASSWORD_SECRET_KEY}" --arg pass_val "${PASSWORD}" \
-    '. + {($host_key): $host_val, ($port_key): $port_val, ($user_key): $user_val, ($pass_key): $pass_val}')
+    --arg uri_key "${conn_name}_URI" --arg uri_val "${FOUND_URI}" \
+    --arg pass_key "${conn_name}_PASSWORD" --arg pass_val "${FOUND_PASSWORD}" \
+    '. + {($uri_key): $uri_val, ($pass_key): $pass_val}')
 
-  echo "Added secrets for connection: ${conn_name} (host=${HOST}, port=${PORT}, user=${USER})"
+  if [[ "${FOUND_LOOKUP_KEY}" != "${conn_name}" ]]; then
+    echo "Added vault for connection: ${conn_name} (matched via prefix ${FOUND_LOOKUP_KEY})"
+  else
+    echo "Added vault for connection: ${conn_name}"
+  fi
 done
 
 # Write vault.json

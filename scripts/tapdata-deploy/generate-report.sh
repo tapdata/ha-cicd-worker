@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Collect deployment results and generate deployment report
 # Required env vars: DEPLOY_DIR, DEPLOYMENT_REF, TARGET_ENV, PROJECT,
-#   GITHUB_ACTOR, LAST_STABLE_TAG,
+#   GITHUB_ACTOR,
 #   CHANGED_CONNECTIONS, CHANGED_TASKS, CHANGED_APIS, CHANGED_GROUP_INFO,
 #   PREPARATION_RESULT, CONNECTIONS_RESULT, TASKS_RESULT, APIS_RESULT, GROUP_INFO_RESULT
 set -euo pipefail
@@ -10,11 +10,24 @@ echo "=== Generating Deployment Report ==="
 
 mkdir -p "${DEPLOY_DIR}"
 
+# --- Map job result to emoji ---
+result_icon() {
+  case "${1}" in
+    success)  echo "✅" ;;
+    failure)  echo "❌" ;;
+    cancelled) echo "⚠️" ;;
+    skipped)  echo "⏭️" ;;
+    *)        echo "❓" ;;
+  esac
+}
+
 # --- Determine overall result ---
-if [[ "${CONNECTIONS_RESULT}" == "success" && "${TASKS_RESULT}" == "success" && "${APIS_RESULT}" == "success" && "${GROUP_INFO_RESULT}" == "success" ]]; then
-  OVERALL_RESULT="SUCCESS"
+if [[ "${PREPARATION_RESULT}" == "success" && "${CONNECTIONS_RESULT}" == "success" && "${TASKS_RESULT}" == "success" && "${APIS_RESULT}" == "success" && "${GROUP_INFO_RESULT}" == "success" ]]; then
+  OVERALL_RESULT="✅ SUCCESS"
+elif [[ "${CONNECTIONS_RESULT}" == "failure" || "${TASKS_RESULT}" == "failure" || "${APIS_RESULT}" == "failure" || "${GROUP_INFO_RESULT}" == "failure" ]]; then
+  OVERALL_RESULT="❌ FAILURE"
 else
-  OVERALL_RESULT="FAILURE"
+  OVERALL_RESULT="⚠️ PARTIAL"
 fi
 
 # --- Count changes from import responses ---
@@ -24,10 +37,35 @@ count_changes() {
     echo "0"
     return
   fi
-  # Try to count array length, fallback to 0
   local count
   count=$(echo "${json}" | jq 'if type == "array" then length elif .data? then (.data | if type == "array" then length else 1 end) else 1 end' 2>/dev/null || echo "0")
   echo "${count}"
+}
+
+# --- Format diff details as markdown list ---
+format_diff_details() {
+  local json="${1:-}"
+  local resource_label="${2:-}"
+  if [[ -z "${json}" || "${json}" == "null" ]]; then
+    echo "_No changes_"
+    return
+  fi
+  # Try to extract name/id from each diff item
+  local details
+  details=$(echo "${json}" | jq -r '
+    if type == "array" then
+      .[] | "- \(.name // .id // "(unknown)")"
+    elif type == "object" then
+      "- \(.name // .id // "(unknown)")"
+    else
+      "- (raw: \(.))"
+    end
+  ' 2>/dev/null || echo "- _(unable to parse diff)_")
+  if [[ -z "${details}" ]]; then
+    echo "_No changes_"
+  else
+    echo "${details}"
+  fi
 }
 
 CONNECTIONS_COUNT=$(count_changes "${CHANGED_CONNECTIONS:-}")
@@ -35,24 +73,10 @@ TASKS_COUNT=$(count_changes "${CHANGED_TASKS:-}")
 APIS_COUNT=$(count_changes "${CHANGED_APIS:-}")
 GROUP_INFO_COUNT=$(count_changes "${CHANGED_GROUP_INFO:-}")
 
-# --- Commits between last stable tag and current ref ---
-COMMIT_COUNT=0
-COMMIT_IDS="-"
-
-if [[ -n "${LAST_STABLE_TAG:-}" ]]; then
-  # Check if tag exists in local repo
-  if git rev-parse "${LAST_STABLE_TAG}" >/dev/null 2>&1; then
-    COMMIT_LOG=$(git log --oneline "${LAST_STABLE_TAG}..HEAD" 2>/dev/null || true)
-    if [[ -n "${COMMIT_LOG}" ]]; then
-      COMMIT_COUNT=$(echo "${COMMIT_LOG}" | wc -l | tr -d ' ')
-      COMMIT_IDS=$(git log --format="%H" "${LAST_STABLE_TAG}..HEAD" 2>/dev/null | paste -sd ',' -)
-    fi
-  else
-    COMMIT_IDS="(tag ${LAST_STABLE_TAG} not found locally)"
-  fi
-else
-  COMMIT_IDS="(no stable tag available)"
-fi
+CONNECTIONS_DETAILS=$(format_diff_details "${CHANGED_CONNECTIONS:-}" "Connections")
+TASKS_DETAILS=$(format_diff_details "${CHANGED_TASKS:-}" "Tasks")
+APIS_DETAILS=$(format_diff_details "${CHANGED_APIS:-}" "APIs")
+GROUP_INFO_DETAILS=$(format_diff_details "${CHANGED_GROUP_INFO:-}" "Group Info")
 
 # --- Timestamp ---
 REPORT_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
@@ -70,32 +94,31 @@ cat > "${REPORT_FILE}" <<EOF
 | Target Environment | ${TARGET_ENV} |
 | Project | ${PROJECT} |
 | Deployment Ref | ${DEPLOYMENT_REF} |
-| Last Stable Tag | ${LAST_STABLE_TAG:-"(none)"} |
 | Overall Result | ${OVERALL_RESULT} |
-
-### Change Summary
-
-| Resource | Count |
-| --- | ---: |
-| Connections | ${CONNECTIONS_COUNT} |
-| Tasks | ${TASKS_COUNT} |
-| APIs | ${APIS_COUNT} |
-| Group Info | ${GROUP_INFO_COUNT} |
-
-### Commit Details
-
-- Commit Count: ${COMMIT_COUNT}
-- Commit IDs: ${COMMIT_IDS}
 
 ### Job Results
 
-| Job | Result |
-| --- | --- |
-| Preparation | ${PREPARATION_RESULT} |
-| Deploy Connections | ${CONNECTIONS_RESULT} |
-| Deploy Tasks | ${TASKS_RESULT} |
-| Deploy APIs | ${APIS_RESULT} |
-| Deploy Group Info | ${GROUP_INFO_RESULT} |
+| Job | Result | Status |
+| --- | --- | --- |
+| Preparation | $(result_icon "${PREPARATION_RESULT}") ${PREPARATION_RESULT} | - |
+| Deploy Connections | $(result_icon "${CONNECTIONS_RESULT}") ${CONNECTIONS_RESULT} | ${CONNECTIONS_COUNT} changed |
+| Deploy Tasks | $(result_icon "${TASKS_RESULT}") ${TASKS_RESULT} | ${TASKS_COUNT} changed |
+| Deploy APIs | $(result_icon "${APIS_RESULT}") ${APIS_RESULT} | ${APIS_COUNT} changed |
+| Deploy Group Info | $(result_icon "${GROUP_INFO_RESULT}") ${GROUP_INFO_RESULT} | ${GROUP_INFO_COUNT} changed |
+
+### Deploy Details
+
+#### Connections (${CONNECTIONS_COUNT} changed)
+${CONNECTIONS_DETAILS}
+
+#### Tasks (${TASKS_COUNT} changed)
+${TASKS_DETAILS}
+
+#### APIs (${APIS_COUNT} changed)
+${APIS_DETAILS}
+
+#### Group Info (${GROUP_INFO_COUNT} changed)
+${GROUP_INFO_DETAILS}
 EOF
 
 echo "Report saved to ${REPORT_FILE}"

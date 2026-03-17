@@ -2,13 +2,11 @@
 # Import resource (connections/tasks/apis) via TapData API
 # Usage: import-resource.sh <resource_type>
 # resource_type: connections | tasks | apis
-# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TARGET_ENV
+# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: ARCHIVE_NAME
 set -euo pipefail
 
 RESOURCE_TYPE="${1:-}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
 echo "=== Importing ${RESOURCE_TYPE} via TapData API ==="
 
@@ -28,23 +26,12 @@ if [[ -z "${TAPDATA_TOKEN:-}" ]]; then
   exit 1
 fi
 
-if [[ -z "${TARGET_ENV:-}" ]]; then
-  echo "::error::TARGET_ENV is not set or empty"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
 
-# Read base URL from env.conf
-if [[ ! -f "${ENV_CONF}" ]]; then
-  echo "::error::env.conf not found at ${ENV_CONF}"
-  exit 1
-fi
-
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
-  exit 1
-fi
+BASE_URL="${TAPDATA_BASE_URL}"
 
 # Determine API path based on resource type
 case "${RESOURCE_TYPE}" in
