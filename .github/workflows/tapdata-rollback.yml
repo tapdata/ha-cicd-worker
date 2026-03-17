@@ -84,12 +84,6 @@ jobs:
         env:
           LAST_STABLE_TAG: ${{ inputs.last_stable_tag }}
 
-      - name: Collect Resource Names
-        id: collect_names
-        run: bash scripts/tapdata-rollback/collect-resource-names.sh
-        env:
-          PROJECT: ${{ env.PROJECT }}
-
   # ============================================================
   # Job 2: Stop and Clean Resources
   # ============================================================
