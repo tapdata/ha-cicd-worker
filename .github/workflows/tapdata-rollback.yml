@@ -206,6 +206,7 @@ jobs:
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: ${{ inputs.target_env }}
+          PROJECT: ${{ env.PROJECT }}
           STOPPED_TASKS_FILE: ${{ needs.stop-and-clean.outputs.stopped_tasks_file }}
           UNPUBLISHED_APIS_FILE: ${{ needs.stop-and-clean.outputs.unpublished_apis_file }}
 

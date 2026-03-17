@@ -138,7 +138,7 @@ echo "stopped_task_ids=${STOPPED_IDS}" >> "${GITHUB_OUTPUT}"
 
 # Save id, attrs and status to a temporary JSON file
 STOPPED_TASKS_FILE="/tmp/stopped-tasks-${GITHUB_RUN_ID:-$$}.json"
-echo "${BODY}" | jq '[.data.items[] | {id, attrs, status}]' > "${STOPPED_TASKS_FILE}"
+echo "${BODY}" | jq '[.data.items[] | {id, name, attrs, status}]' > "${STOPPED_TASKS_FILE}"
 echo "Stopped tasks file: ${STOPPED_TASKS_FILE}"
 echo "stopped_tasks_file=${STOPPED_TASKS_FILE}" >> "${GITHUB_OUTPUT}"
 
