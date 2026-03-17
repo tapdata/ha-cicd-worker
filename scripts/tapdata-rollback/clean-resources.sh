@@ -72,11 +72,11 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] No tasks in stopped tasks file, skipping task deletion"
   else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Total ${TASK_COUNT} task(s) to delete:"
-    jq -r '.[] | "  - id: \(.id), status: \(.status)"' "${STOPPED_TASKS_FILE}"
+    jq -r '.[] | "  - \(.name) (id: \(.id), status: \(.status))"' "${STOPPED_TASKS_FILE}"
 
-    # Build the set of all task IDs to delete
+    # Build the pending list with id and name
     PENDING_IDS_FILE="/tmp/pending-task-ids-${GITHUB_RUN_ID:-$$}.json"
-    jq '[.[].id]' "${STOPPED_TASKS_FILE}" > "${PENDING_IDS_FILE}"
+    jq '[.[] | {id, name}]' "${STOPPED_TASKS_FILE}" > "${PENDING_IDS_FILE}"
     DELETED_COUNT=0
     ELAPSED=0
     ROUND=0
@@ -91,10 +91,8 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
       fi
 
       if [[ ${ELAPSED} -ge ${TASK_DELETE_TIMEOUT} ]]; then
-        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Timed out after ${TASK_DELETE_TIMEOUT}s. ${REMAINING} task(s) still not stopped:"
-        jq -r '.[]' "${PENDING_IDS_FILE}" | while read -r tid; do
-          echo "  - ${tid}"
-        done
+        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Timed out after ${TASK_DELETE_TIMEOUT}s. ${REMAINING} task(s) still not deletable:"
+        jq -r '.[] | "  - \(.name) (id: \(.id))"' "${PENDING_IDS_FILE}"
         rm -f "${PENDING_IDS_FILE}"
         exit 1
       fi
@@ -104,9 +102,9 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
       echo "[$(date '+%Y-%m-%d %H:%M:%S')] ── Round ${ROUND} (elapsed: ${ELAPSED}s/${TASK_DELETE_TIMEOUT}s, remaining: ${REMAINING}/${TASK_COUNT}) ──"
 
       # Query current status for all pending tasks
-      INQ_ARRAY=$(jq -c '.' "${PENDING_IDS_FILE}")
+      INQ_ARRAY=$(jq -c '[.[].id]' "${PENDING_IDS_FILE}")
       FILTER=$(jq -n -c --argjson inq "${INQ_ARRAY}" '{
-        "fields": {"id": true, "status": true},
+        "fields": {"id": true, "name": true, "status": true},
         "where": {"id": {"$inq": $inq}}
       }')
       ENCODED_FILTER=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "${FILTER}")
@@ -124,7 +122,7 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
 
       # Log current status of all pending tasks
       echo "[$(date '+%Y-%m-%d %H:%M:%S')] Current task statuses:"
-      echo "${BODY}" | jq -r '.data.items[] | "  - \(.id): \(.status)"'
+      echo "${BODY}" | jq -r '.data.items[] | "  - \(.name) (id: \(.id)): \(.status)"'
 
       # Find tasks that can be deleted (status: stop, error, wait_start)
       DELETABLE_STATUSES='["stop", "error", "wait_start"]'
@@ -134,7 +132,7 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
 
       if [[ "${DELETABLE_COUNT}" -gt 0 ]]; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found ${DELETABLE_COUNT} deletable task(s) (stop/error/wait_start), proceeding to delete:"
-        echo "${BODY}" | jq -r --argjson s "${DELETABLE_STATUSES}" '.data.items[] | select(.status as $st | $s | index($st)) | "  - \(.id) (\(.status))"'
+        echo "${BODY}" | jq -r --argjson s "${DELETABLE_STATUSES}" '.data.items[] | select(.status as $st | $s | index($st)) | "  - \(.name) (id: \(.id), status: \(.status))"'
 
         # Build batchDelete query params
         TASK_IDS_PARAMS=""
@@ -163,7 +161,7 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
 
         # Remove deleted IDs from pending list
         DELETED_IDS_JSON=$(echo "${BODY}" | jq -c --argjson s "${DELETABLE_STATUSES}" '[.data.items[] | select(.status as $st | $s | index($st)) | .id]')
-        jq --argjson deleted "${DELETED_IDS_JSON}" '[.[] | select(. as $id | $deleted | index($id) | not)]' \
+        jq --argjson deleted "${DELETED_IDS_JSON}" '[.[] | select(.id as $id | $deleted | index($id) | not)]' \
           "${PENDING_IDS_FILE}" > "${PENDING_IDS_FILE}.tmp"
         mv "${PENDING_IDS_FILE}.tmp" "${PENDING_IDS_FILE}"
       else

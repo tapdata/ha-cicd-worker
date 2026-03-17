@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Restore task attrs, start previously-running tasks, and publish previously-active APIs after rollback
-# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
-# Optional env vars: STOPPED_TASKS_FILE (JSON with id, attrs, status)
+# Restore task attrs, start tasks defined in export directory, and publish previously-active APIs after rollback
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL, PROJECT
+# Optional env vars: STOPPED_TASKS_FILE (JSON with id, name, attrs, status)
 #                    UNPUBLISHED_APIS_FILE (JSON with id, status, tableName)
 set -euo pipefail
 
@@ -12,23 +12,37 @@ if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+if [[ -z "${PROJECT:-}" ]]; then
+  echo "::error::PROJECT is not set or empty"
+  exit 1
+fi
 
+BASE_URL="${TAPDATA_BASE_URL}"
 API_BASE="${BASE_URL%/}/api"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR}/../.."
+TASK_EXPORT_DIR="${REPO_ROOT}/${PROJECT}_tapdata_export/Task"
 
 # ── Step 1: Restore task attrs ──
+echo ""
+echo "────────────────────────────────────────"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 1: Restore task attrs"
+echo "────────────────────────────────────────"
+
 if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
   TASK_COUNT=$(jq 'length' "${STOPPED_TASKS_FILE}")
-  echo "Restoring attrs for ${TASK_COUNT} task(s)..."
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Restoring attrs for ${TASK_COUNT} task(s)..."
 
   while IFS= read -r item; do
     TASK_ID=$(echo "${item}" | jq -r '.id')
+    TASK_NAME=$(echo "${item}" | jq -r '.name // "unknown"')
     ATTRS=$(echo "${item}" | jq -c '.attrs')
 
-    echo "  Updating attrs for task: ${TASK_ID}..."
+    PATCH_URL="${API_BASE}/task/${TASK_ID}?access_token=${TAPDATA_TOKEN}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating attrs for task: ${TASK_NAME} (id: ${TASK_ID})..."
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Request URL: PATCH ${PATCH_URL}"
 
     PAYLOAD=$(jq -n -c --argjson attrs "${ATTRS}" '{attrs: $attrs}')
-    PATCH_URL="${API_BASE}/task/${TASK_ID}?access_token=${TAPDATA_TOKEN}"
 
     RESPONSE=$(curl -s -w "\n%{http_code}" -X PATCH "${PATCH_URL}" \
       -H "Content-Type: application/json" \
@@ -38,71 +52,109 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
     BODY=$(echo "${RESPONSE}" | sed '$d')
 
     if [[ "${HTTP_CODE}" -ne 200 ]]; then
-      echo "::error::Failed to update attrs for task '${TASK_ID}': HTTP ${HTTP_CODE} - ${BODY}"
+      echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to update attrs for task '${TASK_NAME}' (id: ${TASK_ID}): HTTP ${HTTP_CODE} - ${BODY}"
       exit 1
     fi
 
-    echo "  Task '${TASK_ID}' attrs updated successfully"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Task '${TASK_NAME}' (id: ${TASK_ID}) attrs updated successfully ✓"
   done < <(jq -c '.[]' "${STOPPED_TASKS_FILE}")
 
-  echo "All task attrs restored successfully"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] All task attrs restored successfully ✓"
 else
-  echo "No stopped tasks file provided or file not found, skipping attrs restore"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] No stopped tasks file provided or file not found, skipping attrs restore"
 fi
 
-# ── Step 2: Start previously-running tasks ──
-if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
-  RUNNING_IDS=$(jq -r '[.[] | select(.status == "running") | .id] | join("\n")' "${STOPPED_TASKS_FILE}")
-  RUNNING_COUNT=$(jq '[.[] | select(.status == "running")] | length' "${STOPPED_TASKS_FILE}")
+# ── Step 2: Start tasks defined in export directory ──
+echo ""
+echo "────────────────────────────────────────"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 2: Start tasks from export directory"
+echo "────────────────────────────────────────"
 
-  if [[ "${RUNNING_COUNT}" -eq 0 ]]; then
-    echo "No previously-running tasks found, skipping batch start"
-  else
-    echo "Starting ${RUNNING_COUNT} previously-running task(s)..."
-
-    TASK_IDS_PARAMS=""
-    while IFS= read -r tid; do
-      if [[ -z "${tid}" ]]; then continue; fi
-      if [[ -n "${TASK_IDS_PARAMS}" ]]; then
-        TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${tid}"
-      else
-        TASK_IDS_PARAMS="taskIds=${tid}"
-      fi
-    done <<< "${RUNNING_IDS}"
-
-    START_URL="${API_BASE}/task/batchStart?access_token=${TAPDATA_TOKEN}&${TASK_IDS_PARAMS}"
-
-    RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${START_URL}")
-    HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
-    BODY=$(echo "${RESPONSE}" | sed '$d')
-
-    if [[ "${HTTP_CODE}" -ne 200 ]]; then
-      echo "::error::Failed to batch start tasks: HTTP ${HTTP_CODE} - ${BODY}"
-      exit 1
-    fi
-
-    echo "All ${RUNNING_COUNT} task(s) started successfully"
-  fi
+if [[ ! -d "${TASK_EXPORT_DIR}" ]]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Task export directory not found: ${TASK_EXPORT_DIR}, skipping task start"
+elif [[ -z "${STOPPED_TASKS_FILE:-}" || ! -f "${STOPPED_TASKS_FILE}" ]]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] No stopped tasks file provided or file not found, skipping task start"
 else
-  echo "No stopped tasks file provided or file not found, skipping task start"
+  # Collect task names from *Task.json files in export directory
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Scanning task export directory: ${TASK_EXPORT_DIR}"
+  TASK_NAMES=()
+  for task_file in "${TASK_EXPORT_DIR}"/*Task.json; do
+    if [[ ! -f "${task_file}" ]]; then continue; fi
+    TASK_NAME=$(jq -r '.[0].json.name // empty' "${task_file}" 2>/dev/null)
+    if [[ -n "${TASK_NAME}" ]]; then
+      TASK_NAMES+=("${TASK_NAME}")
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')]   Found task: ${TASK_NAME} (from $(basename "${task_file}"))"
+    fi
+  done
+
+  if [[ ${#TASK_NAMES[@]} -eq 0 ]]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] No task definitions found in export directory, skipping task start"
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found ${#TASK_NAMES[@]} task(s) in export directory"
+
+    # Look up task IDs from stopped tasks file by name
+    TASK_IDS_PARAMS=""
+    MATCHED_COUNT=0
+    for tname in "${TASK_NAMES[@]}"; do
+      TASK_ID=$(jq -r --arg name "${tname}" '.[] | select(.name == $name) | .id' "${STOPPED_TASKS_FILE}")
+      if [[ -n "${TASK_ID}" ]]; then
+        MATCHED_COUNT=$((MATCHED_COUNT + 1))
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   Matched: ${tname} → id: ${TASK_ID}"
+        if [[ -n "${TASK_IDS_PARAMS}" ]]; then
+          TASK_IDS_PARAMS="${TASK_IDS_PARAMS}&taskIds=${TASK_ID}"
+        else
+          TASK_IDS_PARAMS="taskIds=${TASK_ID}"
+        fi
+      else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   WARNING: Task '${tname}' not found in stopped tasks file, skipping"
+      fi
+    done
+
+    if [[ "${MATCHED_COUNT}" -eq 0 ]]; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] No matching tasks found in stopped tasks file, skipping batch start"
+    else
+      START_URL="${API_BASE}/task/batchStart?access_token=${TAPDATA_TOKEN}&${TASK_IDS_PARAMS}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting ${MATCHED_COUNT} task(s)..."
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Request URL: PUT ${START_URL}"
+
+      RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "${START_URL}")
+      HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+      BODY=$(echo "${RESPONSE}" | sed '$d')
+
+      if [[ "${HTTP_CODE}" -ne 200 ]]; then
+        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to batch start tasks: HTTP ${HTTP_CODE} - ${BODY}"
+        exit 1
+      fi
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] All ${MATCHED_COUNT} task(s) started successfully ✓"
+    fi
+  fi
 fi
 
 # ── Step 3: Publish previously-active APIs ──
+echo ""
+echo "────────────────────────────────────────"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 3: Publish previously-active APIs"
+echo "────────────────────────────────────────"
+
 if [[ -n "${UNPUBLISHED_APIS_FILE:-}" && -f "${UNPUBLISHED_APIS_FILE}" ]]; then
   ACTIVE_APIS=$(jq -c '[.[] | select(.status == "active")]' "${UNPUBLISHED_APIS_FILE}")
   ACTIVE_COUNT=$(echo "${ACTIVE_APIS}" | jq 'length')
 
   if [[ "${ACTIVE_COUNT}" -eq 0 ]]; then
-    echo "No previously-active APIs found, skipping publish"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] No previously-active APIs found, skipping publish"
   else
-    echo "Publishing ${ACTIVE_COUNT} previously-active API(s)..."
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Publishing ${ACTIVE_COUNT} previously-active API(s)..."
     PATCH_URL="${API_BASE}/Modules/batchUpdate?access_token=${TAPDATA_TOKEN}"
 
+    API_INDEX=0
     while IFS= read -r item; do
       API_ID=$(echo "${item}" | jq -r '.id')
       TABLE_NAME=$(echo "${item}" | jq -r '.tableName')
+      API_INDEX=$((API_INDEX + 1))
 
-      echo "  Publishing API: ${TABLE_NAME} (id: ${API_ID})..."
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] Publishing API: ${TABLE_NAME} (id: ${API_ID})..."
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] Request URL: PATCH ${PATCH_URL}"
 
       PAYLOAD=$(jq -n -c \
         --arg id "${API_ID}" \
@@ -117,24 +169,25 @@ if [[ -n "${UNPUBLISHED_APIS_FILE:-}" && -f "${UNPUBLISHED_APIS_FILE}" ]]; then
       BODY=$(echo "${RESPONSE}" | sed '$d')
 
       if [[ "${HTTP_CODE}" -ne 200 ]]; then
-        echo "::error::Failed to publish API '${TABLE_NAME}': HTTP ${HTTP_CODE} - ${BODY}"
+        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish API '${TABLE_NAME}': HTTP ${HTTP_CODE} - ${BODY}"
         exit 1
       fi
 
       RESP_CODE=$(echo "${BODY}" | jq -r '.code // empty')
       if [[ -n "${RESP_CODE}" && "${RESP_CODE}" != "ok" ]]; then
-        echo "::error::Failed to publish API '${TABLE_NAME}': response code '${RESP_CODE}' - ${BODY}"
+        echo "::error::[$(date '+%Y-%m-%d %H:%M:%S')] Failed to publish API '${TABLE_NAME}': response code '${RESP_CODE}' - ${BODY}"
         exit 1
       fi
 
-      echo "  API '${TABLE_NAME}' published successfully"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${API_INDEX}/${ACTIVE_COUNT}] API '${TABLE_NAME}' published successfully ✓"
     done < <(echo "${ACTIVE_APIS}" | jq -c '.[]')
 
-    echo "All ${ACTIVE_COUNT} API(s) published successfully"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] All ${ACTIVE_COUNT} API(s) published successfully ✓"
   fi
 else
-  echo "No unpublished APIs file provided or file not found, skipping API publish"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] No unpublished APIs file provided or file not found, skipping API publish"
 fi
 
-echo "=== Start and Publish Complete ==="
+echo ""
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] === Start and Publish Complete ==="
 
