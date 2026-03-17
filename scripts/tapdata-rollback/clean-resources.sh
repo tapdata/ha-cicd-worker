@@ -126,14 +126,15 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
       echo "[$(date '+%Y-%m-%d %H:%M:%S')] Current task statuses:"
       echo "${BODY}" | jq -r '.data.items[] | "  - \(.id): \(.status)"'
 
-      # Find tasks that have reached "stop" status
-      STOPPED_IDS=$(echo "${BODY}" | jq -r '[.data.items[] | select(.status == "stop") | .id] | join("\n")')
-      STOPPED_COUNT=$(echo "${BODY}" | jq '[.data.items[] | select(.status == "stop")] | length')
-      NOT_STOPPED_COUNT=$(echo "${BODY}" | jq '[.data.items[] | select(.status != "stop")] | length')
+      # Find tasks that can be deleted (status: stop, error, wait_start)
+      DELETABLE_STATUSES='["stop", "error", "wait_start"]'
+      DELETABLE_IDS=$(echo "${BODY}" | jq -r --argjson s "${DELETABLE_STATUSES}" '[.data.items[] | select(.status as $st | $s | index($st)) | .id] | join("\n")')
+      DELETABLE_COUNT=$(echo "${BODY}" | jq --argjson s "${DELETABLE_STATUSES}" '[.data.items[] | select(.status as $st | $s | index($st))] | length')
+      NOT_DELETABLE_COUNT=$(echo "${BODY}" | jq --argjson s "${DELETABLE_STATUSES}" '[.data.items[] | select(.status as $st | $s | index($st) | not)] | length')
 
-      if [[ "${STOPPED_COUNT}" -gt 0 ]]; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found ${STOPPED_COUNT} stopped task(s), proceeding to delete:"
-        echo "${BODY}" | jq -r '.data.items[] | select(.status == "stop") | "  - \(.id)"'
+      if [[ "${DELETABLE_COUNT}" -gt 0 ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found ${DELETABLE_COUNT} deletable task(s) (stop/error/wait_start), proceeding to delete:"
+        echo "${BODY}" | jq -r --argjson s "${DELETABLE_STATUSES}" '.data.items[] | select(.status as $st | $s | index($st)) | "  - \(.id) (\(.status))"'
 
         # Build batchDelete query params
         TASK_IDS_PARAMS=""
@@ -144,7 +145,7 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
           else
             TASK_IDS_PARAMS="taskIds=${tid}"
           fi
-        done <<< "${STOPPED_IDS}"
+        done <<< "${DELETABLE_IDS}"
 
         DELETE_URL="${API_BASE}/Task/batchDelete?${TASK_IDS_PARAMS}&access_token=${TAPDATA_TOKEN}"
         DEL_RESPONSE=$(curl -s -w "\n%{http_code}" -X DELETE "${DELETE_URL}")
@@ -157,16 +158,16 @@ if [[ -n "${STOPPED_TASKS_FILE:-}" && -f "${STOPPED_TASKS_FILE}" ]]; then
           exit 1
         fi
 
-        DELETED_COUNT=$((DELETED_COUNT + STOPPED_COUNT))
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Batch delete successful: deleted ${STOPPED_COUNT} task(s) in this round (total deleted: ${DELETED_COUNT}/${TASK_COUNT}) ✓"
+        DELETED_COUNT=$((DELETED_COUNT + DELETABLE_COUNT))
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Batch delete successful: deleted ${DELETABLE_COUNT} task(s) in this round (total deleted: ${DELETED_COUNT}/${TASK_COUNT}) ✓"
 
         # Remove deleted IDs from pending list
-        DELETED_IDS_JSON=$(echo "${BODY}" | jq -c '[.data.items[] | select(.status == "stop") | .id]')
+        DELETED_IDS_JSON=$(echo "${BODY}" | jq -c --argjson s "${DELETABLE_STATUSES}" '[.data.items[] | select(.status as $st | $s | index($st)) | .id]')
         jq --argjson deleted "${DELETED_IDS_JSON}" '[.[] | select(. as $id | $deleted | index($id) | not)]' \
           "${PENDING_IDS_FILE}" > "${PENDING_IDS_FILE}.tmp"
         mv "${PENDING_IDS_FILE}.tmp" "${PENDING_IDS_FILE}"
       else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] No stopped tasks in this round, ${NOT_STOPPED_COUNT} task(s) still stopping..."
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] No deletable tasks in this round, ${NOT_DELETABLE_COUNT} task(s) still waiting to become deletable..."
       fi
 
       STILL_REMAINING=$(jq 'length' "${PENDING_IDS_FILE}")
