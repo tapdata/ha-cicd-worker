@@ -24,9 +24,6 @@ jobs:
     name: Preparation Phase
     runs-on: self-hosted
     timeout-minutes: 5
-    environment: aat
-    outputs:
-      aat_tapdata_token: ${{ steps.get_aat_token.outputs.tapdata_token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -49,6 +46,27 @@ jobs:
           TARGET_ENV: aat
           PROJECT: ${{ env.PROJECT }}
 
+  # ============================================================
+  # Job 2: Deploy AAT (All Resources in One Job)
+  # ============================================================
+  deploy-aat:
+    name: Deploy AAT
+    runs-on: self-hosted
+    timeout-minutes: 30
+    environment: aat
+    needs: preparation
+    outputs:
+      changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
+      changed_tasks: ${{ steps.import_tasks.outputs.changed_tasks }}
+      changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
+      changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Get AAT TapData Token
         id: get_aat_token
         run: bash scripts/common/get-token.sh
@@ -57,24 +75,6 @@ jobs:
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESS_CODE }}
 
-  # ============================================================
-  # Job 2: Deploy AAT Connections
-  # ============================================================
-  deploy-aat-connections:
-    name: Deploy AAT Connections
-    runs-on: self-hosted
-    timeout-minutes: 15
-    environment: aat
-    needs: preparation
-    outputs:
-      changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Generate vault.json with Connection Secrets
         run: bash scripts/tapdata-deploy/generate-vault.sh
         env:
@@ -82,7 +82,7 @@ jobs:
           ALL_SECRETS: ${{ toJSON(secrets) }}
           ALL_VARS: ${{ toJSON(vars) }}
 
-      - name: Compress Export Files
+      - name: Compress Connections Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -95,29 +95,11 @@ jobs:
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.aat_tapdata_token }}
+          TAPDATA_TOKEN: ${{ steps.get_aat_token.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: aat
 
-  # ============================================================
-  # Job 3: Deploy AAT Tasks
-  # ============================================================
-  deploy-aat-tasks:
-    name: Deploy AAT Tasks
-    runs-on: self-hosted
-    timeout-minutes: 15
-    environment: aat
-    needs: [preparation, deploy-aat-connections]
-    outputs:
-      changed_tasks: ${{ steps.import_tasks.outputs.changed_tasks }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Compress Export Files
+      - name: Compress Tasks Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -130,29 +112,11 @@ jobs:
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.aat_tapdata_token }}
+          TAPDATA_TOKEN: ${{ steps.get_aat_token.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: aat
 
-  # ============================================================
-  # Job 4: Deploy AAT APIs
-  # ============================================================
-  deploy-aat-apis:
-    name: Deploy AAT APIs
-    runs-on: self-hosted
-    timeout-minutes: 15
-    environment: aat
-    needs: [preparation, deploy-aat-tasks]
-    outputs:
-      changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Compress Export Files
+      - name: Compress APIs Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -165,29 +129,11 @@ jobs:
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.aat_tapdata_token }}
+          TAPDATA_TOKEN: ${{ steps.get_aat_token.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: aat
 
-  # ============================================================
-  # Job 5: Deploy AAT Group Info
-  # ============================================================
-  deploy-aat-group-info:
-    name: Deploy AAT Group Info
-    runs-on: self-hosted
-    timeout-minutes: 15
-    environment: aat
-    needs: [preparation, deploy-aat-apis]
-    outputs:
-      changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Compress Export Files
+      - name: Compress Group Info Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -200,25 +146,25 @@ jobs:
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.aat_tapdata_token }}
+          TAPDATA_TOKEN: ${{ steps.get_aat_token.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: aat
 
   # ============================================================
-  # Job 6: Prod Approval Gate
+  # Job 3: Prod Approval Gate
   # ============================================================
   prod-approval:
     name: Prod Approval
     runs-on: self-hosted
     timeout-minutes: 60
     environment: prod-approval
-    needs: [deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info]
+    needs: [deploy-aat]
     steps:
       - name: Approval Confirmed
         run: echo "Prod deployment approved. Proceeding to deploy..."
 
   # ============================================================
-  # Job 7: Deploy Prod (All Resources in One Job)
+  # Job 4: Deploy Prod (All Resources in One Job)
   # ============================================================
   deploy-prod:
     name: Deploy Prod
@@ -322,14 +268,14 @@ jobs:
           TARGET_ENV: prod
 
   # ============================================================
-  # Job 8: Generate Deployment Report
+  # Job 5: Generate Deployment Report
   # ============================================================
   generate-report:
     name: Generate Deployment Report
     runs-on: self-hosted
     timeout-minutes: 5
     if: always()
-    needs: [preparation, deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info, prod-approval, deploy-prod]
+    needs: [preparation, deploy-aat, prod-approval, deploy-prod]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -345,10 +291,10 @@ jobs:
           PROJECT: ${{ env.PROJECT }}
           GITHUB_ACTOR: ${{ github.actor }}
           # AAT results
-          AAT_CHANGED_CONNECTIONS: ${{ needs.deploy-aat-connections.outputs.changed_connections }}
-          AAT_CHANGED_TASKS: ${{ needs.deploy-aat-tasks.outputs.changed_tasks }}
-          AAT_CHANGED_APIS: ${{ needs.deploy-aat-apis.outputs.changed_apis }}
-          AAT_CHANGED_GROUP_INFO: ${{ needs.deploy-aat-group-info.outputs.changed_groupInfo }}
+          AAT_CHANGED_CONNECTIONS: ${{ needs.deploy-aat.outputs.changed_connections }}
+          AAT_CHANGED_TASKS: ${{ needs.deploy-aat.outputs.changed_tasks }}
+          AAT_CHANGED_APIS: ${{ needs.deploy-aat.outputs.changed_apis }}
+          AAT_CHANGED_GROUP_INFO: ${{ needs.deploy-aat.outputs.changed_groupInfo }}
           # Prod results
           PROD_CHANGED_CONNECTIONS: ${{ needs.deploy-prod.outputs.prod_changed_connections }}
           PROD_CHANGED_TASKS: ${{ needs.deploy-prod.outputs.prod_changed_tasks }}
@@ -356,9 +302,9 @@ jobs:
           PROD_CHANGED_GROUP_INFO: ${{ needs.deploy-prod.outputs.prod_changed_groupInfo }}
           # Job results
           PREPARATION_RESULT: ${{ needs.preparation.result }}
-          AAT_CONNECTIONS_RESULT: ${{ needs.deploy-aat-connections.result }}
-          AAT_TASKS_RESULT: ${{ needs.deploy-aat-tasks.result }}
-          AAT_APIS_RESULT: ${{ needs.deploy-aat-apis.result }}
-          AAT_GROUP_INFO_RESULT: ${{ needs.deploy-aat-group-info.result }}
+          AAT_CONNECTIONS_RESULT: ${{ needs.deploy-aat.result }}
+          AAT_TASKS_RESULT: ${{ needs.deploy-aat.result }}
+          AAT_APIS_RESULT: ${{ needs.deploy-aat.result }}
+          AAT_GROUP_INFO_RESULT: ${{ needs.deploy-aat.result }}
           PROD_APPROVAL_RESULT: ${{ needs.prod-approval.result }}
           PROD_RESULT: ${{ needs.deploy-prod.result }}
