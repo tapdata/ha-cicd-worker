@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 # Validate rebuild input parameters
-# Required env vars: TARGET_ENV, TASK_NAMES, RESET_REASON
+# Required env vars: TARGET_ENV, TASK_NAMES, RESET_REASON, TAPDATA_BASE_URL
 set -euo pipefail
 
 VALID_ENVS=("dev" "sit" "lpt" "aat" "prod")
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
 echo "=== Validating Rebuild Input Parameters ==="
 
@@ -42,15 +39,9 @@ if [[ -z "${RESET_REASON:-}" ]]; then
   exit 1
 fi
 
-# Validate env.conf exists and has config for target env
-if [[ ! -f "${ENV_CONF}" ]]; then
-  echo "::error::env.conf not found at ${ENV_CONF}"
-  exit 1
-fi
-
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+# Validate TAPDATA_BASE_URL
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
 
@@ -58,6 +49,6 @@ echo "Target environment: ${TARGET_ENV}"
 echo "Task names: ${TASK_NAMES}"
 echo "Reset reason: ${RESET_REASON}"
 echo "Need drop table: ${NEED_DROP_TABLE:-false}"
-echo "Base URL: ${BASE_URL}"
+echo "Base URL: ${TAPDATA_BASE_URL}"
 echo "=== Validation Passed ==="
 

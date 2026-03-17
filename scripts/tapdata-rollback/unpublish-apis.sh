@@ -2,23 +2,20 @@
 # Unpublish TapData APIs for rollback
 # 1. Query API ids and tableNames via GET /api/Modules
 # 2. Unpublish each API via PATCH /api/Modules
-# Required env vars: TAPDATA_TOKEN, TARGET_ENV
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: API_NAMES (comma separated, if empty unpublishes all APIs)
 # Output: unpublished_api_ids (comma separated, via GITHUB_OUTPUT)
 #         unpublished_apis_file (path to JSON file with id, status, tableName, via GITHUB_OUTPUT)
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
-
 echo "=== Unpublishing APIs ==="
 
-# Read base URL from env.conf
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
 
 API_BASE="${BASE_URL%/}/api"
 

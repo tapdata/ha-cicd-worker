@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 # Reset rebuild task state data via TapData API
-# Required env vars: TAPDATA_TOKEN, TARGET_ENV, TASK_NAMES, NEED_DROP_TABLE
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL, TASK_NAMES, NEED_DROP_TABLE
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
 
 echo "=== Resetting Rebuild Tasks ==="
 
-# Read base URL from env.conf
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
 
 # TODO: Replace with actual TapData API endpoint for resetting tasks
 API_URL="${BASE_URL%/}/api/"  # TODO: complete the API path

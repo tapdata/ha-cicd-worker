@@ -4,23 +4,20 @@
 #    - If TASK_NAMES is set: query by specified task names (rebuild mode)
 #    - If TASK_NAMES is empty/unset: query all tasks (rollback mode)
 # 2. Batch stop tasks via PUT /api/Task/batchStop
-# Required env vars: TAPDATA_TOKEN, TARGET_ENV
+# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: TASK_NAMES (comma separated, if empty stops all tasks)
 # Output: stopped_task_ids (comma separated, via GITHUB_OUTPUT)
 #         stopped_tasks_file (path to JSON file with id, attrs and status, via GITHUB_OUTPUT)
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_CONF="${SCRIPT_DIR}/../../conf/env.conf"
-
 echo "=== Stopping Tasks ==="
 
-# Read base URL from env.conf
-BASE_URL=$(grep "^${TARGET_ENV}=" "${ENV_CONF}" | cut -d'=' -f2-)
-if [[ -z "${BASE_URL}" ]]; then
-  echo "::error::No base URL configured for environment '${TARGET_ENV}' in env.conf"
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
   exit 1
 fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
 
 API_BASE="${BASE_URL%/}/api"
 
