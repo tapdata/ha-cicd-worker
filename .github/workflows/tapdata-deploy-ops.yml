@@ -211,7 +211,7 @@ jobs:
     name: Prod Approval
     runs-on: self-hosted
     timeout-minutes: 60
-    environment: prod_approval
+    environment: prod-approval
     needs: [deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info]
     steps:
       - name: Approval Confirmed
