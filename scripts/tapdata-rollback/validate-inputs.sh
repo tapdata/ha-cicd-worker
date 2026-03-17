@@ -35,11 +35,6 @@ if [[ -z "${LAST_STABLE_TAG:-}" ]]; then
   exit 1
 fi
 
-# Tag should match semver-like pattern, e.g. v1.0.0 or 1.0.0
-if [[ ! "${LAST_STABLE_TAG}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-  echo "::error::LAST_STABLE_TAG '${LAST_STABLE_TAG}' does not match expected tag format (e.g. v1.0.0)"
-  exit 1
-fi
 echo "LAST_STABLE_TAG: ${LAST_STABLE_TAG}"
 
 # Validate PROJECT

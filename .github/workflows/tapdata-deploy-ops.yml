@@ -205,14 +205,27 @@ jobs:
           TARGET_ENV: aat
 
   # ============================================================
-  # Job 6: Deploy Prod (All Resources in One Job)
+  # Job 6: Prod Approval Gate
+  # ============================================================
+  prod-approval:
+    name: Prod Approval
+    runs-on: self-hosted
+    timeout-minutes: 60
+    environment: prod_approval
+    needs: [deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info]
+    steps:
+      - name: Approval Confirmed
+        run: echo "Prod deployment approved. Proceeding to deploy..."
+
+  # ============================================================
+  # Job 7: Deploy Prod (All Resources in One Job)
   # ============================================================
   deploy-prod:
     name: Deploy Prod
     runs-on: self-hosted
     timeout-minutes: 30
     environment: prod
-    needs: [deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info]
+    needs: [prod-approval]
     outputs:
       prod_changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
       prod_changed_tasks: ${{ steps.import_tasks.outputs.changed_tasks }}
@@ -309,14 +322,14 @@ jobs:
           TARGET_ENV: prod
 
   # ============================================================
-  # Job 7: Generate Deployment Report
+  # Job 8: Generate Deployment Report
   # ============================================================
   generate-report:
     name: Generate Deployment Report
     runs-on: self-hosted
     timeout-minutes: 5
     if: always()
-    needs: [preparation, deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info, deploy-prod]
+    needs: [preparation, deploy-aat-connections, deploy-aat-tasks, deploy-aat-apis, deploy-aat-group-info, prod-approval, deploy-prod]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -347,4 +360,5 @@ jobs:
           AAT_TASKS_RESULT: ${{ needs.deploy-aat-tasks.result }}
           AAT_APIS_RESULT: ${{ needs.deploy-aat-apis.result }}
           AAT_GROUP_INFO_RESULT: ${{ needs.deploy-aat-group-info.result }}
+          PROD_APPROVAL_RESULT: ${{ needs.prod-approval.result }}
           PROD_RESULT: ${{ needs.deploy-prod.result }}
