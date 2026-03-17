@@ -48,6 +48,10 @@
       "id" : "6954a2bc35a6fa1717313ac4",
       "name" : "cpi-case-v1",
       "type" : "MODULE"
+    }, {
+      "id" : "69b930d78dd517882462236f",
+      "name" : "cpi-case-v2",
+      "type" : "MODULE"
     } ]
   }
 } ]
