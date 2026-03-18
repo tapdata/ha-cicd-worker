@@ -457,7 +457,7 @@
     "isStopOnError" : true,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
-      "value" : "dmp mdm"
+      "value" : "dmp union mdm"
     } ],
     "name" : "UNION_discharge_information",
     "normalTask" : true,
@@ -1081,9 +1081,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731839625,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_CMSIP_discharge_information",
     "nodeId" : "77adf9e3-fbcf-44fa-b528-4edba38bacef",
@@ -1708,9 +1705,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731839633,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_CMSIP_discharge_information",
     "nodeId" : "2e63fa56-1fc9-4118-8370-8e96a7c8975a",
@@ -2311,9 +2305,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773722142028,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "39086f66-9ea0-49f3-b26b-f65c74b702de",
@@ -2914,9 +2905,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773731821061,
-    "last_updated" : 1773731839613,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_CMSIP_discharge_information",
     "nodeId" : "39086f66-9ea0-49f3-b26b-f65c74b702de",

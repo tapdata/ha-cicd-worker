@@ -457,7 +457,7 @@
     "isStopOnError" : true,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
-      "value" : "dmp mdm"
+      "value" : "dmp union mdm"
     } ],
     "name" : "UNION_cpi_patient_hospital_data",
     "normalTask" : true,
@@ -795,9 +795,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731855476,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_HPI_cpi_patient_hospital_data",
     "nodeId" : "6a50d446-3758-4962-bc95-458b1e9a0707",
@@ -1136,9 +1133,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731855486,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_HPI_cpi_patient_hospital_data",
     "nodeId" : "f9bfd9bb-9f9d-4001-b97f-2b3abb8e7ea5",
@@ -1453,9 +1447,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773722081034,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "75aee412-eeea-4885-b571-6ec47972b01c",
@@ -1770,9 +1761,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773731821061,
-    "last_updated" : 1773731855467,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "75aee412-eeea-4885-b571-6ec47972b01c",
