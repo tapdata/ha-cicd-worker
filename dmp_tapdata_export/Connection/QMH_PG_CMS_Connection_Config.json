@@ -200,8 +200,6 @@
     "kafkaProducerRequestTimeout" : 0,
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
-    "lastUpdate" : 1773728489292,
-    "last_updated" : 1773661979212,
     "listtags" : [ {
       "id" : "69b90ba98dd517882461f4ec",
       "value" : "dmp"

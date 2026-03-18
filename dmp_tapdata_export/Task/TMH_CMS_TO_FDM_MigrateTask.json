@@ -1133,9 +1133,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773664918087,
-    "last_updated" : 1773735839484,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_TMH_CMSIP_discharge_information",
     "nodeId" : "2f2f8289-c51e-43cf-9bb7-ed203c041061",
@@ -1844,9 +1841,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773664918087,
-    "last_updated" : 1773730396022,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_CMSIP_discharge_information",
     "nodeId" : "a7b8f90b-2ec6-41d7-ac19-50d1b0d1f6fc",
@@ -2450,9 +2444,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773664918087,
-    "last_updated" : 1773730388849,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "discharge_information",
     "nodeId" : "020d4cf1-0033-4078-add6-8b08dce62965",
