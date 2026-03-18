@@ -504,7 +504,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1773720978625",
+    "editVersion" : "1773797804027",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
     "fdmMain" : true,
@@ -518,7 +518,7 @@
     "initialSyncTask" : true,
     "isAutoCreateIndex" : true,
     "isAutoInspect" : false,
-    "isEdit" : false,
+    "isEdit" : true,
     "isFilter" : false,
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
@@ -531,7 +531,7 @@
     "name" : "QMH_HPI_TO_FDM",
     "normalTask" : true,
     "oldVersionTimezone" : false,
-    "pageVersion" : "1773720924952",
+    "pageVersion" : "1773797765500",
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -570,7 +570,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "transformTaskId" : "69b8d5548dd5178824619ed5",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "transformed" : true,
     "type" : "initial_sync+cdc",
     "writeBatchSize" : 0,
@@ -1342,9 +1342,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720953846,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_case",
     "nodeId" : "00677eb1-d035-47c9-857d-0ae81270f341",
@@ -1382,7 +1379,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2704,9 +2701,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720953854,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient",
     "nodeId" : "00677eb1-d035-47c9-857d-0ae81270f341",
@@ -2744,7 +2738,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3006,9 +3000,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720953863,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient_hospital_data",
     "nodeId" : "00677eb1-d035-47c9-857d-0ae81270f341",
@@ -3046,7 +3037,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3814,9 +3805,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720978921,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_QMH_HPI_cpi_case",
     "nodeId" : "afc26685-ceea-43b4-a52b-975732e865ef",
@@ -3836,7 +3824,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -3844,17 +3832,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "c8703c56-1301-467f-9335-5cdb52f1e60a",
+      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773660384644,
+      "tableCount" : 3,
+      "testTime" : 1773728490138,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -5176,9 +5164,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720978932,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_QMH_HPI_cpi_patient",
     "nodeId" : "afc26685-ceea-43b4-a52b-975732e865ef",
@@ -5198,7 +5183,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -5206,17 +5191,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "c8703c56-1301-467f-9335-5cdb52f1e60a",
+      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773660384644,
+      "tableCount" : 3,
+      "testTime" : 1773728490138,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -5478,9 +5463,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720978940,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_QMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "afc26685-ceea-43b4-a52b-975732e865ef",
@@ -5500,7 +5482,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -5508,17 +5490,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "c8703c56-1301-467f-9335-5cdb52f1e60a",
+      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773660384644,
+      "tableCount" : 3,
+      "testTime" : 1773728490138,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -6418,9 +6400,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720969518,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_case",
     "nodeId" : "7bb69933-de9f-4579-82a0-2a8dfcb386b7",
@@ -6460,7 +6439,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8006,9 +7985,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720969526,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_patient",
     "nodeId" : "7bb69933-de9f-4579-82a0-2a8dfcb386b7",
@@ -8048,7 +8024,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8368,9 +8344,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773720969527,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "7bb69933-de9f-4579-82a0-2a8dfcb386b7",
@@ -8410,7 +8383,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5548dd5178824619ed6",
-    "transformUuid" : "1773720978659",
+    "transformUuid" : "1773797804037",
     "username" : "admin@admin.com"
   }
 } ]

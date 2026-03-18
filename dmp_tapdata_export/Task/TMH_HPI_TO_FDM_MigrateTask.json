@@ -228,7 +228,7 @@
           "connectionName" : "FDM",
           "connectionTags" : [ "schema-free", "Database", "doubleActive" ],
           "connectionType" : "source_and_target",
-          "db_version" : "7.0.16",
+          "db_version" : "8.0.9",
           "pdkHash" : "4335aaa005ec1a74a4e2166bded2962e939ad50239f48b023b884f35b54129a5",
           "pdkType" : "pdk",
           "position" : [ 610, 50 ]
@@ -504,7 +504,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1773730406024",
+    "editVersion" : "1773798078965",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
     "fdmMain" : true,
@@ -518,7 +518,7 @@
     "initialSyncTask" : true,
     "isAutoCreateIndex" : true,
     "isAutoInspect" : false,
-    "isEdit" : false,
+    "isEdit" : true,
     "isFilter" : false,
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
@@ -531,7 +531,7 @@
     "name" : "TMH_HPI_TO_FDM",
     "normalTask" : true,
     "oldVersionTimezone" : false,
-    "pageVersion" : "1773730400320",
+    "pageVersion" : "1773798047785",
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -570,7 +570,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "transformTaskId" : "69b8d5d98dd517882461a247",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "transformed" : true,
     "type" : "initial_sync+cdc",
     "writeBatchSize" : 0,
@@ -1896,9 +1896,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730406492,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_TMH_HPI_cpi_patient",
     "nodeId" : "d5fc0d81-f1e7-4826-ad2b-92630d0760fe",
@@ -1918,7 +1915,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -1926,17 +1923,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "6eb403a1-b56c-4540-8584-29297c6d0ded",
+      "schemaVersion" : "c4b70bc8-23a7-49e8-a84e-3fcd7c17301d",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773730000886,
+      "tableCount" : 3,
+      "testTime" : 1773735111871,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2704,9 +2701,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730406494,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_TMH_HPI_cpi_case",
     "nodeId" : "d5fc0d81-f1e7-4826-ad2b-92630d0760fe",
@@ -2726,7 +2720,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -2734,17 +2728,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "6eb403a1-b56c-4540-8584-29297c6d0ded",
+      "schemaVersion" : "c4b70bc8-23a7-49e8-a84e-3fcd7c17301d",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773730000886,
+      "tableCount" : 3,
+      "testTime" : 1773735111871,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3006,9 +3000,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730406502,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_TMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "d5fc0d81-f1e7-4826-ad2b-92630d0760fe",
@@ -3028,7 +3019,7 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 0,
+      "loadCount" : 3,
       "loadFieldErrMsg" : "",
       "loadFieldsStatus" : "finished",
       "loadSchemaField" : true,
@@ -3036,17 +3027,17 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "6eb403a1-b56c-4540-8584-29297c6d0ded",
+      "schemaVersion" : "c4b70bc8-23a7-49e8-a84e-3fcd7c17301d",
       "status" : "ready",
       "submit" : true,
-      "tableCount" : 0,
-      "testTime" : 1773730000886,
+      "tableCount" : 3,
+      "testTime" : 1773735111871,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3946,9 +3937,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730405965,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_case",
     "nodeId" : "eefc4c20-95f6-4873-9c3d-e05253493a56",
@@ -3988,7 +3976,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -4308,9 +4296,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730405966,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "eefc4c20-95f6-4873-9c3d-e05253493a56",
@@ -4350,7 +4335,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -5896,9 +5881,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730405976,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_patient",
     "nodeId" : "eefc4c20-95f6-4873-9c3d-e05253493a56",
@@ -5938,7 +5920,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -7260,9 +7242,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730361849,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient",
     "nodeId" : "0781fa70-5491-4f19-9a88-22fbdbca25ee",
@@ -7300,7 +7279,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8068,9 +8047,6 @@
       "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730361857,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_case",
     "nodeId" : "0781fa70-5491-4f19-9a88-22fbdbca25ee",
@@ -8108,7 +8084,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 }, {
@@ -8370,9 +8346,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773730361866,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient_hospital_data",
     "nodeId" : "0781fa70-5491-4f19-9a88-22fbdbca25ee",
@@ -8410,7 +8383,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5d98dd517882461a248",
-    "transformUuid" : "1773730406312",
+    "transformUuid" : "1773798078983",
     "username" : "admin@admin.com"
   }
 } ]

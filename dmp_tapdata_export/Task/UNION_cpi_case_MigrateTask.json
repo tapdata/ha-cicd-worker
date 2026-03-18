@@ -455,7 +455,7 @@
     "isStopOnError" : true,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
-      "value" : "dmp mdm"
+      "value" : "dmp union mdm"
     } ],
     "name" : "UNION_cpi_case",
     "normalTask" : true,
@@ -1211,9 +1211,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731848128,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_HPI_cpi_case",
     "nodeId" : "5eda902d-5eec-48e6-824d-8d5dd6ff2bdc",
@@ -1970,9 +1967,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773731848136,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_HPI_cpi_case",
     "nodeId" : "786f1ca0-e3d5-4c86-8f35-68a9e2a0d9cd",
@@ -2705,9 +2699,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773721903940,
-    "last_updated" : 1773721922644,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_case",
     "nodeId" : "c6354971-fc98-4e26-ae05-5365538d0e31",
@@ -3440,9 +3431,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773731821061,
-    "last_updated" : 1773731848125,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_case",
     "nodeId" : "c6354971-fc98-4e26-ae05-5365538d0e31",

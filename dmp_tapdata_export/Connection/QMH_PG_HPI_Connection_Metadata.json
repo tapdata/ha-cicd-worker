@@ -12,9 +12,6 @@
     "id" : "69b7e8c27e25a691d40faab5",
     "is_deleted" : false,
     "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-    "lastUpdate" : 1773728490218,
-    "last_updated" : 1773728491014,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "database",
     "original_name" : "QMH_PG_HPI",
     "qualified_name" : "CONN_postgres_io_tapdata_1_0-SNAPSHOT_69b7e8c226de2d8303431c84",
@@ -39,11 +36,11 @@
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
+      "schemaVersion" : "89a15ce2-6660-4918-8987-070a019461f8",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 3,
-      "testTime" : 1773728490138,
+      "testTime" : 1773800484393,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
@@ -686,56 +683,6 @@
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
-        "columnName" : "case_type",
-        "columnPosition" : 0
-      }, {
-        "columnIsAsc" : true,
-        "columnName" : "discharge_code",
-        "columnPosition" : 0
-      }, {
-        "columnIsAsc" : true,
-        "columnName" : "last_ward_code",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_case_discharge_code",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "discharge_dtm",
-        "columnPosition" : 0
-      }, {
-        "columnIsAsc" : true,
-        "columnName" : "last_ward_code",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_case_discharge_dtm",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "discharge_dtm",
-        "columnPosition" : 0
-      }, {
-        "columnIsAsc" : true,
-        "columnName" : "last_specialty",
-        "columnPosition" : 0
-      }, {
-        "columnIsAsc" : true,
-        "columnName" : "last_sub_specialty",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_case_discharge_specialty",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
         "columnName" : "hospital_code",
         "columnPosition" : 0
       }, {
@@ -744,24 +691,11 @@
         "columnPosition" : 0
       } ],
       "coreUnique" : false,
-      "indexName" : "cpi_case_idx",
+      "indexName" : "IDX_cpi_case_hospital_code_case_no",
       "primaryKey" : "false",
       "unique" : true
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "patient_key",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_case_patient_idx",
-      "primaryKey" : "false",
-      "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773728599372,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_case",
     "original_name" : "cpi_case",
@@ -780,19 +714,19 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 0,
       "loadFieldErrMsg" : "",
-      "loadFieldsStatus" : "finished",
+      "loadFieldsStatus" : "loading",
       "loadSchemaField" : true,
       "name" : "QMH_PG_HPI",
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
+      "schemaVersion" : "89a15ce2-6660-4918-8987-070a019461f8",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 3,
-      "testTime" : 1773728490138,
+      "testTime" : 1773800484393,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
@@ -1517,14 +1451,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 33,
       "data_type" : "integer",
-      "default_value" : 2147483647,
+      "default_value" : null,
       "field_name" : "access_code",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_access_code",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 2147483647,
       "original_field_name" : "access_code",
       "previousDataType" : "integer",
       "previousFieldName" : "access_code",
@@ -1540,14 +1473,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 34,
       "data_type" : "integer",
-      "default_value" : 0,
+      "default_value" : null,
       "field_name" : "security",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_security",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 0,
       "original_field_name" : "security",
       "previousDataType" : "integer",
       "previousFieldName" : "security",
@@ -1805,14 +1737,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 46,
       "data_type" : "integer",
-      "default_value" : 1,
+      "default_value" : null,
       "field_name" : "rep_hosp1",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_rep_hosp1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 1,
       "original_field_name" : "rep_hosp1",
       "previousDataType" : "integer",
       "previousFieldName" : "rep_hosp1",
@@ -1828,14 +1759,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 47,
       "data_type" : "integer",
-      "default_value" : 0,
+      "default_value" : null,
       "field_name" : "rep_hosp2",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_rep_hosp2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 0,
       "original_field_name" : "rep_hosp2",
       "previousDataType" : "integer",
       "previousFieldName" : "rep_hosp2",
@@ -1851,14 +1781,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 48,
       "data_type" : "integer",
-      "default_value" : 0,
+      "default_value" : null,
       "field_name" : "rep_clinic1",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_rep_clinic1",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 0,
       "original_field_name" : "rep_clinic1",
       "previousDataType" : "integer",
       "previousFieldName" : "rep_clinic1",
@@ -1874,14 +1803,13 @@
       "autoincrement" : "NO",
       "columnPosition" : 49,
       "data_type" : "integer",
-      "default_value" : 0,
+      "default_value" : null,
       "field_name" : "rep_clinic2",
       "id" : "69b7e8c226de2d8303431c84_cpi_patient_rep_clinic2",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : false,
       "originalDataType" : "integer",
-      "originalDefaultValue" : 0,
       "original_field_name" : "rep_clinic2",
       "previousDataType" : "integer",
       "previousFieldName" : "rep_clinic2",
@@ -1946,78 +1874,15 @@
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
-        "columnName" : "building",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_building_idx",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "other_doc_no",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_doc_no_idx",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
         "columnName" : "hkid",
         "columnPosition" : 0
       } ],
       "coreUnique" : false,
-      "indexName" : "cpi_patient_hkid_idx",
+      "indexName" : "IDX_cpi_patient_hkid",
       "primaryKey" : "false",
       "unique" : true
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "patient_key",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_idx",
-      "primaryKey" : "false",
-      "unique" : true
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "patient_name",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_nam_idx",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "patient_no",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_no_idx",
-      "primaryKey" : "false",
-      "unique" : true
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
-        "columnName" : "phone1",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "cpi_patient_phone_idx",
-      "primaryKey" : "false",
-      "unique" : false
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773728599074,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient",
     "original_name" : "cpi_patient",
@@ -2036,19 +1901,19 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 0,
       "loadFieldErrMsg" : "",
-      "loadFieldsStatus" : "finished",
+      "loadFieldsStatus" : "loading",
       "loadSchemaField" : true,
       "name" : "QMH_PG_HPI",
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
+      "schemaVersion" : "89a15ce2-6660-4918-8987-070a019461f8",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 3,
-      "testTime" : 1773728490138,
+      "testTime" : 1773800484393,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },
@@ -2272,16 +2137,6 @@
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
-        "columnName" : "mrn",
-        "columnPosition" : 0
-      } ],
-      "coreUnique" : false,
-      "indexName" : "idx_cpi_patient_hospital_data_mrn",
-      "primaryKey" : "false",
-      "unique" : false
-    }, {
-      "columns" : [ {
-        "columnIsAsc" : true,
         "columnName" : "patient_key",
         "columnPosition" : 0
       }, {
@@ -2290,14 +2145,11 @@
         "columnPosition" : 0
       } ],
       "coreUnique" : false,
-      "indexName" : "pk_cpi_patient_hospital_data",
+      "indexName" : "cpi_patient_hospital_data_pkey",
       "primaryKey" : "true",
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390640724,
-    "last_updated" : 1773728598723,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "cpi_patient_hospital_data",
     "original_name" : "cpi_patient_hospital_data",
@@ -2316,19 +2168,19 @@
       "kafkaIgnoreInvalidRecord" : false,
       "kafkaIgnorePushError" : false,
       "lastUpdBy" : "62bc5008d4958d013d97c7a6",
-      "loadCount" : 3,
+      "loadCount" : 0,
       "loadFieldErrMsg" : "",
-      "loadFieldsStatus" : "finished",
+      "loadFieldsStatus" : "loading",
       "loadSchemaField" : true,
       "name" : "QMH_PG_HPI",
       "plain_password" : "",
       "project" : "",
       "retry" : 0,
-      "schemaVersion" : "a93a612f-53c1-4447-b72a-05cc8f232a38",
+      "schemaVersion" : "89a15ce2-6660-4918-8987-070a019461f8",
       "status" : "ready",
       "submit" : true,
       "tableCount" : 3,
-      "testTime" : 1773728490138,
+      "testTime" : 1773800484393,
       "transformed" : true,
       "user_id" : "62bc5008d4958d013d97c7a6"
     },

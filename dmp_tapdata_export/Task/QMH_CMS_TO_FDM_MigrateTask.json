@@ -510,7 +510,7 @@
     "initialSyncTask" : true,
     "isAutoCreateIndex" : true,
     "isAutoInspect" : false,
-    "isEdit" : false,
+    "isEdit" : true,
     "isFilter" : false,
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
@@ -1130,9 +1130,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390641738,
-    "last_updated" : 1773721032123,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "377917d3-1975-46ee-aa02-9719a9af64a0",
@@ -1840,9 +1837,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390641738,
-    "last_updated" : 1773721026019,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "0c94f6c7-db20-4a20-a13b-02eb78cfa209",
@@ -2446,9 +2440,6 @@
       "unique" : true
     } ],
     "is_deleted" : false,
-    "lastUpdate" : 1773390641738,
-    "last_updated" : 1773721019352,
-    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "discharge_information",
     "nodeId" : "774f0637-3e04-449d-aed4-26fbf125592c",

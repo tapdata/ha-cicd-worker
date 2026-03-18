@@ -136,8 +136,6 @@
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
     "lastStatus" : "ready",
-    "lastUpdate" : 1773731821061,
-    "last_updated" : 1768803675243,
     "listtags" : [ {
       "id" : "69b90ba98dd517882461f4ec",
       "value" : "dmp"
@@ -155,7 +153,7 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "e57c6f02-97c5-4854-aa8f-f67ed105735b",
+    "schemaVersion" : "5c4d6cd6-87e1-4acf-961d-b482b19aaacf",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "status" : "ready",

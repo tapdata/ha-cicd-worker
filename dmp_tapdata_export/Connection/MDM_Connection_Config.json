@@ -6,7 +6,7 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='MDM', connection_type='source_and_target', retry=0, status='ready', tableCount=0, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
+    "alarmInfo" : "DataSourceConnectionDto{name='MDM', connection_type='source_and_target', retry=0, status='ready', tableCount=6, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
       "id" : "source_incremental_update_event_have_before",
       "type" : 20
@@ -136,14 +136,12 @@
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
     "lastStatus" : "ready",
-    "lastUpdate" : 1773731870800,
-    "last_updated" : 1768803675304,
     "listtags" : [ {
       "id" : "69b90ba98dd517882461f4ec",
       "value" : "dmp"
     } ],
     "loadAllTables" : true,
-    "loadCount" : 0,
+    "loadCount" : 6,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
     "name" : "MDM",
@@ -155,11 +153,11 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "88a52cdb-dfe7-444b-a0c3-ea182866d7ed",
+    "schemaVersion" : "8ea81a80-404f-41d4-8ecd-0e76f2fcce86",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "status" : "ready",
     "submit" : true,
-    "tableCount" : 0
+    "tableCount" : 6
   }
 } ]
