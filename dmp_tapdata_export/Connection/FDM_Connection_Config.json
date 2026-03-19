@@ -101,6 +101,7 @@
     },
     "connection_type" : "source_and_target",
     "createTime" : 1768803675243,
+    "createUser" : "admin@admin.com",
     "database_type" : "MongoDB",
     "database_uri" : "mongodb://null/null",
     "db_version" : "8.0.9",
@@ -136,6 +137,9 @@
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
     "lastStatus" : "ready",
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773800485761,
+    "last_updated" : 1768803675243,
     "listtags" : [ {
       "id" : "69b90ba98dd517882461f4ec",
       "value" : "dmp"
@@ -144,6 +148,8 @@
     "loadCount" : 8,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
+    "loadSchemaField" : true,
+    "loadSchemaTime" : 1773800486460,
     "name" : "FDM",
     "openTableExcludeFilter" : false,
     "pdkHash" : "4335aaa005ec1a74a4e2166bded2962e939ad50239f48b023b884f35b54129a5",
@@ -158,6 +164,9 @@
     "shareCdcEnable" : false,
     "status" : "ready",
     "submit" : true,
-    "tableCount" : 8
+    "tableCount" : 8,
+    "testTime" : 1773800485738,
+    "transformed" : true,
+    "user_id" : "62bc5008d4958d013d97c7a6"
   }
 } ]

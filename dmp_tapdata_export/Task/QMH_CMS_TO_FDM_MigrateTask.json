@@ -5,6 +5,7 @@
     "accessNodeProcessId" : "",
     "accessNodeProcessIdList" : [ ],
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
+    "agentId" : "sam_iengine",
     "alarmRules" : [ {
       "equalsFlag" : 1,
       "key" : "TASK_INCREMENT_DELAY",
@@ -64,14 +65,142 @@
       "open" : true,
       "sort" : 0
     } ],
-    "attrs" : { },
+    "attrs" : {
+      "milestone" : {
+        "CDC" : {
+          "begin" : 1773803137971,
+          "code" : "CDC",
+          "end" : 1773803138761,
+          "endRetryTs" : 1773814071864,
+          "nextRetryTs" : 1773814049824,
+          "retryOp" : "SOURCE_STREAM_READ",
+          "retrySuccess" : false,
+          "retryTimes" : 5,
+          "retrying" : false,
+          "startRetryTs" : 1773811403437,
+          "status" : "FINISH",
+          "totalOfRetries" : 5
+        },
+        "DATA_NODE_INIT" : {
+          "begin" : 1773803135077,
+          "code" : "DATA_NODE_INIT",
+          "end" : 1773803140104,
+          "progress" : 2,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "DEDUCTION" : {
+          "begin" : 1773803134897,
+          "code" : "DEDUCTION",
+          "end" : 1773803320817,
+          "status" : "FINISH"
+        },
+        "SNAPSHOT" : {
+          "begin" : 1773803136495,
+          "code" : "SNAPSHOT",
+          "end" : 1773803138761,
+          "progress" : 1,
+          "status" : "FINISH",
+          "totals" : 1
+        },
+        "TABLE_INIT" : {
+          "begin" : 1773803135723,
+          "code" : "TABLE_INIT",
+          "end" : 1773803136043,
+          "progress" : 1,
+          "status" : "FINISH",
+          "totals" : 1
+        },
+        "TASK" : {
+          "begin" : 1773803134874,
+          "code" : "TASK",
+          "end" : 1773803134874,
+          "status" : "FINISH"
+        }
+      },
+      "nodeMilestones" : {
+        "0c94f6c7-db20-4a20-a13b-02eb78cfa209" : {
+          "CDC_WRITE" : {
+            "begin" : 1773803138761,
+            "code" : "CDC_WRITE",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773803135128,
+            "code" : "NODE",
+            "end" : 1773803135613,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_WRITE" : {
+            "begin" : 1773803136752,
+            "code" : "SNAPSHOT_WRITE",
+            "end" : 1773803138761,
+            "status" : "FINISH"
+          },
+          "TABLE_INIT" : {
+            "begin" : 1773803135723,
+            "code" : "TABLE_INIT",
+            "end" : 1773803136043,
+            "progress" : 1,
+            "status" : "FINISH",
+            "totals" : 1
+          }
+        },
+        "377917d3-1975-46ee-aa02-9719a9af64a0" : {
+          "NODE" : {
+            "begin" : 1773803135128,
+            "code" : "NODE",
+            "end" : 1773814072900,
+            "status" : "FINISH"
+          }
+        },
+        "774f0637-3e04-449d-aed4-26fbf125592c" : {
+          "CDC_READ" : {
+            "begin" : 1773803144691,
+            "code" : "CDC_READ",
+            "dynamicDescriptionParameters" : [ ],
+            "end" : 1773814071885,
+            "errorCode" : "10012",
+            "errorMessage" : "java.net.SocketTimeoutException: Connect timed out",
+            "stackMessage" : "java.lang.RuntimeException: java.net.SocketTimeoutException: Connect timed out\n\tat io.tapdata.aspect.utils.AspectUtils.executeDataFuncAspect(AspectUtils.java:73)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.HazelcastBaseNode.executeDataFuncAspect(HazelcastBaseNode.java:186)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doNormalCDC(HazelcastSourcePdkDataNode.java:972)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doCdc(HazelcastSourcePdkDataNode.java:904)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.startSourceRunner(HazelcastSourcePdkDataNode.java:351)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.initAndStartSourceRunner(HazelcastSourcePdkBaseNode.java:464)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.lambda$doInit$3(HazelcastSourcePdkBaseNode.java:286)\n\tat io.tapdata.pdk.core.async.ThreadPoolExecutorEx.lambda$submitSync$0(ThreadPoolExecutorEx.java:67)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat io.tapdata.pdk.core.async.ThreadPoolExecutorEx.submitSync(ThreadPoolExecutorEx.java:65)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.doInit(HazelcastSourcePdkBaseNode.java:263)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doInit(HazelcastSourcePdkDataNode.java:223)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.HazelcastBaseNode.init(HazelcastBaseNode.java:259)\n\tat com.hazelcast.jet.core.AbstractProcessor.init(AbstractProcessor.java:82)\n\tat com.hazelcast.jet.impl.execution.ProcessorTasklet.lambda$init$2f647568$1(ProcessorTasklet.java:279)\n\tat com.hazelcast.jet.function.RunnableEx.run(RunnableEx.java:31)\n\tat com.hazelcast.jet.impl.util.Util.doWithClassLoader(Util.java:532)\n\tat com.hazelcast.jet.impl.execution.ProcessorTasklet.init(ProcessorTasklet.java:279)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService$BlockingWorker.run(TaskletExecutionService.java:311)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)\n\tat java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)\n\tat java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)\n\tat java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)\n\tat java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\n\tat java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\n\tat java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\n\tat java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService.submitBlockingTasklets(TaskletExecutionService.java:177)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService.beginExecute(TaskletExecutionService.java:156)\n\tat com.hazelcast.jet.impl.execution.ExecutionContext.beginExecution(ExecutionContext.java:233)\n\tat com.hazelcast.jet.impl.JobExecutionService.beginExecution0(JobExecutionService.java:568)\n\tat com.hazelcast.jet.impl.JobExecutionService.beginExecution(JobExecutionService.java:563)\n\tat com.hazelcast.jet.impl.operation.StartExecutionOperation.doRun(StartExecutionOperation.java:50)\n\tat com.hazelcast.jet.impl.operation.AsyncOperation.run(AsyncOperation.java:55)\n\tat com.hazelcast.spi.impl.operationservice.Operation.call(Operation.java:190)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.call(OperationRunnerImpl.java:283)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.run(OperationRunnerImpl.java:258)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.run(OperationRunnerImpl.java:219)\n\tat com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.run(OperationExecutorImpl.java:411)\n\tat com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.runOrExecute(OperationExecutorImpl.java:438)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.doInvokeLocal(Invocation.java:601)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.doInvoke(Invocation.java:580)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.invoke0(Invocation.java:541)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.invoke(Invocation.java:241)\n\tat com.hazelcast.spi.impl.operationservice.impl.InvocationBuilderImpl.invoke(InvocationBuilderImpl.java:61)\n\tat com.hazelcast.jet.impl.MasterContext.invokeOnParticipant(MasterContext.java:294)\n\tat com.hazelcast.jet.impl.MasterContext.invokeOnParticipants(MasterContext.java:277)\n\tat com.hazelcast.jet.impl.MasterJobContext.invokeStartExecution(MasterJobContext.java:506)\n\tat com.hazelcast.jet.impl.MasterJobContext.lambda$onInitStepCompleted$7(MasterJobContext.java:473)\n\tat com.hazelcast.jet.impl.JobCoordinationService.lambda$submitToCoordinatorThread$54(JobCoordinationService.java:1306)\n\tat com.hazelcast.jet.impl.JobCoordinationService.lambda$submitToCoordinatorThread$55(JobCoordinationService.java:1327)\n\tat com.hazelcast.internal.util.executor.CompletableFutureTask.run(CompletableFutureTask.java:64)\n\tat com.hazelcast.internal.util.executor.CachedExecutorServiceDelegate$Worker.run(CachedExecutorServiceDelegate.java:217)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\n\tat java.base/java.lang.Thread.run(Thread.java:840)\n\tat com.hazelcast.internal.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:76)\n\tat com.hazelcast.internal.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:102)\nCaused by: java.net.SocketTimeoutException: Connect timed out\n\tat io.tapdata.connector.postgres.exception.PostgresExceptionCollector.revealException(PostgresExceptionCollector.java:156)\n\tat io.tapdata.common.JdbcContext.getConnection(JdbcContext.java:52)\n\tat io.tapdata.common.JdbcContext.queryWithNext(JdbcContext.java:78)\n\tat io.tapdata.connector.postgres.PostgresConnector.buildSlot(PostgresConnector.java:308)\n\tat io.tapdata.connector.postgres.PostgresConnector.streamRead(PostgresConnector.java:629)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.lambda$doBatchCDC$34(HazelcastSourcePdkDataNode.java:1021)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invokePDKMethodPrivate(PDKInvocationMonitor.java:165)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.lambda$invokePDKMethod$10(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.api.Node.applyClassLoaderContext(Node.java:27)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.lambda$invokePDKMethod$11(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.utils.RetryUtils.autoRetry(RetryUtils.java:71)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invokePDKMethod(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invoke(PDKInvocationMonitor.java:96)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.lambda$doNormalCDC$27(HazelcastSourcePdkDataNode.java:982)\n\tat io.tapdata.aspect.utils.AspectUtils.executeDataFuncAspect(AspectUtils.java:67)\n\t... 77 more\nCaused by: java.net.SocketTimeoutException: Connect timed out\n\tat java.base/java.net.SocksSocketImpl.readSocksReply(SocksSocketImpl.java:125)\n\tat java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:429)\n\tat java.base/java.net.Socket.connect(Socket.java:639)\n\tat org.postgresql.core.PGStream.createSocket(PGStream.java:260)\n\tat org.postgresql.core.PGStream.<init>(PGStream.java:121)\n\tat org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:140)\n\tat org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:268)\n\tat org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:54)\n\tat org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:273)\n\tat org.postgresql.Driver.makeConnection(Driver.java:446)\n\tat org.postgresql.Driver.connect(Driver.java:298)\n\tat com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:138)\n\tat com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:364)\n\tat com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:206)\n\tat com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:476)\n\tat com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:561)\n\tat com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:115)\n\tat com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:112)\n\tat io.tapdata.common.JdbcContext.getConnection(JdbcContext.java:49)\n\t... 90 more\n",
+            "status" : "ERROR"
+          },
+          "NODE" : {
+            "begin" : 1773803135128,
+            "code" : "NODE",
+            "end" : 1773803135777,
+            "status" : "FINISH"
+          },
+          "OPEN_CDC_READ" : {
+            "begin" : 1773803137971,
+            "code" : "OPEN_CDC_READ",
+            "end" : 1773803144691,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_READ" : {
+            "begin" : 1773803136495,
+            "code" : "SNAPSHOT_READ",
+            "end" : 1773803137971,
+            "progress" : 1,
+            "status" : "FINISH",
+            "totals" : 1
+          }
+        }
+      },
+      "syncProgress" : {
+        "[\"774f0637-3e04-449d-aed4-26fbf125592c\",\"0c94f6c7-db20-4a20-a13b-02eb78cfa209\"]" : "{\"offset\":null,\"eventTime\":1773811382394,\"eventSerialNo\":2454,\"sourceTime\":1773811382394,\"syncStage\":\"CDC\",\"batchOffset\":\"_tap_encode_gAFkACZqYXZhLnV0aWwuY29uY3VycmVudC5Db25jdXJyZW50SGFzaE1hcAEUABVkaXNjaGFyZ2Vf\\r\\naW5mb3JtYXRpb24BZAARamF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0b3Jf\\r\\nc3RhdHVzARQABE9WRVKoARQAI0ZETV9RTUhfQ01TSVBfZGlzY2hhcmdlX2luZm9ybWF0aW9uAWQA\\r\\nEWphdmEudXRpbC5IYXNoTWFwARQAG2JhdGNoX3JlYWRfY29ubmVjdG9yX3N0YXR1cwEUAAdSVU5O\\r\\nSU5HqKg=\\r\\n\",\"streamOffset\":\"_v2_tap_zip_H4sIAAAAAAAA/22OQXOCMBhE78zwS3qJobHjwcOHUIRCrEiV5OKYoEUkSqsGyK8vnba3Xvftm93tbdds92d5Kfbbd/DdzwUCN6c9eEUjeoJY7p5YnpaxolooUjMn1fJIWuFQxJ2olj2peJDcBeZK4jWKa1dLJz3bllRrk/2mLysZ6PZ115J2BkATgJvmihuepxu26UY8X4Lvdx8s52WMu1IoqbNgcufmNnQbY1vCidCbk/a7DTkXAKssaMpC+VoEz3feT7JiHjWD9ZQBJBJPRlLR+m9dLt0HgOhRzt22ALe0rX0fXSUmBzmPNOvDcVKdzCJjhBrAtFq28eyHMzy5iU2NwurSL7KE0OrkJB7D1INrqDojjuHYtv6xkRwNH/C6GsyOGmkWHqBvnnghGvr4sJxObesLtW8WGX4BAAA=\",\"type\":\"NORMAL\"}"
+      }
+    },
     "autoInspect" : false,
     "blankLog" : false,
+    "canForceStopping" : true,
     "canOpenInspect" : false,
     "cdctask" : false,
     "createTime" : 1773720993385,
+    "createUser" : "admin@admin.com",
     "crontabExpression" : "",
     "crontabExpressionFlag" : false,
+    "currentEventTimestamp" : 1773811382394,
     "dag" : {
       "edges" : [ {
         "disabled" : false,
@@ -493,15 +622,25 @@
     "dataSaving" : true,
     "deduceSchemaTask" : false,
     "deduplicWriteMode" : "intelligent",
+    "delayTime" : 1372,
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
     "editVersion" : "1773721031822",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
+    "errorEvents" : [ {
+      "code" : "10012",
+      "id" : "69ba413751d25d0b9b84fd03",
+      "message" : "PDK retry exception (Server Error Code 0): when operate table: unknown, java.net.SocketTimeoutException: Connect timed out",
+      "skip" : false,
+      "stacks" : "java.net.SocketTimeoutException: Connect timed out\n\tat io.tapdata.connector.postgres.exception.PostgresExceptionCollector.revealException(PostgresExceptionCollector.java:156)\n\tat io.tapdata.common.JdbcContext.getConnection(JdbcContext.java:52)\n\tat io.tapdata.common.JdbcContext.queryWithNext(JdbcContext.java:78)\n\tat io.tapdata.connector.postgres.PostgresConnector.buildSlot(PostgresConnector.java:308)\n\tat io.tapdata.connector.postgres.PostgresConnector.streamRead(PostgresConnector.java:629)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.lambda$doBatchCDC$34(HazelcastSourcePdkDataNode.java:1021)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invokePDKMethodPrivate(PDKInvocationMonitor.java:165)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.lambda$invokePDKMethod$10(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.api.Node.applyClassLoaderContext(Node.java:27)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.lambda$invokePDKMethod$11(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.utils.RetryUtils.autoRetry(RetryUtils.java:71)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invokePDKMethod(PDKInvocationMonitor.java:152)\n\tat io.tapdata.pdk.core.monitor.PDKInvocationMonitor.invoke(PDKInvocationMonitor.java:96)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.lambda$doNormalCDC$27(HazelcastSourcePdkDataNode.java:982)\n\tat io.tapdata.aspect.utils.AspectUtils.executeDataFuncAspect(AspectUtils.java:67)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.HazelcastBaseNode.executeDataFuncAspect(HazelcastBaseNode.java:186)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doNormalCDC(HazelcastSourcePdkDataNode.java:972)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doCdc(HazelcastSourcePdkDataNode.java:904)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.startSourceRunner(HazelcastSourcePdkDataNode.java:351)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.initAndStartSourceRunner(HazelcastSourcePdkBaseNode.java:464)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.lambda$doInit$3(HazelcastSourcePdkBaseNode.java:286)\n\tat io.tapdata.pdk.core.async.ThreadPoolExecutorEx.lambda$submitSync$0(ThreadPoolExecutorEx.java:67)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat io.tapdata.pdk.core.async.ThreadPoolExecutorEx.submitSync(ThreadPoolExecutorEx.java:65)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkBaseNode.doInit(HazelcastSourcePdkBaseNode.java:263)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.data.pdk.HazelcastSourcePdkDataNode.doInit(HazelcastSourcePdkDataNode.java:223)\n\tat io.tapdata.flow.engine.V2.node.hazelcast.HazelcastBaseNode.init(HazelcastBaseNode.java:259)\n\tat com.hazelcast.jet.core.AbstractProcessor.init(AbstractProcessor.java:82)\n\tat com.hazelcast.jet.impl.execution.ProcessorTasklet.lambda$init$2f647568$1(ProcessorTasklet.java:279)\n\tat com.hazelcast.jet.function.RunnableEx.run(RunnableEx.java:31)\n\tat com.hazelcast.jet.impl.util.Util.doWithClassLoader(Util.java:532)\n\tat com.hazelcast.jet.impl.execution.ProcessorTasklet.init(ProcessorTasklet.java:279)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService$BlockingWorker.run(TaskletExecutionService.java:311)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\tat java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java)\n\tat --- Async.Stack.Trace --- (captured by IntelliJ IDEA debugger)\n\tat java.base/java.util.concurrent.FutureTask.<init>(FutureTask.java:151)\n\tat java.base/java.util.concurrent.AbstractExecutorService.newTaskFor(AbstractExecutorService.java:98)\n\tat java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:122)\n\tat java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)\n\tat java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)\n\tat java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)\n\tat java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)\n\tat java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\n\tat java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\n\tat java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\n\tat java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService.submitBlockingTasklets(TaskletExecutionService.java:177)\n\tat com.hazelcast.jet.impl.execution.TaskletExecutionService.beginExecute(TaskletExecutionService.java:156)\n\tat com.hazelcast.jet.impl.execution.ExecutionContext.beginExecution(ExecutionContext.java:233)\n\tat com.hazelcast.jet.impl.JobExecutionService.beginExecution0(JobExecutionService.java:568)\n\tat com.hazelcast.jet.impl.JobExecutionService.beginExecution(JobExecutionService.java:563)\n\tat com.hazelcast.jet.impl.operation.StartExecutionOperation.doRun(StartExecutionOperation.java:50)\n\tat com.hazelcast.jet.impl.operation.AsyncOperation.run(AsyncOperation.java:55)\n\tat com.hazelcast.spi.impl.operationservice.Operation.call(Operation.java:190)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.call(OperationRunnerImpl.java:283)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.run(OperationRunnerImpl.java:258)\n\tat com.hazelcast.spi.impl.operationservice.impl.OperationRunnerImpl.run(OperationRunnerImpl.java:219)\n\tat com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.run(OperationExecutorImpl.java:411)\n\tat com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.runOrExecute(OperationExecutorImpl.java:438)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.doInvokeLocal(Invocation.java:601)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.doInvoke(Invocation.java:580)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.invoke0(Invocation.java:541)\n\tat com.hazelcast.spi.impl.operationservice.impl.Invocation.invoke(Invocation.java:241)\n\tat com.hazelcast.spi.impl.operationservice.impl.InvocationBuilderImpl.invoke(InvocationBuilderImpl.java:61)\n\tat com.hazelcast.jet.impl.MasterContext.invokeOnParticipant(MasterContext.java:294)\n\tat com.hazelcast.jet.impl.MasterContext.invokeOnParticipants(MasterContext.java:277)\n\tat com.hazelcast.jet.impl.MasterJobContext.invokeStartExecution(MasterJobContext.java:506)\n\tat com.hazelcast.jet.impl.MasterJobContext.lambda$onInitStepCompleted$7(MasterJobContext.java:473)\n\tat com.hazelcast.jet.impl.JobCoordinationService.lambda$submitToCoordinatorThread$54(JobCoordinationService.java:1306)\n\tat com.hazelcast.jet.impl.JobCoordinationService.lambda$submitToCoordinatorThread$55(JobCoordinationService.java:1327)\n\tat com.hazelcast.internal.util.executor.CompletableFutureTask.run(CompletableFutureTask.java:64)\n\tat com.hazelcast.internal.util.executor.CachedExecutorServiceDelegate$Worker.run(CachedExecutorServiceDelegate.java:217)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\n\tat java.base/java.lang.Thread.run(Thread.java:840)\n\tat com.hazelcast.internal.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:76)\n\tat com.hazelcast.internal.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:102)\nCaused by: java.net.SocketTimeoutException: Connect timed out\n\tat java.base/java.net.SocksSocketImpl.readSocksReply(SocksSocketImpl.java:125)\n\tat java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:429)\n\tat java.base/java.net.Socket.connect(Socket.java:639)\n\tat org.postgresql.core.PGStream.createSocket(PGStream.java:260)\n\tat org.postgresql.core.PGStream.<init>(PGStream.java:121)\n\tat org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:140)\n\tat org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:268)\n\tat org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:54)\n\tat org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:273)\n\tat org.postgresql.Driver.makeConnection(Driver.java:446)\n\tat org.postgresql.Driver.connect(Driver.java:298)\n\tat com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:138)\n\tat com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:364)\n\tat com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:206)\n\tat com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:476)\n\tat com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:561)\n\tat com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:115)\n\tat com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:112)\n\tat io.tapdata.common.JdbcContext.getConnection(JdbcContext.java:49)\n\t... 90 more\n"
+    } ],
+    "errorTime" : 1773814079447,
     "fdmMain" : true,
     "fileLog" : false,
     "finishTime" : 1760933856355,
+    "functionRetryStatus" : "",
     "id" : "69b8d5a18dd517882461a145",
     "increHysteresis" : false,
     "increOperationMode" : false,
@@ -515,15 +654,22 @@
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
     "isStopOnError" : true,
+    "lastStartDate" : 1773803134342,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "last_updated" : 1773803134553,
     "ldpType" : "fdm",
     "listtags" : [ {
       "id" : "69b8d4cf8dd5178824619d46",
       "value" : "dmp fdm"
     } ],
+    "metricInfo" : {
+      "lastUpdateTime" : 1773814070003
+    },
     "name" : "QMH_CMS_TO_FDM",
     "normalTask" : true,
     "oldVersionTimezone" : false,
     "pageVersion" : "1773720994773",
+    "pingTime" : 1773814023859,
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -531,6 +677,9 @@
     "reFullRun" : false,
     "readBatchSize" : 500,
     "restartFlag" : false,
+    "runningTime" : 1773803134838,
+    "scheduledTime" : 1773803134567,
+    "schedulingTime" : 1773803134412,
     "shareCache" : false,
     "shareCdcEnable" : false,
     "showInspectTips" : false,
@@ -541,9 +690,13 @@
       "limitModeEnum" : "SkipByLimit"
     },
     "snapShotInterrupt" : false,
-    "status" : "edit",
+    "snapshotDoneAt" : 1773803138760,
+    "startTime" : 1773803134342,
+    "status" : "error",
     "statuses" : [ ],
     "stopRetryTimes" : 0,
+    "stopTime" : 1773814079447,
+    "stoppingTime" : 1773801825967,
     "syncPoints" : [ {
       "connectionId" : "69b7ef1b26de2d8303432441",
       "connectionName" : "QMH_PG_CMS",
@@ -553,8 +706,9 @@
       "pointType" : "current",
       "timeZone" : "+8"
     } ],
-    "syncStatus" : "",
+    "syncStatus" : "CDC",
     "syncType" : "migrate",
+    "taskRecordId" : "69ba1192a7ef2755ba2a1c29",
     "taskRetryStartTime" : 0,
     "testTask" : false,
     "testTaskId" : "69b8d5a18dd517882461a143",
@@ -565,6 +719,7 @@
     "transformUuid" : "1773721031857",
     "transformed" : true,
     "type" : "initial_sync+cdc",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -577,6 +732,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773721026011,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69b7ef1c7e25a691d40fb15e",
     "dev_version" : 1,
     "fields" : [ {
@@ -1130,6 +1286,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773390641738,
+    "last_updated" : 1773721032123,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "377917d3-1975-46ee-aa02-9719a9af64a0",
@@ -1167,6 +1327,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5a18dd517882461a145",
     "transformUuid" : "1773721031857",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1177,6 +1338,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773721026019,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1837,6 +1999,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773390641738,
+    "last_updated" : 1773721026019,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "0c94f6c7-db20-4a20-a13b-02eb78cfa209",
@@ -1877,6 +2043,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5a18dd517882461a145",
     "transformUuid" : "1773721031857",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1887,6 +2054,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773721019352,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69b7ef1c7e25a691d40fb15e",
     "dev_version" : 1,
     "fields" : [ {
@@ -2440,6 +2608,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773390641738,
+    "last_updated" : 1773721019352,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "discharge_information",
     "nodeId" : "774f0637-3e04-449d-aed4-26fbf125592c",
@@ -2477,6 +2649,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69b8d5a18dd517882461a145",
     "transformUuid" : "1773721031857",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 } ]

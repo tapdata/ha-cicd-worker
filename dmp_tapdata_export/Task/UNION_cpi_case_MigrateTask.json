@@ -5,6 +5,7 @@
     "accessNodeProcessId" : "",
     "accessNodeProcessIdList" : [ ],
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
+    "agentId" : "sam_iengine",
     "alarmRules" : [ {
       "equalsFlag" : 1,
       "key" : "TASK_INCREMENT_DELAY",
@@ -67,14 +68,126 @@
       "type" : "TASK",
       "unit" : "SECOND"
     } ],
-    "attrs" : { },
+    "attrs" : {
+      "milestone" : {
+        "CDC" : {
+          "begin" : 1773902315016,
+          "code" : "CDC",
+          "end" : 1773902315870,
+          "status" : "FINISH"
+        },
+        "DATA_NODE_INIT" : {
+          "begin" : 1773902312354,
+          "code" : "DATA_NODE_INIT",
+          "end" : 1773902318762,
+          "progress" : 2,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "DEDUCTION" : {
+          "begin" : 1773902312292,
+          "code" : "DEDUCTION",
+          "end" : 1773902319385,
+          "status" : "FINISH"
+        },
+        "SNAPSHOT" : {
+          "begin" : 1773902314997,
+          "code" : "SNAPSHOT",
+          "end" : 1773902315870,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "TABLE_INIT" : {
+          "begin" : 1773902314861,
+          "code" : "TABLE_INIT",
+          "end" : 1773902314862,
+          "progress" : 1,
+          "status" : "FINISH",
+          "totals" : 1
+        },
+        "TASK" : {
+          "begin" : 1773902312138,
+          "code" : "TASK",
+          "end" : 1773902312138,
+          "status" : "FINISH"
+        }
+      },
+      "nodeMilestones" : {
+        "5eda902d-5eec-48e6-824d-8d5dd6ff2bdc" : {
+          "NODE" : {
+            "begin" : 1773902314559,
+            "code" : "NODE",
+            "status" : "RUNNING"
+          }
+        },
+        "786f1ca0-e3d5-4c86-8f35-68a9e2a0d9cd" : {
+          "CDC_WRITE" : {
+            "begin" : 1773902315870,
+            "code" : "CDC_WRITE",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902314523,
+            "code" : "NODE",
+            "end" : 1773902314694,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_WRITE" : {
+            "begin" : 1773902315867,
+            "code" : "SNAPSHOT_WRITE",
+            "end" : 1773902315869,
+            "status" : "FINISH"
+          },
+          "TABLE_INIT" : {
+            "begin" : 1773902314861,
+            "code" : "TABLE_INIT",
+            "end" : 1773902314862,
+            "progress" : 1,
+            "status" : "FINISH",
+            "totals" : 1
+          }
+        },
+        "c6354971-fc98-4e26-ae05-5365538d0e31" : {
+          "CDC_READ" : {
+            "begin" : 1773902315116,
+            "code" : "CDC_READ",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902314559,
+            "code" : "NODE",
+            "end" : 1773902314779,
+            "status" : "FINISH"
+          },
+          "OPEN_CDC_READ" : {
+            "begin" : 1773902315016,
+            "code" : "OPEN_CDC_READ",
+            "end" : 1773902315116,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_READ" : {
+            "begin" : 1773902314997,
+            "code" : "SNAPSHOT_READ",
+            "end" : 1773902315015,
+            "progress" : 0,
+            "status" : "FINISH",
+            "totals" : 2
+          }
+        }
+      },
+      "syncProgress" : {
+        "[\"c6354971-fc98-4e26-ae05-5365538d0e31\",\"786f1ca0-e3d5-4c86-8f35-68a9e2a0d9cd\"]" : "{\"offset\":null,\"eventTime\":null,\"eventSerialNo\":204,\"sourceTime\":1773803227088,\"syncStage\":\"CDC\",\"batchOffset\":\"_tap_encode_gAFkACZqYXZhLnV0aWwuY29uY3VycmVudC5Db25jdXJyZW50SGFzaE1hcAEUABRGRE1fVE1IX0hQ\\r\\nSV9jcGlfY2FzZQFkABFqYXZhLnV0aWwuSGFzaE1hcAEUABtiYXRjaF9yZWFkX2Nvbm5lY3Rvcl9z\\r\\ndGF0dXMBFAAET1ZFUqgBFAAURkRNX1FNSF9IUElfY3BpX2Nhc2UBZAARamF2YS51dGlsLkhhc2hN\\r\\nYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0b3Jfc3RhdHVzARQABE9WRVKoARQAEE1ETV9IUElfY3Bp\\r\\nX2Nhc2UBZAARamF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0b3Jfc3RhdHVz\\r\\nARQAB1JVTk5JTkeoqA==\\r\\n\",\"streamOffset\":\"_v2_tap_zip_H4sIAAAAAAAA/z2OvQ6CMBgAdxLeBdCYMH6NlAURMLalC6Et0ogF5Vd5ek2MrnfDXTGW96JqZaeqogbcAMKPnHEdtcQp6TKdQryWgaslBGeA25WHccINXzlLEaZmh8cBYYBIbNBBeOrnwLYgSwFTdxZGzcyLm9z156/NLtw8NV8C1B8dQCx+/asfLoycUuPPIiRaDE4tuz2xrTbpJ6gB0c+kMnhQlGwlhJ1tvQFLgdLgwgAAAA==\",\"type\":\"NORMAL\"}"
+      }
+    },
     "autoIncrementalBatchSize" : true,
     "autoInspect" : false,
     "blankLog" : false,
+    "canForceStopping" : true,
     "canOpenInspect" : false,
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1773721185636,
+    "createUser" : "admin@admin.com",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -433,6 +546,7 @@
     "dataSaving" : true,
     "deduceSchemaTask" : false,
     "deduplicWriteMode" : "intelligent",
+    "delayTime" : 0,
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
@@ -453,14 +567,21 @@
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
     "isStopOnError" : true,
+    "lastStartDate" : 1773803225274,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "last_updated" : 1773902313783,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
       "value" : "dmp union mdm"
     } ],
+    "metricInfo" : {
+      "lastUpdateTime" : 1773902700018
+    },
     "name" : "UNION_cpi_case",
     "normalTask" : true,
     "oldVersionTimezone" : false,
     "pageVersion" : "1773803174000",
+    "pingTime" : 1773902624692,
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -468,6 +589,9 @@
     "reFullRun" : false,
     "readBatchSize" : 500,
     "restartFlag" : false,
+    "runningTime" : 1773902319825,
+    "scheduledTime" : 1773902313798,
+    "schedulingTime" : 1773902312184,
     "shareCache" : false,
     "shareCdcEnable" : false,
     "showInspectTips" : false,
@@ -478,9 +602,12 @@
       "limitModeEnum" : "SkipByLimit"
     },
     "snapShotInterrupt" : false,
-    "status" : "edit",
+    "snapshotDoneAt" : 1773803230330,
+    "startTime" : 1773803225274,
+    "status" : "running",
     "statuses" : [ ],
     "stopRetryTimes" : 0,
+    "stoppingTime" : 1773799437074,
     "syncPoints" : [ {
       "connectionId" : "695497a235a6fa1717313957",
       "connectionName" : "FDM",
@@ -490,8 +617,9 @@
       "pointType" : "current",
       "timeZone" : "+8"
     } ],
-    "syncStatus" : "",
+    "syncStatus" : "CDC",
     "syncType" : "migrate",
+    "taskRecordId" : "69ba0f87a7ef2755ba2a192a",
     "testTask" : false,
     "testTaskId" : "69b8d6618dd517882461a528",
     "testUsingPreview" : false,
@@ -501,6 +629,7 @@
     "transformUuid" : "1773803192063",
     "transformed" : true,
     "type" : "initial_sync+cdc",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -513,6 +642,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722003264,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1211,6 +1341,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773803192183,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_HPI_cpi_case",
     "nodeId" : "5eda902d-5eec-48e6-824d-8d5dd6ff2bdc",
@@ -1259,6 +1393,7 @@
     },
     "taskId" : "69b8d6618dd517882461a52a",
     "transformUuid" : "1773803192063",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1269,6 +1404,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722003283,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -1967,6 +2103,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773803192200,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_HPI_cpi_case",
     "nodeId" : "786f1ca0-e3d5-4c86-8f35-68a9e2a0d9cd",
@@ -2015,6 +2155,7 @@
     },
     "taskId" : "69b8d6618dd517882461a52a",
     "transformUuid" : "1773803192063",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2025,6 +2166,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773721922644,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -2699,6 +2841,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773721922644,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_case",
     "nodeId" : "c6354971-fc98-4e26-ae05-5365538d0e31",
@@ -2747,6 +2893,7 @@
     },
     "taskId" : "69b8d6618dd517882461a52a",
     "transformUuid" : "1773803192063",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2757,6 +2904,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773731848125,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -3431,6 +3579,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773731821061,
+    "last_updated" : 1773731848125,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_case",
     "nodeId" : "c6354971-fc98-4e26-ae05-5365538d0e31",
@@ -3479,6 +3631,7 @@
     },
     "taskId" : "69b8d6618dd517882461a52a",
     "transformUuid" : "1773803192063",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 } ]

@@ -5,6 +5,7 @@
     "accessNodeProcessId" : "",
     "accessNodeProcessIdList" : [ ],
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
+    "agentId" : "sam_iengine",
     "alarmRules" : [ {
       "equalsFlag" : 1,
       "key" : "TASK_INCREMENT_DELAY",
@@ -67,14 +68,126 @@
       "type" : "TASK",
       "unit" : "SECOND"
     } ],
-    "attrs" : { },
+    "attrs" : {
+      "milestone" : {
+        "CDC" : {
+          "begin" : 1773902320408,
+          "code" : "CDC",
+          "end" : 1773902321219,
+          "status" : "FINISH"
+        },
+        "DATA_NODE_INIT" : {
+          "begin" : 1773902316405,
+          "code" : "DATA_NODE_INIT",
+          "end" : 1773902324319,
+          "progress" : 2,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "DEDUCTION" : {
+          "begin" : 1773902316309,
+          "code" : "DEDUCTION",
+          "end" : 1773902319385,
+          "status" : "FINISH"
+        },
+        "SNAPSHOT" : {
+          "begin" : 1773902320399,
+          "code" : "SNAPSHOT",
+          "end" : 1773902321219,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "TABLE_INIT" : {
+          "begin" : 1773902320714,
+          "code" : "TABLE_INIT",
+          "end" : 1773902320714,
+          "progress" : 1,
+          "status" : "FINISH",
+          "totals" : 1
+        },
+        "TASK" : {
+          "begin" : 1773902316200,
+          "code" : "TASK",
+          "end" : 1773902316200,
+          "status" : "FINISH"
+        }
+      },
+      "nodeMilestones" : {
+        "2e63fa56-1fc9-4118-8370-8e96a7c8975a" : {
+          "CDC_WRITE" : {
+            "begin" : 1773902321219,
+            "code" : "CDC_WRITE",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902319886,
+            "code" : "NODE",
+            "end" : 1773902320219,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_WRITE" : {
+            "begin" : 1773902321218,
+            "code" : "SNAPSHOT_WRITE",
+            "end" : 1773902321219,
+            "status" : "FINISH"
+          },
+          "TABLE_INIT" : {
+            "begin" : 1773902320714,
+            "code" : "TABLE_INIT",
+            "end" : 1773902320714,
+            "progress" : 1,
+            "status" : "FINISH",
+            "totals" : 1
+          }
+        },
+        "39086f66-9ea0-49f3-b26b-f65c74b702de" : {
+          "CDC_READ" : {
+            "begin" : 1773902320496,
+            "code" : "CDC_READ",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902319881,
+            "code" : "NODE",
+            "end" : 1773902320067,
+            "status" : "FINISH"
+          },
+          "OPEN_CDC_READ" : {
+            "begin" : 1773902320408,
+            "code" : "OPEN_CDC_READ",
+            "end" : 1773902320496,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_READ" : {
+            "begin" : 1773902320399,
+            "code" : "SNAPSHOT_READ",
+            "end" : 1773902320407,
+            "progress" : 0,
+            "status" : "FINISH",
+            "totals" : 2
+          }
+        },
+        "77adf9e3-fbcf-44fa-b528-4edba38bacef" : {
+          "NODE" : {
+            "begin" : 1773902319895,
+            "code" : "NODE",
+            "status" : "RUNNING"
+          }
+        }
+      },
+      "syncProgress" : {
+        "[\"39086f66-9ea0-49f3-b26b-f65c74b702de\",\"2e63fa56-1fc9-4118-8370-8e96a7c8975a\"]" : "{\"offset\":null,\"eventTime\":null,\"eventSerialNo\":204,\"sourceTime\":1773803228485,\"syncStage\":\"CDC\",\"batchOffset\":\"_tap_encode_gAFkACZqYXZhLnV0aWwuY29uY3VycmVudC5Db25jdXJyZW50SGFzaE1hcAEUAB9NRE1fQ01TSVBf\\r\\nZGlzY2hhcmdlX2luZm9ybWF0aW9uAWQAEWphdmEudXRpbC5IYXNoTWFwARQAG2JhdGNoX3JlYWRf\\r\\nY29ubmVjdG9yX3N0YXR1cwEUAAdSVU5OSU5HqAEUACNGRE1fVE1IX0NNU0lQX2Rpc2NoYXJnZV9p\\r\\nbmZvcm1hdGlvbgFkABFqYXZhLnV0aWwuSGFzaE1hcAEUABtiYXRjaF9yZWFkX2Nvbm5lY3Rvcl9z\\r\\ndGF0dXMBFAAET1ZFUqgBFAAjRkRNX1FNSF9DTVNJUF9kaXNjaGFyZ2VfaW5mb3JtYXRpb24BZAAR\\r\\namF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0b3Jfc3RhdHVzARQABE9WRVKo\\r\\nqA==\\r\\n\",\"streamOffset\":\"_v2_tap_zip_H4sIAAAAAAAA/z2OvQ6CMBgAdxLeBdCYMH6NlAURMLbQhdAWacSC8lOUp9fE6Ho33JVTdS/rTvSyLhvALSD8KHKmoo44FV3mU4jXKnCVgOAMcLuyME6YZivLU4Sp3uFpQRgg4ht04J78ObAtyFLA1DVcS5N7cVu4vvna7ML0U7ElQMPRAZTHr3/1w7kWc6p9w0Oi+Og0ot8T2+qSYYYGEP1MSo1HSclWQNjb1huHVS0vwgAAAA==\",\"type\":\"NORMAL\"}"
+      }
+    },
     "autoIncrementalBatchSize" : true,
     "autoInspect" : false,
     "blankLog" : false,
+    "canForceStopping" : true,
     "canOpenInspect" : false,
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1773722102278,
+    "createUser" : "admin@admin.com",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -435,12 +548,14 @@
     "dataSaving" : true,
     "deduceSchemaTask" : false,
     "deduplicWriteMode" : "intelligent",
+    "delayTime" : 0,
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
     "editVersion" : "1773731839428",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
+    "errorTime" : 1773797440042,
     "fileLog" : false,
     "id" : "69b8d9f68dd517882461b332",
     "increHysteresis" : false,
@@ -455,14 +570,21 @@
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
     "isStopOnError" : true,
+    "lastStartDate" : 1773803226903,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "last_updated" : 1773902314732,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
       "value" : "dmp union mdm"
     } ],
+    "metricInfo" : {
+      "lastUpdateTime" : 1773902700018
+    },
     "name" : "UNION_discharge_information",
     "normalTask" : true,
     "oldVersionTimezone" : false,
     "pageVersion" : "1773731837271",
+    "pingTime" : 1773902624691,
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -470,6 +592,9 @@
     "reFullRun" : false,
     "readBatchSize" : 500,
     "restartFlag" : false,
+    "runningTime" : 1773902316121,
+    "scheduledTime" : 1773902314755,
+    "schedulingTime" : 1773902314646,
     "shareCache" : false,
     "shareCdcEnable" : false,
     "showInspectTips" : false,
@@ -480,9 +605,12 @@
       "limitModeEnum" : "SkipByLimit"
     },
     "snapShotInterrupt" : false,
-    "status" : "edit",
+    "snapshotDoneAt" : 1773803231731,
+    "startTime" : 1773803226903,
+    "status" : "running",
     "statuses" : [ ],
     "stopRetryTimes" : 0,
+    "stoppingTime" : 1773799436880,
     "syncPoints" : [ {
       "connectionId" : "695497a235a6fa1717313957",
       "connectionName" : "FDM",
@@ -492,8 +620,9 @@
       "pointType" : "current",
       "timeZone" : "+8"
     } ],
-    "syncStatus" : "",
+    "syncStatus" : "CDC",
     "syncType" : "migrate",
+    "taskRecordId" : "69ba0f87a7ef2755ba2a191e",
     "testTask" : false,
     "testTaskId" : "69b8d9f68dd517882461b330",
     "testUsingPreview" : false,
@@ -503,6 +632,7 @@
     "transformUuid" : "1773731839442",
     "transformed" : true,
     "type" : "initial_sync+cdc",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -515,6 +645,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722151188,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1081,6 +1212,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773731839625,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_CMSIP_discharge_information",
     "nodeId" : "77adf9e3-fbcf-44fa-b528-4edba38bacef",
@@ -1129,6 +1264,7 @@
     },
     "taskId" : "69b8d9f68dd517882461b332",
     "transformUuid" : "1773731839442",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1139,6 +1275,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722151210,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -1705,6 +1842,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773731839633,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_CMSIP_discharge_information",
     "nodeId" : "2e63fa56-1fc9-4118-8370-8e96a7c8975a",
@@ -1753,6 +1894,7 @@
     },
     "taskId" : "69b8d9f68dd517882461b332",
     "transformUuid" : "1773731839442",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1763,6 +1905,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773722142028,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -2305,6 +2448,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773722142028,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_CMSIP_discharge_information",
     "nodeId" : "39086f66-9ea0-49f3-b26b-f65c74b702de",
@@ -2353,6 +2500,7 @@
     },
     "taskId" : "69b8d9f68dd517882461b332",
     "transformUuid" : "1773731839442",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2363,6 +2511,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773731839613,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -2905,6 +3054,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773731821061,
+    "last_updated" : 1773731839613,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_CMSIP_discharge_information",
     "nodeId" : "39086f66-9ea0-49f3-b26b-f65c74b702de",
@@ -2953,6 +3106,7 @@
     },
     "taskId" : "69b8d9f68dd517882461b332",
     "transformUuid" : "1773731839442",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 } ]

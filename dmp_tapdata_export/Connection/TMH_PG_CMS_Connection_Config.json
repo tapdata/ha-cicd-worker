@@ -167,9 +167,10 @@
     },
     "connection_type" : "source_and_target",
     "createTime" : 1773729984543,
+    "createUser" : "admin@admin.com",
     "dataSourceMonitor" : false,
     "database_type" : "PostgreSQL",
-    "datasourceInstanceTag" : "113.98.206.142:25432",
+    "datasourceInstanceTag" : "192.168.1.184:25432",
     "definitionBuildNumber" : "null",
     "definitionGroup" : "io.tapdata",
     "definitionPdkAPIVersion" : "2.0.5-SNAPSHOT",
@@ -201,7 +202,10 @@
     "kafkaProducerRequestTimeout" : 0,
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
-    "lastStatus" : "ready",
+    "lastStatus" : "invalid",
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773902591615,
+    "last_updated" : 1773730009282,
     "listtags" : [ {
       "id" : "69b90ba98dd517882461f4ec",
       "value" : "dmp"
@@ -210,7 +214,9 @@
     "loadCount" : 1,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
-    "multiConnectionInstanceId" : "cdfbe78c6639b8e3995f4ae4b353d5d6",
+    "loadSchemaField" : true,
+    "loadSchemaTime" : 1773902690530,
+    "multiConnectionInstanceId" : "7903ef379676ad930e8c41ae63a7a161",
     "name" : "TMH_PG_CMS",
     "namespace" : [ "cms" ],
     "openTableExcludeFilter" : false,
@@ -221,11 +227,14 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "3cb9e3b9-022c-46f9-8720-fcfba86f4efa",
+    "schemaVersion" : "c8a24fab-97bf-4a81-a80c-c0b1f176488f",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "status" : "ready",
     "submit" : true,
-    "tableCount" : 1
+    "tableCount" : 1,
+    "testTime" : 1773902591583,
+    "transformed" : true,
+    "user_id" : "62bc5008d4958d013d97c7a6"
   }
 } ]

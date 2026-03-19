@@ -5,6 +5,7 @@
     "accessNodeProcessId" : "",
     "accessNodeProcessIdList" : [ ],
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
+    "agentId" : "sam_iengine",
     "alarmRules" : [ {
       "equalsFlag" : 1,
       "key" : "TASK_INCREMENT_DELAY",
@@ -67,14 +68,126 @@
       "type" : "TASK",
       "unit" : "SECOND"
     } ],
-    "attrs" : { },
+    "attrs" : {
+      "milestone" : {
+        "CDC" : {
+          "begin" : 1773902319625,
+          "code" : "CDC",
+          "end" : 1773902320932,
+          "status" : "FINISH"
+        },
+        "DATA_NODE_INIT" : {
+          "begin" : 1773902315555,
+          "code" : "DATA_NODE_INIT",
+          "end" : 1773902320610,
+          "progress" : 2,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "DEDUCTION" : {
+          "begin" : 1773902315465,
+          "code" : "DEDUCTION",
+          "end" : 1773902319385,
+          "status" : "FINISH"
+        },
+        "SNAPSHOT" : {
+          "begin" : 1773902319466,
+          "code" : "SNAPSHOT",
+          "end" : 1773902320932,
+          "status" : "FINISH",
+          "totals" : 2
+        },
+        "TABLE_INIT" : {
+          "begin" : 1773902319423,
+          "code" : "TABLE_INIT",
+          "end" : 1773902319423,
+          "progress" : 1,
+          "status" : "FINISH",
+          "totals" : 1
+        },
+        "TASK" : {
+          "begin" : 1773902315353,
+          "code" : "TASK",
+          "end" : 1773902315353,
+          "status" : "FINISH"
+        }
+      },
+      "nodeMilestones" : {
+        "6a50d446-3758-4962-bc95-458b1e9a0707" : {
+          "NODE" : {
+            "begin" : 1773902316221,
+            "code" : "NODE",
+            "status" : "RUNNING"
+          }
+        },
+        "75aee412-eeea-4885-b571-6ec47972b01c" : {
+          "CDC_READ" : {
+            "begin" : 1773902319712,
+            "code" : "CDC_READ",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902316207,
+            "code" : "NODE",
+            "end" : 1773902316421,
+            "status" : "FINISH"
+          },
+          "OPEN_CDC_READ" : {
+            "begin" : 1773902319625,
+            "code" : "OPEN_CDC_READ",
+            "end" : 1773902319712,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_READ" : {
+            "begin" : 1773902319466,
+            "code" : "SNAPSHOT_READ",
+            "end" : 1773902319624,
+            "progress" : 0,
+            "status" : "FINISH",
+            "totals" : 2
+          }
+        },
+        "f9bfd9bb-9f9d-4001-b97f-2b3abb8e7ea5" : {
+          "CDC_WRITE" : {
+            "begin" : 1773902320932,
+            "code" : "CDC_WRITE",
+            "status" : "RUNNING"
+          },
+          "NODE" : {
+            "begin" : 1773902316229,
+            "code" : "NODE",
+            "end" : 1773902317544,
+            "status" : "FINISH"
+          },
+          "SNAPSHOT_WRITE" : {
+            "begin" : 1773902320931,
+            "code" : "SNAPSHOT_WRITE",
+            "end" : 1773902320932,
+            "status" : "FINISH"
+          },
+          "TABLE_INIT" : {
+            "begin" : 1773902319423,
+            "code" : "TABLE_INIT",
+            "end" : 1773902319423,
+            "progress" : 1,
+            "status" : "FINISH",
+            "totals" : 1
+          }
+        }
+      },
+      "syncProgress" : {
+        "[\"75aee412-eeea-4885-b571-6ec47972b01c\",\"f9bfd9bb-9f9d-4001-b97f-2b3abb8e7ea5\"]" : "{\"offset\":null,\"eventTime\":null,\"eventSerialNo\":148,\"sourceTime\":1773803228246,\"syncStage\":\"CDC\",\"batchOffset\":\"_tap_encode_gAFkACZqYXZhLnV0aWwuY29uY3VycmVudC5Db25jdXJyZW50SGFzaE1hcAEUACFNRE1fSFBJX2Nw\\r\\naV9wYXRpZW50X2hvc3BpdGFsX2RhdGEBZAARamF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVh\\r\\nZF9jb25uZWN0b3Jfc3RhdHVzARQAB1JVTk5JTkeoARQAJUZETV9UTUhfSFBJX2NwaV9wYXRpZW50\\r\\nX2hvc3BpdGFsX2RhdGEBZAARamF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0\\r\\nb3Jfc3RhdHVzARQABE9WRVKoARQAJUZETV9RTUhfSFBJX2NwaV9wYXRpZW50X2hvc3BpdGFsX2Rh\\r\\ndGEBZAARamF2YS51dGlsLkhhc2hNYXABFAAbYmF0Y2hfcmVhZF9jb25uZWN0b3Jfc3RhdHVzARQA\\r\\nBE9WRVKoqA==\\r\\n\",\"streamOffset\":\"_v2_tap_zip_H4sIAAAAAAAA/z2OvQ6CMBgAdxLeBdCYMH6NlAURMLbQhdAWacSC8lOUp9fE6Ho33JVTdS/rTvSyLhvALSD8KHKmoo44FV3mU4jXKnCVgOAMcLuyME6YZivLU4Sp3uFpQRgg4ht04J78ObAtyFLA1DVcS5N7cVu4vvna7ML0U7ElQMPRAZTHr3/1w7kWc6p9w0Oi+Og0ot8T2+qSYYYGEP1MSo1HSclWQNjb1huHVS0vwgAAAA==\",\"type\":\"NORMAL\"}"
+      }
+    },
     "autoIncrementalBatchSize" : true,
     "autoInspect" : false,
     "blankLog" : false,
+    "canForceStopping" : true,
     "canOpenInspect" : false,
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1773722071262,
+    "createUser" : "admin@admin.com",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -435,12 +548,14 @@
     "dataSaving" : true,
     "deduceSchemaTask" : false,
     "deduplicWriteMode" : "intelligent",
+    "delayTime" : 0,
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
     "editVersion" : "1773731855277",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
+    "errorTime" : 1773797429918,
     "fileLog" : false,
     "id" : "69b8d9d78dd517882461b24e",
     "increHysteresis" : false,
@@ -455,14 +570,21 @@
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
     "isStopOnError" : true,
+    "lastStartDate" : 1773803226469,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "last_updated" : 1773902314555,
     "listtags" : [ {
       "id" : "69b90c2c8dd517882461f593",
       "value" : "dmp union mdm"
     } ],
+    "metricInfo" : {
+      "lastUpdateTime" : 1773902700018
+    },
     "name" : "UNION_cpi_patient_hospital_data",
     "normalTask" : true,
     "oldVersionTimezone" : false,
     "pageVersion" : "1773731853314",
+    "pingTime" : 1773902624693,
     "planStartDateFlag" : false,
     "preview" : false,
     "previewTask" : false,
@@ -470,6 +592,9 @@
     "reFullRun" : false,
     "readBatchSize" : 500,
     "restartFlag" : false,
+    "runningTime" : 1773902315272,
+    "scheduledTime" : 1773902314562,
+    "schedulingTime" : 1773902314294,
     "shareCache" : false,
     "shareCdcEnable" : false,
     "showInspectTips" : false,
@@ -480,9 +605,12 @@
       "limitModeEnum" : "SkipByLimit"
     },
     "snapShotInterrupt" : false,
-    "status" : "edit",
+    "snapshotDoneAt" : 1773803230974,
+    "startTime" : 1773803226469,
+    "status" : "running",
     "statuses" : [ ],
     "stopRetryTimes" : 0,
+    "stoppingTime" : 1773799436950,
     "syncPoints" : [ {
       "connectionId" : "695497a235a6fa1717313957",
       "connectionName" : "FDM",
@@ -492,8 +620,9 @@
       "pointType" : "current",
       "timeZone" : "+8"
     } ],
-    "syncStatus" : "",
+    "syncStatus" : "CDC",
     "syncType" : "migrate",
+    "taskRecordId" : "69ba0f87a7ef2755ba2a1926",
     "testTask" : false,
     "testTaskId" : "69b8d9d78dd517882461b24c",
     "testUsingPreview" : false,
@@ -503,6 +632,7 @@
     "transformUuid" : "1773731855312",
     "transformed" : true,
     "type" : "initial_sync+cdc",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -515,6 +645,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722086938,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -795,6 +926,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773731855476,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "processor_node",
     "name" : "MDM_HPI_cpi_patient_hospital_data",
     "nodeId" : "6a50d446-3758-4962-bc95-458b1e9a0707",
@@ -843,6 +978,7 @@
     },
     "taskId" : "69b8d9d78dd517882461b24e",
     "transformUuid" : "1773731855312",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -853,6 +989,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773722086939,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -1133,6 +1270,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773731855486,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "MDM_HPI_cpi_patient_hospital_data",
     "nodeId" : "f9bfd9bb-9f9d-4001-b97f-2b3abb8e7ea5",
@@ -1181,6 +1322,7 @@
     },
     "taskId" : "69b8d9d78dd517882461b24e",
     "transformUuid" : "1773731855312",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1191,6 +1333,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1773722081034,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1447,6 +1590,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773721903940,
+    "last_updated" : 1773722081034,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_QMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "75aee412-eeea-4885-b571-6ec47972b01c",
@@ -1495,6 +1642,7 @@
     },
     "taskId" : "69b8d9d78dd517882461b24e",
     "transformUuid" : "1773731855312",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1505,6 +1653,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1773731855467,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1761,6 +1910,10 @@
       "unique" : true
     } ],
     "is_deleted" : false,
+    "lastUpdBy" : "62bc5008d4958d013d97c7a6",
+    "lastUpdate" : 1773731821061,
+    "last_updated" : 1773731855467,
+    "last_user_name" : "admin@admin.com",
     "meta_type" : "table",
     "name" : "FDM_TMH_HPI_cpi_patient_hospital_data",
     "nodeId" : "75aee412-eeea-4885-b571-6ec47972b01c",
@@ -1809,6 +1962,7 @@
     },
     "taskId" : "69b8d9d78dd517882461b24e",
     "transformUuid" : "1773731855312",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 } ]
