@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# Preview resource changes (connections/migrate/tasks/sync/tasks/apis) via TapData API
+# Usage: preview-resource.sh <resource_type>
+# resource_type: connections | migrate/tasks | sync/tasks | apis
+# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TAPDATA_BASE_URL
+# Optional env vars: ARCHIVE_NAME
+set -euo pipefail
+
+RESOURCE_TYPE="${1:-}"
+
+echo "=== Previewing ${RESOURCE_TYPE} via TapData API ==="
+
+# Validate inputs
+if [[ -z "${RESOURCE_TYPE}" ]]; then
+  echo "::error::Usage: preview-resource.sh <connections|migrate/tasks|sync/tasks|apis>"
+  exit 1
+fi
+
+if [[ -z "${DEPLOY_DIR:-}" ]]; then
+  echo "::error::DEPLOY_DIR is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${TAPDATA_TOKEN:-}" ]]; then
+  echo "::error::TAPDATA_TOKEN is not set or empty"
+  exit 1
+fi
+
+if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
+  echo "::error::TAPDATA_BASE_URL is not set or empty"
+  exit 1
+fi
+
+BASE_URL="${TAPDATA_BASE_URL}"
+
+# Determine API path based on resource type
+case "${RESOURCE_TYPE}" in
+  connections)
+    API_PATH="api/groupInfo/preview/connections"
+    DISPLAY_NAME="Connections"
+    ;;
+  migrate/tasks)
+    API_PATH="api/groupInfo/preview/migrate/tasks"
+    DISPLAY_NAME="Migrate Tasks"
+    ;;
+  sync/tasks)
+    API_PATH="api/groupInfo/preview/sync/tasks"
+    DISPLAY_NAME="Sync Tasks"
+    ;;
+  apis)
+    API_PATH="api/groupInfo/preview/apis"
+    DISPLAY_NAME="APIs"
+    ;;
+  *)
+    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|migrate/tasks|sync/tasks|apis"
+    exit 1
+    ;;
+esac
+
+API_URL="${BASE_URL%/}/${API_PATH}"
+ACCESS_TOKEN_ENCODED=$(jq -nr --arg v "${TAPDATA_TOKEN}" '$v|@uri')
+
+if [[ "${API_URL}" == *\?* ]]; then
+  PREVIEW_URL="${API_URL}&access_token=${ACCESS_TOKEN_ENCODED}"
+else
+  PREVIEW_URL="${API_URL}?access_token=${ACCESS_TOKEN_ENCODED}"
+fi
+
+# Locate tar archive
+ARCHIVE_NAME="${ARCHIVE_NAME:-export.tar}"
+ARCHIVE="${DEPLOY_DIR}/${ARCHIVE_NAME}"
+
+if [[ ! -f "${ARCHIVE}" ]]; then
+  echo "::error::Archive not found: ${ARCHIVE}"
+  exit 1
+fi
+
+echo "Target environment: ${TARGET_ENV:-unknown}"
+echo "API URL: ${API_URL}"
+
+IMPORT_MODE="${IMPORT_MODE:-replace}"
+
+echo "Archive: ${ARCHIVE}"
+echo "Import mode: ${IMPORT_MODE}"
+
+# Build curl arguments for multipart/form-data upload
+CURL_ARGS=(-s -w "\n%{http_code}" -X POST "${PREVIEW_URL}" \
+  -F "file=@${ARCHIVE}" \
+  -F "importMode=${IMPORT_MODE}")
+
+# Optionally attach vault file
+VAULT_FILE="${DEPLOY_DIR}/vault.json"
+if [[ -f "${VAULT_FILE}" ]]; then
+  echo "Vault file found: ${VAULT_FILE}"
+  CURL_ARGS+=(-F "vault=@${VAULT_FILE}")
+fi
+
+# Upload via POST multipart/form-data
+RESPONSE=$(curl "${CURL_ARGS[@]}")
+
+HTTP_CODE=$(echo "${RESPONSE}" | tail -n1)
+BODY=$(echo "${RESPONSE}" | sed '$d')
+
+echo "HTTP Status: ${HTTP_CODE}"
+echo "Response: ${BODY}"
+
+if [[ "${HTTP_CODE}" -ne 200 ]]; then
+  echo "::error::Preview API returned HTTP ${HTTP_CODE}: ${BODY}"
+  exit 1
+fi
+
+# Check response for errors
+CODE=$(echo "${BODY}" | jq -r '.code // empty')
+if [[ -n "${CODE}" && "${CODE}" != "ok" ]]; then
+  MESSAGE=$(echo "${BODY}" | jq -r '.message // empty')
+  echo "::error::Preview failed with code '${CODE}': ${MESSAGE}"
+  exit 1
+fi
+
+# Extract add/update/delete arrays from response
+ADD_LIST=$(echo "${BODY}" | jq -r '.data.add // []')
+UPDATE_LIST=$(echo "${BODY}" | jq -r '.data.update // []')
+DELETE_LIST=$(echo "${BODY}" | jq -r '.data.delete // []')
+
+ADD_COUNT=$(echo "${ADD_LIST}" | jq 'length')
+UPDATE_COUNT=$(echo "${UPDATE_LIST}" | jq 'length')
+DELETE_COUNT=$(echo "${DELETE_LIST}" | jq 'length')
+
+echo "Preview results - Add: ${ADD_COUNT}, Update: ${UPDATE_COUNT}, Delete: ${DELETE_COUNT}"
+
+# Write GitHub Step Summary as Markdown
+{
+  echo "## Preview: ${DISPLAY_NAME}"
+  echo ""
+
+  if [[ "${ADD_COUNT}" -eq 0 && "${UPDATE_COUNT}" -eq 0 && "${DELETE_COUNT}" -eq 0 ]]; then
+    echo "> No changes detected."
+    echo ""
+  fi
+
+  if [[ "${ADD_COUNT}" -gt 0 ]]; then
+    echo "### ➕ Add (${ADD_COUNT})"
+    echo ""
+    echo "${ADD_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo ""
+  fi
+
+  if [[ "${UPDATE_COUNT}" -gt 0 ]]; then
+    echo "### ✏️ Update (${UPDATE_COUNT})"
+    echo ""
+    echo "${UPDATE_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo ""
+  fi
+
+  if [[ "${DELETE_COUNT}" -gt 0 ]]; then
+    echo "### 🗑️ Delete (${DELETE_COUNT})"
+    echo ""
+    echo "${DELETE_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo ""
+  fi
+} >> "${GITHUB_STEP_SUMMARY}"
+
+# Save response for downstream steps
+SAFE_NAME="${RESOURCE_TYPE//\//_}"
+echo "${BODY}" > "${DEPLOY_DIR}/${SAFE_NAME}-preview-response.json"
+
+echo "=== Preview ${RESOURCE_TYPE} Complete ==="

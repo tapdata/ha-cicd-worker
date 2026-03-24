@@ -1,11 +1,10 @@
 name: TapData Deploy
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
     paths:
       - '**/*tapdata_export/**'
-  push:
     tags:
       - '**'
   workflow_dispatch:
@@ -28,10 +27,10 @@ on:
 
 env:
   DEPLOY_DIR: /tmp/tapdata-deploy-${{ github.run_id }}
-  # PR 触发时使用 head_ref（feat 分支），手动/Tag 触发时使用 ref_name
-  DEPLOY_REF: ${{ github.head_ref || github.ref_name }}
-  # PR 触发时固定 dev；push 创建 Tag 触发时固定 sit；手动触发时使用 inputs.target_env
-  TARGET_ENV: ${{ github.event_name == 'pull_request' && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+  # push 到 main 或创建 Tag 时使用 ref_name
+  DEPLOY_REF: ${{ github.ref_name }}
+  # push 到 main 时固定 dev；push 创建 Tag 时固定 sit；手动触发时使用 inputs.target_env
+  TARGET_ENV: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
   # 创建 Tag 触发时固定 dmp；其他场景默认 dmp 或使用手动输入
   PROJECT: ${{ inputs.project || 'dmp' }}
 
@@ -43,10 +42,10 @@ jobs:
     name: Preparation Phase
     runs-on: self-hosted
     timeout-minutes: 5
-    environment: ${{ github.event_name == 'pull_request' && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+    environment: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
-      target_env: ${{ github.event_name == 'pull_request' && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+      target_env: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -69,16 +68,53 @@ jobs:
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESS_CODE }}
 
+  # ============================================================
+  # Job 2: Preview Connections
+  # ============================================================
+  preview-connections:
+    name: Preview Connections
+    runs-on: self-hosted
+    timeout-minutes: 5
+    needs: preparation
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Generate vault.json with Connection Secrets
+        run: bash scripts/tapdata-deploy/generate-vault.sh
+        env:
+          PROJECT: ${{ env.PROJECT }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+          ALL_VARS: ${{ toJSON(vars) }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: connections-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview Connections
+        run: bash scripts/common/preview-resource.sh connections
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: connections-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 2: Deploy Connections
+  # Job 3: Deploy Connections (requires approval)
   # ============================================================
   deploy-connections:
     name: Deploy Connections
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: ${{ needs.preparation.outputs.target_env }}
-    needs: preparation
+    environment: approve-connections
+    needs: [preparation, preview-connections]
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
     steps:
@@ -112,18 +148,14 @@ jobs:
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
-
   # ============================================================
-  # Job 3: Deploy Tasks
+  # Job 4: Preview Migrate Tasks (parallel branch 1)
   # ============================================================
-  deploy-tasks:
-    name: Deploy Tasks
+  preview-migrate-tasks:
+    name: Preview Migrate Tasks
     runs-on: self-hosted
-    timeout-minutes: 15
-    environment: ${{ needs.preparation.outputs.target_env }}
+    timeout-minutes: 5
     needs: [preparation, deploy-connections]
-    outputs:
-      changed_tasks: ${{ steps.import_tasks.outputs.changed_tasks }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -138,9 +170,8 @@ jobs:
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
-      - name: Import Tasks via TapData API
-        id: import_tasks
-        run: bash scripts/common/import-resource.sh tasks
+      - name: Preview Migrate Tasks
+        run: bash scripts/common/preview-resource.sh migrate/tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -149,14 +180,80 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 4: Deploy APIs
+  # Job 5: Preview APIs (parallel branch 2)
+  # ============================================================
+  preview-apis:
+    name: Preview APIs
+    runs-on: self-hosted
+    timeout-minutes: 5
+    needs: [preparation, deploy-connections]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview APIs
+        run: bash scripts/common/preview-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 6: Deploy Migrate Tasks (requires approval)
+  # ============================================================
+  deploy-migrate-tasks:
+    name: Deploy Migrate Tasks
+    runs-on: self-hosted
+    timeout-minutes: 15
+    environment: approve-migrate-tasks
+    needs: [preparation, preview-migrate-tasks]
+    outputs:
+      changed_migrate_tasks: ${{ steps.import_migrate_tasks.outputs.changed_migrate_tasks }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Migrate Tasks via TapData API
+        id: import_migrate_tasks
+        run: bash scripts/common/import-resource.sh migrate/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 7: Deploy APIs (requires approval, parallel with migrate)
   # ============================================================
   deploy-apis:
     name: Deploy APIs
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: ${{ needs.preparation.outputs.target_env }}
-    needs: [preparation, deploy-tasks]
+    environment: approve-apis
+    needs: [preparation, preview-apis]
     outputs:
       changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
     steps:
@@ -184,14 +281,80 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 5: Deploy Group Info
+  # Job 8: Preview Sync Tasks
+  # ============================================================
+  preview-sync-tasks:
+    name: Preview Sync Tasks
+    runs-on: self-hosted
+    timeout-minutes: 5
+    needs: [preparation, deploy-migrate-tasks]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview Sync Tasks
+        run: bash scripts/common/preview-resource.sh sync/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 9: Deploy Sync Tasks (requires approval)
+  # ============================================================
+  deploy-sync-tasks:
+    name: Deploy Sync Tasks
+    runs-on: self-hosted
+    timeout-minutes: 15
+    environment: approve-sync-tasks
+    needs: [preparation, preview-sync-tasks]
+    outputs:
+      changed_sync_tasks: ${{ steps.import_sync_tasks.outputs.changed_sync_tasks }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Sync Tasks via TapData API
+        id: import_sync_tasks
+        run: bash scripts/common/import-resource.sh sync/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 10: Deploy Group Info (waits for both parallel branches)
   # ============================================================
   deploy-group-info:
     name: Deploy Group Info
     runs-on: self-hosted
     timeout-minutes: 15
     environment: ${{ needs.preparation.outputs.target_env }}
-    needs: [preparation, deploy-apis]
+    needs: [preparation, deploy-sync-tasks, deploy-apis]
     outputs:
       changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
     steps:
@@ -219,14 +382,14 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 6: Generate Deployment Report
+  # Job 11: Generate Deployment Report
   # ============================================================
   generate-report:
     name: Generate Deployment Report
     runs-on: self-hosted
     timeout-minutes: 5
     if: always()
-    needs: [preparation, deploy-connections, deploy-tasks, deploy-apis, deploy-group-info]
+    needs: [preparation, deploy-connections, deploy-migrate-tasks, deploy-apis, deploy-sync-tasks, deploy-group-info]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -243,12 +406,13 @@ jobs:
           PROJECT: ${{ env.PROJECT }}
           GITHUB_ACTOR: ${{ github.actor }}
           CHANGED_CONNECTIONS: ${{ needs.deploy-connections.outputs.changed_connections }}
-          CHANGED_TASKS: ${{ needs.deploy-tasks.outputs.changed_tasks }}
+          CHANGED_MIGRATE_TASKS: ${{ needs.deploy-migrate-tasks.outputs.changed_migrate_tasks }}
+          CHANGED_SYNC_TASKS: ${{ needs.deploy-sync-tasks.outputs.changed_sync_tasks }}
           CHANGED_APIS: ${{ needs.deploy-apis.outputs.changed_apis }}
           CHANGED_GROUP_INFO: ${{ needs.deploy-group-info.outputs.changed_groupInfo }}
           PREPARATION_RESULT: ${{ needs.preparation.result }}
           CONNECTIONS_RESULT: ${{ needs.deploy-connections.result }}
-          TASKS_RESULT: ${{ needs.deploy-tasks.result }}
+          MIGRATE_TASKS_RESULT: ${{ needs.deploy-migrate-tasks.result }}
+          SYNC_TASKS_RESULT: ${{ needs.deploy-sync-tasks.result }}
           APIS_RESULT: ${{ needs.deploy-apis.result }}
           GROUP_INFO_RESULT: ${{ needs.deploy-group-info.result }}
-
