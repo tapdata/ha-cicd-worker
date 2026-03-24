@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Import resource (connections/tasks/apis) via TapData API
 # Usage: import-resource.sh <resource_type>
-# resource_type: connections | tasks | apis
+# resource_type: connections | tasks | migrate/tasks | sync/tasks | apis
 # Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TAPDATA_BASE_URL
 # Optional env vars: ARCHIVE_NAME
 set -euo pipefail
@@ -12,7 +12,7 @@ echo "=== Importing ${RESOURCE_TYPE} via TapData API ==="
 
 # Validate inputs
 if [[ -z "${RESOURCE_TYPE}" ]]; then
-  echo "::error::Usage: import-resource.sh <connections|tasks|apis>"
+  echo "::error::Usage: import-resource.sh <connections|tasks|migrate/tasks|sync/tasks|apis>"
   exit 1
 fi
 
@@ -41,6 +41,12 @@ case "${RESOURCE_TYPE}" in
   tasks)
     API_PATH="api/groupInfo/import/tasks"
     ;;
+  migrate/tasks)
+    API_PATH="api/groupInfo/import/migrate/tasks"
+    ;;
+  sync/tasks)
+    API_PATH="api/groupInfo/import/sync/tasks"
+    ;;
   apis)
     API_PATH="api/groupInfo/import/apis"
     ;;
@@ -48,7 +54,7 @@ case "${RESOURCE_TYPE}" in
     API_PATH="api/groupInfo/import/groupInfo"
     ;;
   *)
-    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|apis|groupInfo"
+    echo "::error::Unknown resource type: ${RESOURCE_TYPE}. Expected: connections|tasks|migrate/tasks|sync/tasks|apis|groupInfo"
     exit 1
     ;;
 esac
@@ -121,9 +127,10 @@ echo "Record ID: ${RECORD_ID}"
 echo "Diff: ${DIFF}"
 
 # Save response for downstream steps
-echo "${BODY}" > "${DEPLOY_DIR}/${RESOURCE_TYPE}-import-response.json"
+SAFE_NAME="${RESOURCE_TYPE//\//_}"
+echo "${BODY}" > "${DEPLOY_DIR}/${SAFE_NAME}-import-response.json"
 
 # Output diff as changed_<resource_type> for downstream jobs
-echo "changed_${RESOURCE_TYPE}=${DIFF}" >> "${GITHUB_OUTPUT}"
+echo "changed_${SAFE_NAME}=${DIFF}" >> "${GITHUB_OUTPUT}"
 
 echo "=== Import ${RESOURCE_TYPE} Complete ==="
