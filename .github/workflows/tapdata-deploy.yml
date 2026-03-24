@@ -46,6 +46,7 @@ jobs:
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
       target_env: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+      tapdata_url: ${{ vars.TAPDATA_URL }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -68,6 +69,21 @@ jobs:
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESS_CODE }}
 
+      - name: Generate vault.json with Connection Secrets
+        run: bash scripts/tapdata-deploy/generate-vault.sh
+        env:
+          PROJECT: ${{ env.PROJECT }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+          ALL_VARS: ${{ toJSON(vars) }}
+
+      - name: Upload vault and export files
+        uses: actions/upload-artifact@v4
+        with:
+          name: vault-and-export
+          path: |
+            ${{ env.PROJECT }}_tapdata_export/vault.json
+          retention-days: 1
+
   # ============================================================
   # Job 2: Preview Connections
   # ============================================================
@@ -83,12 +99,11 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Generate vault.json with Connection Secrets
-        run: bash scripts/tapdata-deploy/generate-vault.sh
-        env:
-          PROJECT: ${{ env.PROJECT }}
-          ALL_SECRETS: ${{ toJSON(secrets) }}
-          ALL_VARS: ${{ toJSON(vars) }}
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
@@ -103,7 +118,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -113,7 +128,7 @@ jobs:
     name: Deploy Connections
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: approve-connections
+    environment: deploy
     needs: [preparation, preview-connections]
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
@@ -124,12 +139,11 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Generate vault.json with Connection Secrets
-        run: bash scripts/tapdata-deploy/generate-vault.sh
-        env:
-          PROJECT: ${{ env.PROJECT }}
-          ALL_SECRETS: ${{ toJSON(secrets) }}
-          ALL_VARS: ${{ toJSON(vars) }}
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
@@ -138,6 +152,15 @@ jobs:
           ARCHIVE_NAME: connections-export.tar
           PROJECT: ${{ env.PROJECT }}
 
+      - name: Preview Connections (diff)
+        run: bash scripts/common/preview-resource.sh connections
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: connections-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
       - name: Import Connections via TapData API
         id: import_connections
         run: bash scripts/common/import-resource.sh connections
@@ -145,7 +168,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -163,6 +186,12 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
@@ -176,7 +205,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -194,6 +223,12 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
@@ -207,7 +242,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -217,7 +252,7 @@ jobs:
     name: Deploy Migrate Tasks
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: approve-migrate-tasks
+    environment: deploy
     needs: [preparation, preview-migrate-tasks]
     outputs:
       changed_migrate_tasks: ${{ steps.import_migrate_tasks.outputs.changed_migrate_tasks }}
@@ -228,12 +263,27 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview Migrate Tasks (diff)
+        run: bash scripts/common/preview-resource.sh migrate/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Import Migrate Tasks via TapData API
         id: import_migrate_tasks
@@ -242,7 +292,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -252,7 +302,7 @@ jobs:
     name: Deploy APIs
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: approve-apis
+    environment: deploy
     needs: [preparation, preview-apis]
     outputs:
       changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
@@ -263,12 +313,27 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview APIs (diff)
+        run: bash scripts/common/preview-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Import APIs via TapData API
         id: import_apis
@@ -277,7 +342,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -295,6 +360,12 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
@@ -308,7 +379,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -318,7 +389,7 @@ jobs:
     name: Deploy Sync Tasks
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: approve-sync-tasks
+    environment: deploy
     needs: [preparation, preview-sync-tasks]
     outputs:
       changed_sync_tasks: ${{ steps.import_sync_tasks.outputs.changed_sync_tasks }}
@@ -329,12 +400,27 @@ jobs:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview Sync Tasks (diff)
+        run: bash scripts/common/preview-resource.sh sync/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Import Sync Tasks via TapData API
         id: import_sync_tasks
@@ -343,7 +429,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -353,7 +439,6 @@ jobs:
     name: Deploy Group Info
     runs-on: self-hosted
     timeout-minutes: 15
-    environment: ${{ needs.preparation.outputs.target_env }}
     needs: [preparation, deploy-sync-tasks, deploy-apis]
     outputs:
       changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
@@ -363,6 +448,12 @@ jobs:
         with:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
         run: bash scripts/common/compress-files.sh
@@ -378,7 +469,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================

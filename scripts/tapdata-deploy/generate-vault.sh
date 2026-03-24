@@ -115,7 +115,6 @@ for conn_name in "${CONNECTION_NAMES[@]}"; do
   # Priority 2: {conn_name}_URL in Variables + {conn_name}_USER in Variables + {conn_name}_PASSWORD in Secrets
   if [[ -z "${MATCH_TYPE}" ]]; then
     try_lookup_url_user_password "${conn_name}"
-    echo "DEBUG Priority 2: lookup_key=${conn_name}, FOUND_URL=[${FOUND_URL:+SET}], FOUND_USER=[${FOUND_USER:+SET}], FOUND_PASSWORD=[${FOUND_PASSWORD:+SET}]"
     if [[ -n "${FOUND_URL}" && -n "${FOUND_PASSWORD}" ]]; then
       MATCH_TYPE="url_user_password"
     fi
