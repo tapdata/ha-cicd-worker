@@ -128,7 +128,8 @@ DELETE_COUNT=$(echo "${DELETE_LIST}" | jq 'length')
 
 echo "Preview results - Add: ${ADD_COUNT}, Update: ${UPDATE_COUNT}, Delete: ${DELETE_COUNT}"
 
-# Write GitHub Step Summary as Markdown
+# Build markdown content
+MARKDOWN_TMPFILE=$(mktemp)
 {
   echo "## Preview: ${DISPLAY_NAME}"
   echo ""
@@ -158,7 +159,18 @@ echo "Preview results - Add: ${ADD_COUNT}, Update: ${UPDATE_COUNT}, Delete: ${DE
     echo "${DELETE_LIST}" | jq -r '.[] | "- `\(.)`"'
     echo ""
   fi
-} >> "${GITHUB_STEP_SUMMARY}"
+} > "${MARKDOWN_TMPFILE}"
+
+# Write to GitHub Step Summary
+cat "${MARKDOWN_TMPFILE}" >> "${GITHUB_STEP_SUMMARY}"
+
+# Optionally save markdown to a separate file for artifact upload
+if [[ -n "${PREVIEW_MARKDOWN_OUTPUT:-}" ]]; then
+  cp "${MARKDOWN_TMPFILE}" "${PREVIEW_MARKDOWN_OUTPUT}"
+  echo "Preview markdown saved to: ${PREVIEW_MARKDOWN_OUTPUT}"
+fi
+
+rm -f "${MARKDOWN_TMPFILE}"
 
 # Save response for downstream steps
 SAFE_NAME="${RESOURCE_TYPE//\//_}"
