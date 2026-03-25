@@ -314,6 +314,7 @@
           "unit" : "SECOND"
         } ],
         "attrs" : {
+          "capabilities" : [ ],
           "position" : [ 248, 232.5 ]
         },
         "catalog" : "processor",
@@ -323,7 +324,7 @@
         "id" : "808724d1-8628-4c70-abb6-0640474962b8",
         "isTransformed" : false,
         "name" : "表编辑",
-        "prefix" : "FDM_PWH_",
+        "prefix" : "FDM_PWH_CMSIP_",
         "replaceAfter" : "",
         "suffix" : "",
         "tableNames" : [ ],
@@ -475,9 +476,9 @@
         "readBatchSize" : 500,
         "syncForeignKeyEnable" : true,
         "syncObjects" : [ {
-          "objectNames" : [ "FDM_PWH_discharge_information" ],
+          "objectNames" : [ "FDM_PWH_CMSIP_discharge_information" ],
           "tableNameRelation" : {
-            "discharge_information" : "FDM_PWH_discharge_information"
+            "discharge_information" : "FDM_PWH_CMSIP_discharge_information"
           },
           "type" : "table"
         } ],
@@ -495,7 +496,7 @@
     "desc" : "",
     "doubleActive" : false,
     "dynamicAdjustMemoryUsage" : false,
-    "editVersion" : "1774428208775",
+    "editVersion" : "1774430349863",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
     "fileLog" : false,
@@ -1159,7 +1160,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69c3a011ba7dc880b7ee101d",
-    "transformUuid" : "1774428208794",
+    "transformUuid" : "1774430349887",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1169,7 +1170,7 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "job_analyze",
-    "createTime" : 1774428200786,
+    "createTime" : 1774430347636,
     "databaseId" : "69c39e65a6fb9b4275d4f633",
     "dev_version" : 1,
     "fields" : [ {
@@ -1706,7 +1707,7 @@
     "hasTransformEx" : false,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "69c3a028a6fb9b4275d4f844",
+    "id" : "69c3a88ba6fb9b4275d503c8",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -1724,11 +1725,11 @@
     } ],
     "is_deleted" : false,
     "meta_type" : "processor_node",
-    "name" : "FDM_PWH_discharge_information",
+    "name" : "FDM_PWH_CMSIP_discharge_information",
     "nodeId" : "808724d1-8628-4c70-abb6-0640474962b8",
-    "original_name" : "FDM_PWH_discharge_information",
+    "original_name" : "FDM_PWH_CMSIP_discharge_information",
     "partitionSet" : [ ],
-    "qualified_name" : "PN_808724d1-8628-4c70-abb6-0640474962b8_FDM_PWH_discharge_information",
+    "qualified_name" : "PN_808724d1-8628-4c70-abb6-0640474962b8_FDM_PWH_CMSIP_discharge_information",
     "source" : {
       "_id" : "69c39cfaba7dc880b7ee0f12",
       "agentTags" : [ ],
@@ -1760,7 +1761,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69c3a011ba7dc880b7ee101d",
-    "transformUuid" : "1774428208794",
+    "transformUuid" : "1774430349887",
     "username" : "admin@admin.com"
   }
 }, {
@@ -1770,7 +1771,7 @@
     "comment" : "",
     "constraints" : [ ],
     "createSource" : "auto",
-    "createTime" : 1774428200797,
+    "createTime" : 1774430347656,
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1782,7 +1783,7 @@
       "data_type" : "OBJECT_ID",
       "default_value" : null,
       "field_name" : "_id",
-      "id" : "808724d1-8628-4c70-abb6-0640474962b8_FDM_PWH_discharge_information__id",
+      "id" : "808724d1-8628-4c70-abb6-0640474962b8_FDM_PWH_CMSIP_discharge_information__id",
       "is_auto_allowed" : true,
       "is_deleted" : false,
       "is_nullable" : true,
@@ -1793,7 +1794,7 @@
       "primaryKey" : false,
       "source" : "job_analyze",
       "sourceDbType" : "MongoDB",
-      "table_name" : "FDM_PWH_discharge_information",
+      "table_name" : "FDM_PWH_CMSIP_discharge_information",
       "tapType" : "{\"bytes\":24,\"type\":10}",
       "unique" : false,
       "useDefaultValue" : true
@@ -2414,7 +2415,7 @@
     "hasTransformEx" : true,
     "hasUnionIndex" : true,
     "hasUpdateField" : false,
-    "id" : "69c3a028a6fb9b4275d4f845",
+    "id" : "69c3a88ba6fb9b4275d503c9",
     "indices" : [ {
       "columns" : [ {
         "columnIsAsc" : true,
@@ -2432,11 +2433,11 @@
     } ],
     "is_deleted" : false,
     "meta_type" : "table",
-    "name" : "FDM_PWH_discharge_information",
+    "name" : "FDM_PWH_CMSIP_discharge_information",
     "nodeId" : "9dbe0d5c-405e-4256-a615-4e0776cd3034",
-    "original_name" : "FDM_PWH_discharge_information",
+    "original_name" : "FDM_PWH_CMSIP_discharge_information",
     "partitionSet" : [ ],
-    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_PWH_discharge_information_695497a235a6fa1717313957_69c3a011ba7dc880b7ee101d",
+    "qualified_name" : "T_mongodb_io_tapdata_1_0-SNAPSHOT_FDM_PWH_CMSIP_discharge_information_695497a235a6fa1717313957_69c3a011ba7dc880b7ee101d",
     "source" : {
       "_id" : "695497a235a6fa1717313957",
       "agentTags" : [ ],
@@ -2470,7 +2471,7 @@
     },
     "sourceType" : "VIRTUAL",
     "taskId" : "69c3a011ba7dc880b7ee101d",
-    "transformUuid" : "1774428208794",
+    "transformUuid" : "1774430349887",
     "username" : "admin@admin.com"
   }
 } ]
