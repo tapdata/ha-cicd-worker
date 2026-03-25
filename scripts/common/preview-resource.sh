@@ -128,6 +128,15 @@ DELETE_COUNT=$(echo "${DELETE_LIST}" | jq 'length')
 
 echo "Preview results - Add: ${ADD_COUNT}, Update: ${UPDATE_COUNT}, Delete: ${DELETE_COUNT}"
 
+# 输出 has_changes 标志给 GitHub Actions
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  if [[ "${ADD_COUNT}" -eq 0 && "${UPDATE_COUNT}" -eq 0 && "${DELETE_COUNT}" -eq 0 ]]; then
+    echo "has_changes=false" >> "${GITHUB_OUTPUT}"
+  else
+    echo "has_changes=true" >> "${GITHUB_OUTPUT}"
+  fi
+fi
+
 # Build markdown content
 MARKDOWN_TMPFILE=$(mktemp)
 {
@@ -161,8 +170,10 @@ MARKDOWN_TMPFILE=$(mktemp)
   fi
 } > "${MARKDOWN_TMPFILE}"
 
-# Write to GitHub Step Summary
-cat "${MARKDOWN_TMPFILE}" >> "${GITHUB_STEP_SUMMARY}"
+# Write to GitHub Step Summary (skip when called from deploy job)
+if [[ "${SKIP_SUMMARY:-}" != "true" ]]; then
+  cat "${MARKDOWN_TMPFILE}" >> "${GITHUB_STEP_SUMMARY}"
+fi
 
 # Optionally save markdown to a separate file for artifact upload
 if [[ -n "${PREVIEW_MARKDOWN_OUTPUT:-}" ]]; then
