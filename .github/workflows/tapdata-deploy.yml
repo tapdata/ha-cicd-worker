@@ -369,10 +369,10 @@ jobs:
       !cancelled()
       && needs.preparation.result == 'success'
       && needs.preview-all.result == 'success'
-      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped')
-      && (needs.deploy-migrate-tasks.result == 'success' || needs.deploy-migrate-tasks.result == 'skipped')
-      && (needs.deploy-sync-tasks.result == 'success' || needs.deploy-sync-tasks.result == 'skipped')
-      && (needs.deploy-apis.result == 'success' || needs.deploy-apis.result == 'skipped')
+      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped' || needs.deploy-connections.result == 'cancelled')
+      && (needs.deploy-migrate-tasks.result == 'success' || needs.deploy-migrate-tasks.result == 'skipped' || needs.deploy-migrate-tasks.result == 'cancelled')
+      && (needs.deploy-sync-tasks.result == 'success' || needs.deploy-sync-tasks.result == 'skipped' || needs.deploy-sync-tasks.result == 'cancelled')
+      && (needs.deploy-apis.result == 'success' || needs.deploy-apis.result == 'skipped' || needs.deploy-apis.result == 'cancelled')
     outputs:
       changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
     steps:
