@@ -85,13 +85,18 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # Job 2: Preview Connections
+  # Job 2: Preview All Resources
   # ============================================================
-  preview-connections:
-    name: Preview Connections
+  preview-all:
+    name: Preview All Resources
     runs-on: self-hosted
-    timeout-minutes: 5
+    timeout-minutes: 10
     needs: preparation
+    outputs:
+      connections_has_changes: ${{ steps.preview_connections.outputs.has_changes }}
+      migrate_tasks_has_changes: ${{ steps.preview_migrate_tasks.outputs.has_changes }}
+      sync_tasks_has_changes: ${{ steps.preview_sync_tasks.outputs.has_changes }}
+      apis_has_changes: ${{ steps.preview_apis.outputs.has_changes }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -105,7 +110,7 @@ jobs:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
 
-      - name: Compress Export Files
+      - name: Compress Connections Export Files
         run: bash scripts/common/compress-files.sh
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -113,6 +118,7 @@ jobs:
           PROJECT: ${{ env.PROJECT }}
 
       - name: Preview Connections
+        id: preview_connections
         run: bash scripts/common/preview-resource.sh connections
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
@@ -120,15 +126,50 @@ jobs:
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
-          PREVIEW_MARKDOWN_OUTPUT: /tmp/preview-connections.md
 
-      - name: Upload preview markdown
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-md-connections
-          path: /tmp/preview-connections.md
-          retention-days: 1
+      - name: Compress Tasks Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview Migrate Tasks
+        id: preview_migrate_tasks
+        run: bash scripts/common/preview-resource.sh migrate/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+      - name: Preview Sync Tasks
+        id: preview_sync_tasks
+        run: bash scripts/common/preview-resource.sh sync/tasks
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: tasks-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+      - name: Compress APIs Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Preview APIs
+        id: preview_apis
+        run: bash scripts/common/preview-resource.sh apis
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: apis-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
   # Job 3: Deploy Connections (requires approval)
@@ -138,7 +179,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
-    needs: [preparation, preview-connections]
+    needs: [preparation, preview-all]
+    if: needs.preview-all.outputs.connections_has_changes == 'true'
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
     steps:
@@ -161,15 +203,6 @@ jobs:
           ARCHIVE_NAME: connections-export.tar
           PROJECT: ${{ env.PROJECT }}
 
-      - name: Preview Connections (diff)
-        run: bash scripts/common/preview-resource.sh connections
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: connections-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-
       - name: Import Connections via TapData API
         id: import_connections
         run: bash scripts/common/import-resource.sh connections
@@ -181,60 +214,20 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 4: Preview Migrate Tasks
-  # ============================================================
-  preview-migrate-tasks:
-    name: Preview Migrate Tasks
-    runs-on: self-hosted
-    timeout-minutes: 5
-    needs: [preparation, deploy-connections]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Download vault artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vault-and-export
-          path: ${{ env.PROJECT }}_tapdata_export
-
-      - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          PROJECT: ${{ env.PROJECT }}
-
-      - name: Preview Migrate Tasks
-        run: bash scripts/common/preview-resource.sh migrate/tasks
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-          PREVIEW_MARKDOWN_OUTPUT: /tmp/preview-migrate-tasks.md
-
-      - name: Upload preview markdown
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-md-migrate-tasks
-          path: /tmp/preview-migrate-tasks.md
-          retention-days: 1
-
-  # ============================================================
-  # Job 5: Deploy Migrate Tasks (requires approval)
+  # Job 4: Deploy Migrate Tasks (requires approval)
   # ============================================================
   deploy-migrate-tasks:
     name: Deploy Migrate Tasks
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
-    needs: [preparation, preview-migrate-tasks]
+    needs: [preparation, preview-all, deploy-connections]
+    if: >-
+      !cancelled()
+      && needs.preparation.result == 'success'
+      && needs.preview-all.result == 'success'
+      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped')
+      && needs.preview-all.outputs.migrate_tasks_has_changes == 'true'
     outputs:
       changed_migrate_tasks: ${{ steps.import_migrate_tasks.outputs.changed_migrate_tasks }}
     steps:
@@ -257,15 +250,6 @@ jobs:
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
-      - name: Preview Migrate Tasks (diff)
-        run: bash scripts/common/preview-resource.sh migrate/tasks
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-
       - name: Import Migrate Tasks via TapData API
         id: import_migrate_tasks
         run: bash scripts/common/import-resource.sh migrate/tasks
@@ -277,60 +261,21 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 6: Preview Sync Tasks
-  # ============================================================
-  preview-sync-tasks:
-    name: Preview Sync Tasks
-    runs-on: self-hosted
-    timeout-minutes: 5
-    needs: [preparation, deploy-migrate-tasks]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Download vault artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vault-and-export
-          path: ${{ env.PROJECT }}_tapdata_export
-
-      - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          PROJECT: ${{ env.PROJECT }}
-
-      - name: Preview Sync Tasks
-        run: bash scripts/common/preview-resource.sh sync/tasks
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-          PREVIEW_MARKDOWN_OUTPUT: /tmp/preview-sync-tasks.md
-
-      - name: Upload preview markdown
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-md-sync-tasks
-          path: /tmp/preview-sync-tasks.md
-          retention-days: 1
-
-  # ============================================================
-  # Job 7: Deploy Sync Tasks (requires approval)
+  # Job 5: Deploy Sync Tasks (requires approval)
   # ============================================================
   deploy-sync-tasks:
     name: Deploy Sync Tasks
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
-    needs: [preparation, preview-sync-tasks]
+    needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks]
+    if: >-
+      !cancelled()
+      && needs.preparation.result == 'success'
+      && needs.preview-all.result == 'success'
+      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped')
+      && (needs.deploy-migrate-tasks.result == 'success' || needs.deploy-migrate-tasks.result == 'skipped')
+      && needs.preview-all.outputs.sync_tasks_has_changes == 'true'
     outputs:
       changed_sync_tasks: ${{ steps.import_sync_tasks.outputs.changed_sync_tasks }}
     steps:
@@ -353,15 +298,6 @@ jobs:
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
-      - name: Preview Sync Tasks (diff)
-        run: bash scripts/common/preview-resource.sh sync/tasks
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: tasks-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-
       - name: Import Sync Tasks via TapData API
         id: import_sync_tasks
         run: bash scripts/common/import-resource.sh sync/tasks
@@ -373,60 +309,22 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 8: Preview APIs
-  # ============================================================
-  preview-apis:
-    name: Preview APIs
-    runs-on: self-hosted
-    timeout-minutes: 5
-    needs: [preparation, deploy-sync-tasks]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Download vault artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vault-and-export
-          path: ${{ env.PROJECT }}_tapdata_export
-
-      - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: apis-export.tar
-          PROJECT: ${{ env.PROJECT }}
-
-      - name: Preview APIs
-        run: bash scripts/common/preview-resource.sh apis
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: apis-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-          PREVIEW_MARKDOWN_OUTPUT: /tmp/preview-apis.md
-
-      - name: Upload preview markdown
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-md-apis
-          path: /tmp/preview-apis.md
-          retention-days: 1
-
-  # ============================================================
-  # Job 9: Deploy APIs (requires approval)
+  # Job 6: Deploy APIs (requires approval)
   # ============================================================
   deploy-apis:
     name: Deploy APIs
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
-    needs: [preparation, preview-apis]
+    needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks, deploy-sync-tasks]
+    if: >-
+      !cancelled()
+      && needs.preparation.result == 'success'
+      && needs.preview-all.result == 'success'
+      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped')
+      && (needs.deploy-migrate-tasks.result == 'success' || needs.deploy-migrate-tasks.result == 'skipped')
+      && (needs.deploy-sync-tasks.result == 'success' || needs.deploy-sync-tasks.result == 'skipped')
+      && needs.preview-all.outputs.apis_has_changes == 'true'
     outputs:
       changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
     steps:
@@ -449,15 +347,6 @@ jobs:
           ARCHIVE_NAME: apis-export.tar
           PROJECT: ${{ env.PROJECT }}
 
-      - name: Preview APIs (diff)
-        run: bash scripts/common/preview-resource.sh apis
-        env:
-          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
-          ARCHIVE_NAME: apis-export.tar
-          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
-          TARGET_ENV: ${{ env.TARGET_ENV }}
-
       - name: Import APIs via TapData API
         id: import_apis
         run: bash scripts/common/import-resource.sh apis
@@ -469,13 +358,21 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 10: Deploy Group Info
+  # Job 7: Deploy Group Info
   # ============================================================
   deploy-group-info:
     name: Deploy Group Info
     runs-on: self-hosted
     timeout-minutes: 15
-    needs: [preparation, deploy-apis]
+    needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks, deploy-sync-tasks, deploy-apis]
+    if: >-
+      !cancelled()
+      && needs.preparation.result == 'success'
+      && needs.preview-all.result == 'success'
+      && (needs.deploy-connections.result == 'success' || needs.deploy-connections.result == 'skipped')
+      && (needs.deploy-migrate-tasks.result == 'success' || needs.deploy-migrate-tasks.result == 'skipped')
+      && (needs.deploy-sync-tasks.result == 'success' || needs.deploy-sync-tasks.result == 'skipped')
+      && (needs.deploy-apis.result == 'success' || needs.deploy-apis.result == 'skipped')
     outputs:
       changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
     steps:
@@ -507,34 +404,3 @@ jobs:
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
           TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
-
-  # ============================================================
-  # Job 11: Deployment Summary (consolidated preview in reverse order)
-  # ============================================================
-  deployment-summary:
-    name: Deployment Summary
-    runs-on: self-hosted
-    timeout-minutes: 5
-    if: always()
-    needs: [preparation, deploy-group-info]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_REF }}
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Download preview markdown artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: preview-md-*
-          path: /tmp/preview-artifacts
-          merge-multiple: false
-
-      - name: Consolidate previews (reverse order)
-        run: |
-          bash scripts/common/consolidate-previews.sh \
-            /tmp/preview-artifacts/preview-md-apis/preview-apis.md \
-            /tmp/preview-artifacts/preview-md-sync-tasks/preview-sync-tasks.md \
-            /tmp/preview-artifacts/preview-md-migrate-tasks/preview-migrate-tasks.md \
-            /tmp/preview-artifacts/preview-md-connections/preview-connections.md
