@@ -6,7 +6,7 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='TMH_PG_CMS', connection_type='source_and_target', retry=0, status='testing', tableCount=1, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
+    "alarmInfo" : "DataSourceConnectionDto{name='TMH_PG_CMS', connection_type='source_and_target', retry=0, status='ready', tableCount=1, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
       "id" : "count_raw_command_function",
       "type" : 11
@@ -158,7 +158,7 @@
       "deploymentMode" : "standalone",
       "globalPublicationName" : "dbz_publication",
       "id" : "69b8f8c08dd517882461dbbb",
-      "logPluginName" : "pgoutput",
+      "logPluginName" : "wal2json",
       "partPublication" : false,
       "pgtoHost" : "127.0.0.1",
       "pgtoPort" : 9876,
@@ -224,7 +224,7 @@
     "schemaVersion" : "c8a24fab-97bf-4a81-a80c-c0b1f176488f",
     "shareCDCExternalStorageId" : "696dccf3c085cb3a6493261e",
     "shareCdcEnable" : true,
-    "status" : "testing",
+    "status" : "ready",
     "submit" : true,
     "tableCount" : 1
   }
