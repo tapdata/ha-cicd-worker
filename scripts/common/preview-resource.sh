@@ -151,7 +151,16 @@ MARKDOWN_TMPFILE=$(mktemp)
   if [[ "${ADD_COUNT}" -gt 0 ]]; then
     echo "### ➕ Add (${ADD_COUNT})"
     echo ""
-    echo "${ADD_LIST}" | jq -r '.[] | if type == "string" then "- `\(.)`" else "- `\(.name // .id // tostring)`" end'
+    echo "${ADD_LIST}" | jq -r '
+      if all(type == "string") then
+        .[] | "- `\(.)`"
+      elif length > 0 then
+        (.[0] | keys_unsorted) as $keys |
+        "| \($keys | join(" | ")) |",
+        "| \($keys | map("---") | join(" | ")) |",
+        (.[] | [to_entries[].value // "-"] | map("`\(.)`") | "| \(join(" | ")) |")
+      else empty end
+    '
     echo ""
   fi
 
@@ -216,7 +225,16 @@ MARKDOWN_TMPFILE=$(mktemp)
   if [[ "${DELETE_COUNT}" -gt 0 ]]; then
     echo "### 🗑️ Delete (${DELETE_COUNT})"
     echo ""
-    echo "${DELETE_LIST}" | jq -r '.[] | if type == "string" then "- `\(.)`" else "- `\(.name // .id // tostring)`" end'
+    echo "${DELETE_LIST}" | jq -r '
+      if all(type == "string") then
+        .[] | "- `\(.)`"
+      elif length > 0 then
+        (.[0] | keys_unsorted) as $keys |
+        "| \($keys | join(" | ")) |",
+        "| \($keys | map("---") | join(" | ")) |",
+        (.[] | [to_entries[].value // "-"] | map("`\(.)`") | "| \(join(" | ")) |")
+      else empty end
+    '
     echo ""
   fi
 } > "${MARKDOWN_TMPFILE}"
