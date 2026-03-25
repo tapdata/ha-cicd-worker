@@ -6,7 +6,6 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='TMH_PG_HPI', connection_type='source_and_target', retry=0, status='ready', tableCount=3, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
       "id" : "count_raw_command_function",
       "type" : 11
@@ -224,7 +223,6 @@
     "schemaVersion" : "ba2c48ae-3493-4aea-a659-c2ead67d2ebd",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
-    "status" : "ready",
     "submit" : true,
     "tableCount" : 3
   }
