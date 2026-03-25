@@ -6,7 +6,6 @@
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
     "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
-    "alarmInfo" : "DataSourceConnectionDto{name='FDM', connection_type='source_and_target', retry=0, status='ready', tableCount=8, loadAllTables=true, loadFieldsStatus=finished, loadFieldErrMsg=}",
     "capabilities" : [ {
       "id" : "source_incremental_update_event_have_before",
       "type" : 20
@@ -156,7 +155,6 @@
     "schemaVersion" : "5c4d6cd6-87e1-4acf-961d-b482b19aaacf",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
-    "status" : "ready",
     "submit" : true,
     "tableCount" : 8
   }
