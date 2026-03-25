@@ -151,21 +151,72 @@ MARKDOWN_TMPFILE=$(mktemp)
   if [[ "${ADD_COUNT}" -gt 0 ]]; then
     echo "### ➕ Add (${ADD_COUNT})"
     echo ""
-    echo "${ADD_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo "${ADD_LIST}" | jq -r '.[] | if type == "string" then "- `\(.)`" else "- `\(.name // .id // tostring)`" end'
     echo ""
   fi
 
   if [[ "${UPDATE_COUNT}" -gt 0 ]]; then
     echo "### ✏️ Update (${UPDATE_COUNT})"
     echo ""
-    echo "${UPDATE_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo "${UPDATE_LIST}" | jq -r '
+      .[] |
+      if type == "string" then
+        "- `\(.)`"
+      else
+        # Resource name and top-level changes
+        (.name // .id // "unknown") as $name |
+        (.changes // []) as $changes |
+        (.dagChangeDetail // {}) as $dag |
+        ($dag.nodeAdditions // []) as $nodeAdds |
+        ($dag.nodeRemovals // []) as $nodeDels |
+        ($dag.nodeConfigChanges // []) as $nodeCfgs |
+        ($dag.edgeAdditions // []) as $edgeAdds |
+        ($dag.edgeRemovals // []) as $edgeDels |
+        (($changes | length) + ($nodeAdds | length) + ($nodeDels | length) + ($nodeCfgs | length) + ($edgeAdds | length) + ($edgeDels | length)) as $total |
+
+        "<details>\n<summary><code>\($name)</code> (\($total) change\(if $total == 1 then "" else "s" end))</summary>\n" +
+
+        # Top-level changes table
+        if ($changes | length) > 0 then
+          "\n**Config Changes**\n\n| Field | From | To |\n| --- | --- | --- |\n" +
+          ($changes | map("| `\(.field)` | `\(.from // "-")` | `\(.to // "-")` |") | join("\n")) + "\n"
+        else "" end +
+
+        # Node additions
+        if ($nodeAdds | length) > 0 then
+          "\n**Node Additions:** " + ([$nodeAdds[].name // $nodeAdds[].id // "unknown"] | map("`\(.)`") | join(", ")) + "\n"
+        else "" end +
+
+        # Node removals
+        if ($nodeDels | length) > 0 then
+          "\n**Node Removals:** " + ([$nodeDels[].name // $nodeDels[].id // "unknown"] | map("`\(.)`") | join(", ")) + "\n"
+        else "" end +
+
+        # Node config changes
+        if ($nodeCfgs | length) > 0 then
+          "\n**Node Config Changes** (\($nodeCfgs | length))\n\n| Field | From | To |\n| --- | --- | --- |\n" +
+          ($nodeCfgs | map(
+            (.field | split(".") | last) as $shortField |
+            (if .from then (.from | if type == "object" then "\(.op // ""): \(.field // "")" else tostring end) else "-" end) as $fromVal |
+            (if .to then (.to | if type == "object" then "\(.op // ""): \(.field // "")" else tostring end) else "-" end) as $toVal |
+            "| `\($shortField)` | \($fromVal) | \($toVal) |"
+          ) | join("\n")) + "\n"
+        else "" end +
+
+        # Edge changes
+        if ($edgeAdds | length) > 0 then "\n**Edge Additions:** \($edgeAdds | length)\n" else "" end +
+        if ($edgeDels | length) > 0 then "\n**Edge Removals:** \($edgeDels | length)\n" else "" end +
+
+        "\n</details>"
+      end
+    '
     echo ""
   fi
 
   if [[ "${DELETE_COUNT}" -gt 0 ]]; then
     echo "### 🗑️ Delete (${DELETE_COUNT})"
     echo ""
-    echo "${DELETE_LIST}" | jq -r '.[] | "- `\(.)`"'
+    echo "${DELETE_LIST}" | jq -r '.[] | if type == "string" then "- `\(.)`" else "- `\(.name // .id // tostring)`" end'
     echo ""
   fi
 } > "${MARKDOWN_TMPFILE}"
