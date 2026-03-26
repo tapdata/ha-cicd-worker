@@ -52,6 +52,10 @@
       "id" : "69c4d60e5d9e5241fc73ee41",
       "name" : "PWH_CMS_TO_FDM",
       "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69c4da705d9e5241fc73efff",
+      "name" : "cpi-case-v2",
+      "type" : "MODULE"
     } ]
   }
 } ]
