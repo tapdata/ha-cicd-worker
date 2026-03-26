@@ -217,7 +217,7 @@ jobs:
   # Job 4: Deploy Migrate Tasks (requires approval)
   # ============================================================
   deploy-migrate-tasks:
-    name: Deploy Migrate Tasks
+    name: Deploy Data Replication(FDM)
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
@@ -264,7 +264,7 @@ jobs:
   # Job 5: Deploy Sync Tasks (requires approval)
   # ============================================================
   deploy-sync-tasks:
-    name: Deploy Sync Tasks
+    name: Deploy Data Transformation(MDM)
     runs-on: self-hosted
     timeout-minutes: 15
     environment: deploy
