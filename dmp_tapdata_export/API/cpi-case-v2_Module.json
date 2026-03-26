@@ -878,7 +878,6 @@
       "fields" : [ {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "OBJECT_ID",
         "default_value" : null,
         "field_name" : "_id",
@@ -900,7 +899,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "DATE_TIME",
         "default_value" : null,
         "field_name" : "admissionDate",
@@ -922,7 +920,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "caseNum",
@@ -944,7 +941,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "caseType",
@@ -966,7 +962,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 1,
-        "comment" : "",
         "data_type" : "DOCUMENT",
         "default_value" : null,
         "field_name" : "cpiPatient",
@@ -987,7 +982,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "OBJECT_ID",
         "default_value" : null,
         "field_name" : "cpiPatient._id",
@@ -1009,7 +1003,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "INT32",
         "default_value" : null,
         "field_name" : "cpiPatient.accessCode",
@@ -1031,7 +1024,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "NULL",
         "default_value" : null,
         "field_name" : "cpiPatient.chiName",
@@ -1053,7 +1045,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "NULL",
         "default_value" : null,
         "field_name" : "cpiPatient.deathDate",
@@ -1075,7 +1066,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.deathIndicator",
@@ -1097,7 +1087,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "DATE_TIME",
         "default_value" : null,
         "field_name" : "cpiPatient.dob",
@@ -1119,7 +1108,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.hkid",
@@ -1141,7 +1129,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 1,
-        "comment" : "",
         "data_type" : "ARRAY",
         "default_value" : null,
         "field_name" : "cpiPatient.hospitalData",
@@ -1162,7 +1149,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 10,
-        "comment" : "",
         "data_type" : "OBJECT_ID",
         "default_value" : null,
         "field_name" : "cpiPatient.hospitalData._id",
@@ -1184,7 +1170,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 10,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.hospitalData.hospCode",
@@ -1206,7 +1191,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 10,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.hospitalData.mrn",
@@ -1228,7 +1212,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 10,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.hospitalData.patientKey",
@@ -1250,7 +1233,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.patientKey",
@@ -1272,7 +1254,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.patientName",
@@ -1294,7 +1275,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 52,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "cpiPatient.sex",
@@ -1316,7 +1296,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "dischargeCode",
@@ -1338,7 +1317,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 9,
-        "comment" : "",
         "data_type" : "ARRAY",
         "default_value" : null,
         "field_name" : "dischargeInformation",
@@ -1359,7 +1337,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 23,
-        "comment" : "",
         "data_type" : "OBJECT_ID",
         "default_value" : null,
         "field_name" : "dischargeInformation._id",
@@ -1381,7 +1358,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 2,
-        "comment" : "",
         "data_type" : "STRING(12)",
         "default_value" : null,
         "field_name" : "dischargeInformation.caseNum",
@@ -1404,7 +1380,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 7,
-        "comment" : "",
         "data_type" : "DATE_TIME",
         "default_value" : null,
         "field_name" : "dischargeInformation.createDate",
@@ -1427,7 +1402,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 18,
-        "comment" : "",
         "data_type" : "STRING(5)",
         "default_value" : null,
         "field_name" : "dischargeInformation.dischargeTeam",
@@ -1450,7 +1424,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 1,
-        "comment" : "",
         "data_type" : "STRING(3)",
         "default_value" : null,
         "field_name" : "dischargeInformation.hospCode",
@@ -1473,7 +1446,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 5,
-        "comment" : "",
         "data_type" : "STRING(12)",
         "default_value" : null,
         "field_name" : "dischargeInformation.moInChargeId",
@@ -1496,7 +1468,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 10,
-        "comment" : "",
         "data_type" : "STRING(12)",
         "default_value" : null,
         "field_name" : "dischargeInformation.specialistIc",
@@ -1519,7 +1490,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 3,
-        "comment" : "",
         "data_type" : "STRING(4)",
         "default_value" : null,
         "field_name" : "dischargeInformation.specialty",
@@ -1542,7 +1512,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "hospCode",
@@ -1564,7 +1533,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "NULL",
         "default_value" : null,
         "field_name" : "lastBedNum",
@@ -1586,7 +1554,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "lastSpecCode",
@@ -1608,7 +1575,27 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
+        "data_type" : "STRING(100)",
+        "default_value" : null,
+        "field_name" : "lastWardCode",
+        "id" : "695497a235a6fa171731395e_MDM_HPI_merge_cpi_case_lastWardCode",
+        "is_auto_allowed" : true,
+        "is_deleted" : false,
+        "is_nullable" : true,
+        "originalDataType" : "STRING(100)",
+        "original_field_name" : "lastWardCode",
+        "previousDataType" : "STRING(100)",
+        "previousFieldName" : "lastWardCode",
+        "primaryKey" : false,
+        "primary_key_position" : 0,
+        "source" : "auto",
+        "sourceDbType" : "MongoDB",
+        "tapType" : "{\"bytes\":100,\"type\":10}",
+        "unique" : false,
+        "useDefaultValue" : true
+      }, {
+        "autoincrement" : "NO",
+        "columnPosition" : 29,
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "patientKey",
@@ -1630,7 +1617,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "NULL",
         "default_value" : null,
         "field_name" : "sourceCode",
@@ -1652,7 +1638,6 @@
       }, {
         "autoincrement" : "NO",
         "columnPosition" : 29,
-        "comment" : "",
         "data_type" : "STRING(100)",
         "default_value" : null,
         "field_name" : "statusCode",
