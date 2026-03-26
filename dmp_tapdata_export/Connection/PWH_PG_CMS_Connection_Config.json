@@ -157,7 +157,7 @@
       "deploymentMode" : "standalone",
       "globalPublicationName" : "dbz_publication",
       "id" : "69c4988fb4e9708702d4fb8c",
-      "logPluginName" : "wal2json",
+      "logPluginName" : "pgoutput",
       "partPublication" : false,
       "pgtoHost" : "127.0.0.1",
       "pgtoPort" : 9876,
