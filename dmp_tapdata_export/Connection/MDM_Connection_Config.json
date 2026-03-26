@@ -140,7 +140,7 @@
       "value" : "dmp"
     } ],
     "loadAllTables" : true,
-    "loadCount" : 6,
+    "loadCount" : 0,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
     "name" : "MDM",
@@ -152,10 +152,10 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "447a0fc5-2945-4547-af26-92a1b9d47ca4",
+    "schemaVersion" : "0cebcdd5-1fe9-429e-9e5b-4f464ded529c",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "submit" : true,
-    "tableCount" : 6
+    "tableCount" : 0
   }
 } ]

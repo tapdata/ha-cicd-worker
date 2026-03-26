@@ -140,7 +140,7 @@
       "value" : "dmp"
     } ],
     "loadAllTables" : true,
-    "loadCount" : 9,
+    "loadCount" : 8,
     "loadFieldErrMsg" : "",
     "loadFieldsStatus" : "finished",
     "name" : "FDM",
@@ -152,10 +152,10 @@
     "retry" : 0,
     "schema" : { },
     "schemaUpdateHour" : "default",
-    "schemaVersion" : "a166470b-c5b4-489c-a788-60da51d3a143",
+    "schemaVersion" : "909c3511-c270-42ea-a089-fb7bd1bb9b22",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "submit" : true,
-    "tableCount" : 9
+    "tableCount" : 7
   }
 } ]
