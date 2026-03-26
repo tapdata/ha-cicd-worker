@@ -2265,6 +2265,7 @@
     "editVersion" : "1774493642641",
     "emailReceivers" : [ ],
     "enforceShareCdc" : true,
+    "errorEvents" : [ ],
     "fileLog" : false,
     "finishTime" : 1755244519713,
     "id" : "688980fc143e5b4bfd479caa",
