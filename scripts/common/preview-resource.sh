@@ -151,16 +151,71 @@ MARKDOWN_TMPFILE=$(mktemp)
   if [[ "${ADD_COUNT}" -gt 0 ]]; then
     echo "### ➕ Add (${ADD_COUNT})"
     echo ""
-    echo "${ADD_LIST}" | jq -r '
-      if all(type == "string") then
-        .[] | "- `\(.)`"
-      elif length > 0 then
-        (.[0] | keys_unsorted) as $keys |
-        "| \($keys | join(" | ")) |",
-        "| \($keys | map("---") | join(" | ")) |",
-        (.[] | [to_entries[].value // "-"] | map("`\(.)`") | "| \(join(" | ")) |")
-      else empty end
-    '
+
+    HAS_COMPLEX=$(echo "${ADD_LIST}" | jq '[.[] | select(type == "object") | to_entries[] | select(.value | type == "object" or type == "array")] | length > 0')
+
+    if [[ "${HAS_COMPLEX}" == "false" ]]; then
+      # Simple rendering: plain list or table
+      echo "${ADD_LIST}" | jq -r '
+        if all(type == "string") then
+          .[] | "- `\(.)`"
+        elif length > 0 then
+          (.[0] | keys_unsorted) as $keys |
+          "| \($keys | join(" | ")) |",
+          "| \($keys | map("---") | join(" | ")) |",
+          (.[] | [to_entries[].value // "-"] | map("`\(.)`") | "| \(join(" | ")) |")
+        else empty end
+      '
+    else
+      # Complex rendering: <details>/<summary> per item with formatted JSON for complex fields
+      local item_count
+      item_count=$(echo "${ADD_LIST}" | jq 'length')
+      for (( i=0; i<item_count; i++ )); do
+        local item_json
+        item_json=$(echo "${ADD_LIST}" | jq ".[$i]")
+        if echo "${item_json}" | jq -e 'type == "string"' >/dev/null 2>&1; then
+          echo "- \`$(echo "${item_json}" | jq -r '.')\`"
+          continue
+        fi
+        local display_name
+        display_name=$(echo "${item_json}" | jq -r '.name // .id // .tableName // "item"')
+        echo "<details>"
+        echo "<summary><code>${display_name}</code></summary>"
+        echo ""
+
+        # Separate scalar and complex fields
+        local scalar_keys complex_keys
+        scalar_keys=$(echo "${item_json}" | jq -r '[to_entries[] | select(.value | type != "object" and type != "array") | .key] | .[]')
+        complex_keys=$(echo "${item_json}" | jq -r '[to_entries[] | select(.value | type == "object" or type == "array") | .key] | .[]')
+
+        # Render scalar fields as table
+        if [[ -n "${scalar_keys}" ]]; then
+          echo "| Field | Value |"
+          echo "| --- | --- |"
+          while IFS= read -r key; do
+            local val
+            val=$(echo "${item_json}" | jq -r --arg k "${key}" '.[$k] // "-" | tostring')
+            echo "| \`${key}\` | \`${val}\` |"
+          done <<< "${scalar_keys}"
+          echo ""
+        fi
+
+        # Render complex fields as formatted JSON code blocks
+        if [[ -n "${complex_keys}" ]]; then
+          while IFS= read -r key; do
+            echo "**${key}**"
+            echo ""
+            echo '```json'
+            echo "${item_json}" | jq --arg k "${key}" '.[$k]'
+            echo '```'
+            echo ""
+          done <<< "${complex_keys}"
+        fi
+
+        echo "</details>"
+        echo ""
+      done
+    fi
     echo ""
   fi
 
