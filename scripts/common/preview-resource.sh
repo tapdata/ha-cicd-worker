@@ -168,23 +168,19 @@ MARKDOWN_TMPFILE=$(mktemp)
       '
     else
       # Complex rendering: <details>/<summary> per item with formatted JSON for complex fields
-      local item_count
       item_count=$(echo "${ADD_LIST}" | jq 'length')
       for (( i=0; i<item_count; i++ )); do
-        local item_json
         item_json=$(echo "${ADD_LIST}" | jq ".[$i]")
         if echo "${item_json}" | jq -e 'type == "string"' >/dev/null 2>&1; then
           echo "- \`$(echo "${item_json}" | jq -r '.')\`"
           continue
         fi
-        local display_name
         display_name=$(echo "${item_json}" | jq -r '.name // .id // .tableName // "item"')
         echo "<details>"
         echo "<summary><code>${display_name}</code></summary>"
         echo ""
 
         # Separate scalar and complex fields
-        local scalar_keys complex_keys
         scalar_keys=$(echo "${item_json}" | jq -r '[to_entries[] | select(.value | type != "object" and type != "array") | .key] | .[]')
         complex_keys=$(echo "${item_json}" | jq -r '[to_entries[] | select(.value | type == "object" or type == "array") | .key] | .[]')
 
@@ -193,7 +189,6 @@ MARKDOWN_TMPFILE=$(mktemp)
           echo "| Field | Value |"
           echo "| --- | --- |"
           while IFS= read -r key; do
-            local val
             val=$(echo "${item_json}" | jq -r --arg k "${key}" '.[$k] // "-" | tostring')
             echo "| \`${key}\` | \`${val}\` |"
           done <<< "${scalar_keys}"
