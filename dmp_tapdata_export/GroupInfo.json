@@ -48,6 +48,14 @@
       "id" : "6954a2bc35a6fa1717313ac4",
       "name" : "cpi-case-v1",
       "type" : "MODULE"
+    }, {
+      "id" : "69c49927b4e9708702d4fc2d",
+      "name" : "PWH_HPI_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69c49904b4e9708702d4fbcb",
+      "name" : "PWH_CMS_TO_FDM",
+      "type" : "MIGRATE_TASK"
     } ]
   }
 } ]
