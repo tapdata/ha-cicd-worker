@@ -31,8 +31,6 @@ env:
   DEPLOY_REF: ${{ github.ref_name }}
   # push 到 main 时固定 dev；push 创建 Tag 时固定 sit；手动触发时使用 inputs.target_env
   TARGET_ENV: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
-  # 创建 Tag 触发时固定 dmp；其他场景默认 dmp 或使用手动输入
-  PROJECT: ${{ inputs.project || 'dmp' }}
 
 jobs:
   # ============================================================
@@ -47,12 +45,21 @@ jobs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
       target_env: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
       tapdata_url: ${{ vars.TAPDATA_URL }}
+      project: ${{ steps.detect_project.outputs.project }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           ref: ${{ env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fetch-depth: 2
+
+      - name: Detect Project
+        id: detect_project
+        run: bash scripts/tapdata-deploy/detect-project.sh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PROJECT: ${{ inputs.project }}
 
       - name: Validate Input Parameters
         run: bash scripts/tapdata-deploy/validate-inputs.sh
@@ -92,6 +99,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 10
     needs: preparation
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     outputs:
       connections_has_changes: ${{ steps.preview_connections.outputs.has_changes }}
       migrate_tasks_has_changes: ${{ steps.preview_migrate_tasks.outputs.has_changes }}
@@ -180,6 +189,8 @@ jobs:
     timeout-minutes: 15
     environment: deploy
     needs: [preparation, preview-all]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     if: needs.preview-all.outputs.connections_has_changes == 'true'
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
@@ -222,6 +233,8 @@ jobs:
     timeout-minutes: 15
     environment: deploy
     needs: [preparation, preview-all, deploy-connections]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     if: >-
       !cancelled()
       && needs.preparation.result == 'success'
@@ -269,6 +282,8 @@ jobs:
     timeout-minutes: 15
     environment: deploy
     needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     if: >-
       !cancelled()
       && needs.preparation.result == 'success'
@@ -317,6 +332,8 @@ jobs:
     timeout-minutes: 15
     environment: deploy
     needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks, deploy-sync-tasks]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     if: >-
       !cancelled()
       && needs.preparation.result == 'success'
@@ -365,6 +382,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     needs: [preparation, preview-all, deploy-connections, deploy-migrate-tasks, deploy-sync-tasks, deploy-apis]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
     if: >-
       !cancelled()
       && needs.preparation.result == 'success'
