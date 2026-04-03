@@ -1,0 +1,282 @@
+[ {
+  "collectionName" : "Connections",
+  "json" : {
+    "accessNodeProcessId" : "",
+    "accessNodeProcessIdList" : [ ],
+    "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
+    "agentTags" : [ ],
+    "capabilities" : [ {
+      "id" : "count_raw_command_function",
+      "type" : 11
+    }, {
+      "id" : "run_raw_command_function",
+      "type" : 11
+    }, {
+      "id" : "execute_command_function",
+      "type" : 11
+    }, {
+      "id" : "release_external_function",
+      "type" : 11
+    }, {
+      "id" : "batch_read_function",
+      "type" : 11
+    }, {
+      "id" : "stream_read_function",
+      "type" : 11
+    }, {
+      "id" : "batch_count_function",
+      "type" : 11
+    }, {
+      "id" : "timestamp_to_stream_offset_function",
+      "type" : 11
+    }, {
+      "id" : "write_record_function",
+      "type" : 11
+    }, {
+      "id" : "after_initial_sync_function",
+      "type" : 11
+    }, {
+      "id" : "query_by_filter_function",
+      "type" : 11
+    }, {
+      "id" : "query_by_advance_filter_function",
+      "type" : 11
+    }, {
+      "id" : "create_table_v2_function",
+      "type" : 11
+    }, {
+      "id" : "clear_table_function",
+      "type" : 11
+    }, {
+      "id" : "drop_table_function",
+      "type" : 11
+    }, {
+      "id" : "create_index_function",
+      "type" : 11
+    }, {
+      "id" : "delete_index_function",
+      "type" : 11
+    }, {
+      "id" : "query_indexes_function",
+      "type" : 11
+    }, {
+      "id" : "query_constraints_function",
+      "type" : 11
+    }, {
+      "id" : "create_constraint_function",
+      "type" : 11
+    }, {
+      "id" : "drop_constraint_function",
+      "type" : 11
+    }, {
+      "id" : "alter_field_attributes_function",
+      "type" : 11
+    }, {
+      "id" : "alter_field_name_function",
+      "type" : 11
+    }, {
+      "id" : "drop_field_function",
+      "type" : 11
+    }, {
+      "id" : "new_field_function",
+      "type" : 11
+    }, {
+      "id" : "count_by_partition_filter_function",
+      "type" : 11
+    }, {
+      "id" : "stream_read_multi_connection_function",
+      "type" : 11
+    }, {
+      "id" : "transaction_begin_function",
+      "type" : 11
+    }, {
+      "id" : "transaction_commit_function",
+      "type" : 11
+    }, {
+      "id" : "transaction_rollback_function",
+      "type" : 11
+    }, {
+      "id" : "query_hash_by_advance_filter_function",
+      "type" : 11
+    }, {
+      "id" : "get_stream_offset_function",
+      "type" : 11
+    }, {
+      "id" : "export_event_sql_function",
+      "type" : 11
+    }, {
+      "id" : "flush_offset_function",
+      "type" : 11
+    }, {
+      "id" : "get_table_info_function",
+      "type" : 11
+    }, {
+      "id" : "get_table_names_function",
+      "type" : 11
+    }, {
+      "id" : "error_handle_function",
+      "type" : 11
+    }, {
+      "id" : "execute_command_v2_function",
+      "type" : 11
+    }, {
+      "alternatives" : [ "update_on_exists", "ignore_on_exists", "just_insert" ],
+      "id" : "dml_insert_policy",
+      "type" : 20
+    }, {
+      "alternatives" : [ "ignore_on_nonexists", "insert_on_nonexists", "log_on_nonexists" ],
+      "id" : "dml_update_policy",
+      "type" : 20
+    }, {
+      "alternatives" : [ "ignore_on_nonexists", "log_on_nonexists" ],
+      "id" : "dml_delete_policy",
+      "type" : 20
+    }, {
+      "alternatives" : [ "ignore_all_check", "default_check" ],
+      "id" : "dml_check_policy",
+      "type" : 20
+    }, {
+      "id" : "api_server_supported",
+      "type" : 20
+    }, {
+      "id" : "source_support_exactly_once",
+      "type" : 20
+    }, {
+      "id" : "batch_read_hash_split",
+      "type" : 20
+    }, {
+      "id" : "source_support_partition",
+      "type" : 20
+    } ],
+    "config" : {
+      "__connectionType" : "source_and_target",
+      "allowReplication" : true,
+      "database" : "qmh",
+      "defaultWalLogSize" : 102400,
+      "deploymentMode" : "standalone",
+      "globalPublicationName" : "dbz_publication",
+      "logPluginName" : "pgoutput",
+      "partPublication" : false,
+      "pgtoHost" : "127.0.0.1",
+      "pgtoPort" : 9876,
+      "schema" : "hpi",
+      "timezone" : ""
+    },
+    "connection_type" : "source_and_target",
+    "createAt" : 1774601780436,
+    "createUser" : "sam",
+    "dataSourceMonitor" : false,
+    "database_type" : "PostgreSQL",
+    "datasourceInstanceTag" : "192.168.1.184:25432",
+    "definitionBuildNumber" : "null",
+    "definitionGroup" : "io.tapdata",
+    "definitionPdkAPIVersion" : "2.0.5-SNAPSHOT",
+    "definitionPdkId" : "postgres",
+    "definitionScope" : "public",
+    "definitionTags" : [ "Database", "ssl", "doubleActive", "disableForeignKey", "NullsLast" ],
+    "definitionVersion" : "1.0-SNAPSHOT",
+    "everLoadSchema" : true,
+    "heartbeatEnable" : false,
+    "id" : "69c64634b9dbbccec453fbf0",
+    "isInit" : false,
+    "kafkaAcks" : "-1",
+    "kafkaBatchSize" : 0,
+    "kafkaBufferMemory" : 0,
+    "kafkaCompressionType" : "",
+    "kafkaConsumerRequestTimeout" : 0,
+    "kafkaConsumerUseTransactional" : false,
+    "kafkaDeliveryTimeoutMS" : 0,
+    "kafkaIgnoreInvalidRecord" : false,
+    "kafkaIgnorePushError" : false,
+    "kafkaLingerMS" : 0,
+    "kafkaMaxBlockMS" : 0,
+    "kafkaMaxFetchBytes" : 0,
+    "kafkaMaxFetchWaitMS" : 0,
+    "kafkaMaxPollRecords" : 0,
+    "kafkaMaxRequestSize" : 0,
+    "kafkaPartitionKey" : "",
+    "kafkaPollTimeoutMS" : 0,
+    "kafkaProducerRequestTimeout" : 0,
+    "kafkaProducerUseTransactional" : false,
+    "kafkaRetries" : 0,
+    "lastUpdAt" : 1774601780436,
+    "loadAllTables" : false,
+    "loadCount" : 2,
+    "loadFieldErrMsg" : "",
+    "loadFieldsStatus" : "finished",
+    "multiConnectionInstanceId" : "2de6b03c0508121e4451dadee20e37f9",
+    "name" : "QMH_PG_HPI_PATIENT",
+    "namespace" : [ "hpi" ],
+    "openTableExcludeFilter" : false,
+    "pdkHash" : "8dea069f269dd428d82e60e75d0d91b6dc61be7be26eae7bc407d7b95d3b0594",
+    "pdkType" : "pdk",
+    "permissions" : [ {
+      "actions" : [ "Edit", "View" ],
+      "type" : "Role",
+      "typeId" : "69c622ff1f850faa41527872"
+    } ],
+    "project" : "",
+    "response_body" : {
+      "retry" : 0,
+      "validate_details" : [ {
+        "fail_message" : "2.0.5-SNAPSHOT (build: 2026-03-12 15:43:38)",
+        "required" : true,
+        "show_msg" : "PDK Connector version",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "connected to 192.168.1.184:25432 succeed!",
+        "required" : true,
+        "show_msg" : "Check host port is valid",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "login succeed!",
+        "required" : true,
+        "show_msg" : "Connection",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "PostgreSQL 15.13",
+        "required" : true,
+        "show_msg" : "Version",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Create,Insert,Update,Delete,Drop succeed",
+        "required" : true,
+        "show_msg" : "Write",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Current user has DBA privilege",
+        "required" : true,
+        "show_msg" : "Read",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Cdc can work normally",
+        "required" : true,
+        "show_msg" : "Read log",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "192.168.1.184:25432",
+        "required" : true,
+        "show_msg" : "Datasource instance info",
+        "sort" : 0,
+        "status" : "passed"
+      } ]
+    },
+    "schemaUpdateHour" : "default",
+    "schemaVersion" : "2f3e0ddc-a0fd-40a9-9af6-85b918964e57",
+    "shareCDCExternalStorageId" : "",
+    "shareCdcEnable" : false,
+    "submit" : true,
+    "tableCount" : 3,
+    "table_filter" : "cpi_patient,cpi_patient_hospital_data",
+    "testCount" : 0,
+    "timeDifference" : 0,
+    "userId" : "69c64490b9dbbccec453fb54"
+  }
+} ]
