@@ -92,13 +92,53 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # Job 2: Preview All Resources
+  # Job 2: Deploy Users (no approval required)
+  # ============================================================
+  deploy-users:
+    name: Deploy Users
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: [preparation]
+    env:
+      PROJECT: ${{ needs.preparation.outputs.project }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_REF }}
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Download vault artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vault-and-export
+          path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Compress Export Files
+        run: bash scripts/common/compress-files.sh
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: users-export.tar
+          PROJECT: ${{ env.PROJECT }}
+
+      - name: Import Users via TapData API
+        id: import_users
+        run: bash scripts/common/import-resource.sh users
+        env:
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
+          ARCHIVE_NAME: users-export.tar
+          TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
+          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+
+  # ============================================================
+  # Job 3: Preview All Resources
   # ============================================================
   preview-all:
     name: Preview All Resources
     runs-on: self-hosted
     timeout-minutes: 10
-    needs: preparation
+    needs: [preparation, deploy-users]
     env:
       PROJECT: ${{ needs.preparation.outputs.project }}
     outputs:
