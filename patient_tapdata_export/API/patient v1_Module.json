@@ -12,6 +12,7 @@
     "connectionName" : "MDM",
     "connectionType" : "MongoDB",
     "createTime" : 1774945397523,
+    "createUser" : "patient-sam",
     "datasource" : "695497a235a6fa171731395e",
     "fields" : [ {
       "autoincrement" : "NO",

@@ -4,7 +4,6 @@
     "accessNodeProcessId" : "",
     "accessNodeProcessIdList" : [ ],
     "accessNodeType" : "AUTOMATIC_PLATFORM_ALLOCATION",
-    "accessNodeTypeEmpty" : false,
     "agentTags" : [ ],
     "capabilities" : [ {
       "id" : "count_raw_command_function",
@@ -164,7 +163,8 @@
       "timezone" : ""
     },
     "connection_type" : "source_and_target",
-    "createTime" : 1774601716604,
+    "createAt" : 1774601716604,
+    "createUser" : "sam",
     "dataSourceMonitor" : false,
     "database_type" : "PostgreSQL",
     "datasourceInstanceTag" : "192.168.1.184:25432",
@@ -199,6 +199,7 @@
     "kafkaProducerRequestTimeout" : 0,
     "kafkaProducerUseTransactional" : false,
     "kafkaRetries" : 0,
+    "lastUpdAt" : 1774601716604,
     "loadAllTables" : false,
     "loadCount" : 2,
     "loadFieldErrMsg" : "",
@@ -209,13 +210,73 @@
     "openTableExcludeFilter" : false,
     "pdkHash" : "8dea069f269dd428d82e60e75d0d91b6dc61be7be26eae7bc407d7b95d3b0594",
     "pdkType" : "pdk",
+    "permissions" : [ {
+      "actions" : [ "Edit", "View" ],
+      "type" : "Role",
+      "typeId" : "69c622ff1f850faa41527872"
+    } ],
     "project" : "",
+    "response_body" : {
+      "retry" : 0,
+      "validate_details" : [ {
+        "fail_message" : "2.0.5-SNAPSHOT (build: 2026-03-12 15:43:38)",
+        "required" : true,
+        "show_msg" : "PDK Connector version",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "connected to 192.168.1.184:25432 succeed!",
+        "required" : true,
+        "show_msg" : "Check host port is valid",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "login succeed!",
+        "required" : true,
+        "show_msg" : "Connection",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "PostgreSQL 15.13",
+        "required" : true,
+        "show_msg" : "Version",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Create,Insert,Update,Delete,Drop succeed",
+        "required" : true,
+        "show_msg" : "Write",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Current user has DBA privilege",
+        "required" : true,
+        "show_msg" : "Read",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "Cdc can work normally",
+        "required" : true,
+        "show_msg" : "Read log",
+        "sort" : 0,
+        "status" : "passed"
+      }, {
+        "fail_message" : "192.168.1.184:25432",
+        "required" : true,
+        "show_msg" : "Datasource instance info",
+        "sort" : 0,
+        "status" : "passed"
+      } ]
+    },
     "schemaUpdateHour" : "default",
     "schemaVersion" : "e206de5c-cf43-4147-833c-2bb49c0770ae",
     "shareCDCExternalStorageId" : "",
     "shareCdcEnable" : false,
     "submit" : true,
     "tableCount" : 3,
-    "table_filter" : "cpi_patient,cpi_patient_hospital_data"
+    "table_filter" : "cpi_patient,cpi_patient_hospital_data",
+    "testCount" : 0,
+    "timeDifference" : 0,
+    "userId" : "69c64490b9dbbccec453fb54"
   }
 } ]

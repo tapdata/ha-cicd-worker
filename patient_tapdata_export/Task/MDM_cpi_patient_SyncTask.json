@@ -75,6 +75,7 @@
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1774856949627,
+    "createUser" : "patient-sam",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -1054,6 +1055,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "type" : "initial_sync+cdc",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -1064,6 +1066,7 @@
     "ancestorsName" : "MDM_HPI_cpi_patient",
     "createSource" : "job_analyze",
     "createTime" : 1774857307194,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -2381,6 +2384,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -2390,6 +2394,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774857335208,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -3707,6 +3712,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -3715,6 +3721,7 @@
     "ancestorsName" : "MDM_HPI_cpi_patient_hospital_data",
     "createSource" : "job_analyze",
     "createTime" : 1774857584335,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -4032,6 +4039,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -4041,6 +4049,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774857606645,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -4358,6 +4367,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -4367,6 +4377,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774866956394,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -4654,6 +4665,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -4664,6 +4676,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774857263183,
+    "createUser" : "patient-sam",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -5989,6 +6002,7 @@
     },
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -5999,6 +6013,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774857267898,
+    "createUser" : "patient-sam",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -6324,6 +6339,7 @@
     },
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -6333,6 +6349,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774867064786,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -6690,6 +6707,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -6699,6 +6717,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774857638011,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -6850,6 +6869,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 }, {
@@ -6859,6 +6879,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774929228985,
+    "createUser" : "admin@admin.com",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -7247,6 +7268,7 @@
     "sourceType" : "VIRTUAL",
     "taskId" : "69ca2af5d8de1e64a964038a",
     "transformUuid" : "1774929237060",
+    "user_id" : "62bc5008d4958d013d97c7a6",
     "username" : "admin@admin.com"
   }
 } ]

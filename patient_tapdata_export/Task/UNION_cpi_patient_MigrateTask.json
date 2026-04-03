@@ -75,6 +75,7 @@
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1774856672317,
+    "createUser" : "patient-sam",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -446,7 +447,7 @@
     "initialSyncTask" : true,
     "isAutoCreateIndex" : true,
     "isAutoInspect" : false,
-    "isEdit" : false,
+    "isEdit" : true,
     "isFilter" : false,
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
@@ -487,6 +488,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "type" : "initial_sync+cdc",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -499,6 +501,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774856832182,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1824,6 +1827,7 @@
     },
     "taskId" : "69ca29e0d8de1e64a9640191",
     "transformUuid" : "1774856843567",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -1834,6 +1838,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774856837612,
+    "createUser" : "patient-sam",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -3159,6 +3164,7 @@
     },
     "taskId" : "69ca29e0d8de1e64a9640191",
     "transformUuid" : "1774856843567",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -3169,6 +3175,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774856752677,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -4483,6 +4490,7 @@
     },
     "taskId" : "69ca29e0d8de1e64a9640191",
     "transformUuid" : "1774856843567",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -4493,6 +4501,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774856781534,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -5808,6 +5817,7 @@
     },
     "taskId" : "69ca29e0d8de1e64a9640191",
     "transformUuid" : "1774856843567",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 } ]

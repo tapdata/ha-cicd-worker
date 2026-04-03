@@ -75,6 +75,7 @@
     "cdctask" : false,
     "checkMemoryHeap" : false,
     "createTime" : 1774856856789,
+    "createUser" : "patient-sam",
     "crontabExpressionFlag" : false,
     "dag" : {
       "edges" : [ {
@@ -449,7 +450,7 @@
     "initialSyncTask" : true,
     "isAutoCreateIndex" : true,
     "isAutoInspect" : false,
-    "isEdit" : false,
+    "isEdit" : true,
     "isFilter" : false,
     "isOpenAutoDDL" : false,
     "isSchedule" : false,
@@ -490,6 +491,7 @@
     "transformDagHash" : 0,
     "transformProcess" : 0.0,
     "type" : "initial_sync+cdc",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "writeBatchSize" : 0,
     "writeBatchWaitMs" : 0,
     "writeThreadSize" : 8
@@ -502,6 +504,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774856891107,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -813,6 +816,7 @@
     },
     "taskId" : "69ca2a98d8de1e64a96402b9",
     "transformUuid" : "1774856915899",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -823,6 +827,7 @@
     "constraints" : [ ],
     "createSource" : "auto",
     "createTime" : 1774856891108,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1134,6 +1139,7 @@
     },
     "taskId" : "69ca2a98d8de1e64a96402b9",
     "transformUuid" : "1774856915899",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -1144,6 +1150,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774856911964,
+    "createUser" : "patient-sam",
     "databaseId" : "69549862aedd5fe4733b3966",
     "dev_version" : 1,
     "fields" : [ {
@@ -1469,6 +1476,7 @@
     },
     "taskId" : "69ca2a98d8de1e64a96402b9",
     "transformUuid" : "1774856915899",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 }, {
@@ -1479,6 +1487,7 @@
     "constraints" : [ ],
     "createSource" : "job_analyze",
     "createTime" : 1774856911965,
+    "createUser" : "patient-sam",
     "databaseId" : "69549865aedd5fe4733b3c1d",
     "dev_version" : 1,
     "fields" : [ {
@@ -1804,6 +1813,7 @@
     },
     "taskId" : "69ca2a98d8de1e64a96402b9",
     "transformUuid" : "1774856915899",
+    "user_id" : "69c64490b9dbbccec453fb54",
     "username" : "patient-sam"
   }
 } ]
