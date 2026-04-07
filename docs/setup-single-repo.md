@@ -1,129 +1,121 @@
 # Single-Repo Mode: Setup Guide
 
-All TapData configuration files and CI/CD scripts are stored in a single GitHub repository (`ha-cicd-worker`). This mode is suitable for a single team or project.
+All TapData configuration files and CI/CD scripts are stored in a single GitHub repository (`ha-cicd-worker`). Suitable for a single team or project.
 
 ---
 
-## Prerequisites
+## Part 1: Resources to Request from Your IT/Ops Team
 
-- A GitHub account with permission to create repositories
-- A Self-hosted Runner machine with access to GitHub and the target TapData server
-- An SSH key pair already generated for the Runner to access the repository
+> These items require internal approval processes and should be arranged **before go-live**. Please confirm all items below are in place before proceeding.
 
----
+### 1.1 GitHub Account and Repository
 
-## Step 1: Create the Repository
-
-1. Create a repository named `ha-cicd-worker` on GitHub (private or public)
-2. Push the project code to the `main` branch of that repository
-
----
-
-## Step 2: Install the Self-hosted Runner
-
-1. Go to the repository page → **Settings** → **Actions** → **Runners** → **New self-hosted runner**
-2. Follow the on-screen instructions to download and install the Runner on the target machine
-3. Once registered, the Runner status should show as **Idle**
-
----
-
-## Step 3: Configure GitHub Environments
-
-Environments are used to control deployment approvals and manage environment-specific variables.
-
-Go to repository **Settings** → **Environments** and create the following:
-
-| Environment Name | Purpose | Requires Reviewers |
-|---|---|---|
-| `dev` | Development environment (auto-triggered on push to main) | No |
-| `sit` | Testing environment (auto-triggered on tag creation) | No |
-| `lpt` | Performance testing environment (manually triggered) | No |
-| `aat` | Acceptance testing environment (manually triggered) | No |
-| `prod` | Production environment (manually triggered) | No |
-| `deploy` | Manual approval gate before deploying connections/tasks/APIs | **Yes** — configure reviewers |
-
-> **Note**: The `deploy` Environment is the approval gate in the pipeline. Every time connections, migration tasks, sync tasks, or APIs are deployed, a reviewer must confirm on the GitHub page before execution continues.
-
----
-
-## Step 4: Configure Repository Secrets
-
-Go to repository **Settings** → **Secrets and variables** → **Actions** → **Secrets** tab and add the following:
-
-### Required Secrets
-
-| Secret Name | Description |
+| Item | Requirement |
 |---|---|
-| `SSH_PRIVATE_KEY` | SSH private key content for the Runner to access the repository (the corresponding public key must be added to your GitHub account or the repository's Deploy Keys) |
-| `TAPDATA_ACCESS_CODE` | Access credentials for the TapData platform, used to obtain an API token |
+| GitHub account (personal or organization) | With permission to create repositories |
+| One **private** repository named `ha-cicd-worker` | For storing all CI/CD scripts and TapData config files |
 
-### Database Connection Secrets (based on your actual connections)
+> If multiple team members need access, request a GitHub Organization and invite members accordingly. The CI/CD administrator account needs **Owner** or **Admin** access to the repository.
 
-During deployment, `generate-vault.sh` automatically extracts database connection information from Secrets using the following priority order (`{NAME}` is the connection name in TapData, converted to uppercase):
+### 1.2 Self-hosted Runner Machine
 
-**Priority 1**: Provide a full URI directly
+Request a server/VM to act as the GitHub Actions Runner. This machine will execute all deployment jobs.
 
-| Secret Name | Example |
+**Requirements:**
+
+| Item | Requirement |
 |---|---|
-| `{NAME}_URI` | `MYSQL_PROD_URI` = `mysql://user:pass@host:3306/db` |
-
-**Priority 2**: Provide URL + username + password separately
-
-| Type | Name | Example |
-|---|---|---|
-| Variable | `{NAME}_URL` | `MYSQL_PROD_URL` = `mysql://host:3306/db` |
-| Variable | `{NAME}_USER` | `MYSQL_PROD_USER` = `admin` |
-| Secret | `{NAME}_PASSWORD` | `MYSQL_PROD_PASSWORD` = `secret123` |
-
-**Priority 3**: Group by prefix (connection name `A_B_C_D` automatically tries prefix `A_B`)
-
-> For example, if the connection name is `MYSQL_PROD_ORDERS`, it will automatically try `MYSQL_PROD_URL` / `MYSQL_PROD_USER` / `MYSQL_PROD_PASSWORD`
-
-**Priority 4**: Default fallback
-
-| Type | Name |
-|---|---|
-| Variable | `DEFAULT_URL` |
-| Variable | `DEFAULT_USER` |
-| Secret | `DEFAULT_PASSWORD` |
+| OS | Linux (Ubuntu 20.04+ recommended) |
+| Network access | Must reach the GitHub instance (outbound HTTPS) |
+| Network access | Must reach the TapData server (host + port) |
+| Disk | ≥ 20 GB free |
+| User | A dedicated service account (non-root) is recommended |
 
 ---
 
-## Step 5: Configure Repository Variables
+## Part 2: Configuration Done by Our Team
 
-Go to repository **Settings** → **Secrets and variables** → **Actions** → **Variables** tab and add:
+> Once we have the GitHub account and repository access, the following can be set up and adjusted at any time — no IT approval required.
 
-| Variable Name | Description | Example |
+### 2.1 Push Code to the Repository
+
+Push the `ha-cicd-worker` project code to the `main` branch.
+
+### 2.2 Install the Self-hosted Runner
+
+1. Go to `ha-cicd-worker` → **Settings** → **Actions** → **Runners** → **New self-hosted runner**
+2. Follow the on-screen instructions to register the Runner on the target machine
+3. During registration, add the custom label **`tapdata`** (in addition to the default `self-hosted` label):
+   ```
+   # When the setup script prompts for extra labels:
+   Enter any additional labels (comma separated): tapdata
+   ```
+4. Verify the Runner status shows **Idle**
+
+### 2.3 Configure GitHub Environments
+
+Go to **Settings** → **Environments** and create the following:
+
+| Environment | Purpose | Requires Reviewers |
 |---|---|---|
-| `TAPDATA_URL` | TapData server address (including protocol and port) | `http://10.0.0.1:3030` |
+| `dev` | Development (auto-triggered on push to main) | No |
+| `sit` | Testing (auto-triggered on tag creation) | No |
+| `lpt` | Performance testing (manually triggered) | No |
+| `aat` | Acceptance testing (manually triggered) | No |
+| `prod` | Production (manually triggered) | No |
+| `deploy` | Approval gate before any deployment | **Yes** — add reviewers |
 
-> If each environment uses a different TapData server address, configure an Environment-level Variable with the same name to override the repository-level value.
+> The `deploy` Environment is the manual approval gate. Every deployment (connections, tasks, APIs) pauses here until an approver clicks **Review deployments** on the GitHub Actions page.
 
----
+### 2.4 Place TapData Export Files
 
-## Step 6: Prepare TapData Export Files
-
-Place the JSON files exported from the TapData platform into the `{project}_tapdata_export/` directory at the root of the repository. The directory structure should look like this:
+Add the exported TapData JSON files into the repository:
 
 ```
 {project}_tapdata_export/
-├── Connection/       # Database connection configuration JSON files
-├── Task/             # Data migration/sync task JSON files
-├── API/              # API endpoint JSON files
-├── User/             # User configuration JSON files
-└── GroupInfo.json    # Group information
+├── Connection/
+├── Task/
+├── API/
+├── User/
+└── GroupInfo.json
 ```
+
+### 2.5 Configure Secrets and Variables
+
+Go to **Settings** → **Secrets and variables** → **Actions**:
+
+**Secrets:**
+
+| Name | Description |
+|---|---|
+| `GH_DEPLOY_TOKEN` | Fine-grained personal access token for accessing the repository |
+| `TAPDATA_ACCESS_CODE` | TapData platform access credentials |
+| Database passwords | Named by connection (see rules below) |
+
+**Variables:**
+
+| Name | Description | Example |
+|---|---|---|
+| `TAPDATA_URL` | TapData server address | `http://10.0.0.1:3030` |
+| Database URLs / Users | Named by connection (see rules below) | |
+
+> If each environment uses a different TapData server, configure `TAPDATA_URL` as an Environment-level Variable inside each environment to override the repository-level value.
+
+**Database credential naming rules** (`{NAME}` = TapData connection name, uppercased):
+
+| Priority | Type | Name | Example |
+|---|---|---|---|
+| 1 (highest) | Secret | `{NAME}_URI` | `MYSQL_PROD_URI` = `mysql://user:pass@host:3306/db` |
+| 2 | Variable + Secret | `{NAME}_URL` / `{NAME}_USER` / `{NAME}_PASSWORD` | Split credentials |
+| 3 | Variable + Secret | `{PREFIX}_URL` / `{PREFIX}_USER` / `{PREFIX}_PASSWORD` | Shared by prefix group |
+| 4 (fallback) | Variable + Secret | `DEFAULT_URL` / `DEFAULT_USER` / `DEFAULT_PASSWORD` | Global default |
 
 ---
 
-## Step 7: Verify Triggers
-
-After completing the above configuration, trigger a deployment using one of the following methods:
+## Deployment Triggers
 
 | Action | Target Environment |
 |---|---|
-| Push to `main` branch (with changes in `{project}_tapdata_export/`) | `dev` |
+| Push to `main` (with changes in `{project}_tapdata_export/`) | `dev` |
 | Create a Git Tag | `sit` |
-| Manually trigger from GitHub Actions page (Workflow dispatch) | Select `sit` / `lpt` / `aat` / `prod` |
-
-Go to the repository's **Actions** tab to view the Workflow run status. When the pipeline reaches the `deploy` approval gate, reviewers will receive an email notification and can click **Review deployments** on the GitHub page to confirm and continue execution.
+| Manually trigger from the Actions page | Select `sit` / `lpt` / `aat` / `prod` |

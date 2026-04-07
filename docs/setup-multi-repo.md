@@ -1,164 +1,122 @@
 # Multi-Repo Multi-Tenant Mode: Setup Guide
 
-Each team (tenant) owns an independent GitHub repository containing their TapData configuration files, and triggers automated deployments via the shared `ha-cicd-worker` repository. The Worker repository serves as a unified deployment engine reused by all tenants.
+Each team (tenant) owns an independent GitHub repository for their TapData configuration files. A shared `ha-cicd-worker` repository serves as the unified deployment engine for all tenants.
 
 ```
-ha-cicd-worker      ← Shared deployment engine (Workflows + Scripts, centrally maintained)
-├── patient-team    ← Tenant repo (TapData config files for the patient project)
-└── case-team       ← Tenant repo (TapData config files for the case project)
+ha-cicd-worker      ← Shared deployment engine (centrally maintained)
+├── patient-team    ← Tenant repo (patient project config files)
+└── case-team       ← Tenant repo (case project config files)
 ```
-
-When the Worker is updated, all tenant repositories automatically use the latest pipeline without any changes needed.
 
 ---
 
-## Prerequisites
+## Part 1: Resources to Request from Your IT/Ops Team
 
-- An existing GitHub Organization (this project uses `tapdata`)
-- A Self-hosted Runner machine with access to GitHub and the target TapData server
-- An SSH key pair already generated
+> These items require internal approval processes and should be arranged **before go-live**. Please confirm all items below are in place before proceeding.
+
+### 1.1 GitHub Organization
+
+Provide a GitHub Organization under which all repositories will be created. Note the organization name — it will be used throughout this setup (referred to as `{org}`).
+
+- If an Organization already exists, confirm you have **Owner** access to it
+- If not, request one to be created
+
+### 1.2 GitHub User Accounts
+
+> Customer team members already have their own GitHub accounts. Only the following TapData-side accounts need to be requested and added to the Organization.
+
+| Account | Quantity | Organization Role | Repository Access | Purpose |
+|---|---|---|---|---|
+| TapData implementation engineer | 1–2 | **Owner** | All repositories (admin) | Push code, configure environments, manage secrets, install Runner |
+
+**Note on deployment approvers**: Approvers are customer-side personnel who review and approve each deployment on the GitHub Actions page. They use their existing GitHub accounts — just add them to the Organization as **Member** and assign them as reviewers in the `deploy` Environment (done in Part 2, no IT request needed).
+
+### 1.3 GitHub Repositories
+
+Request the following **private** repositories to be created under `{org}`:
+
+| Repository Name | Purpose |
+|---|---|
+| `ha-cicd-worker` | Shared deployment engine — holds all CI/CD scripts and workflows |
+| `{project}-team` (one per team) | Tenant repository — holds TapData export files for that team, e.g. `patient-team`, `case-team` |
+
+### 1.4 Self-hosted Runner Machine
+
+Request a server/VM to act as the GitHub Actions Runner. This machine will execute all deployment jobs.
+
+**Requirements:**
+
+| Item | Requirement |
+|---|---|
+| OS | Linux (Ubuntu 20.04+ recommended) |
+| Network access | Must reach the GitHub instance (outbound HTTPS) |
+| Network access | Must reach the TapData server (host + port) |
+| Disk | ≥ 20 GB free |
+| User | A dedicated service account (non-root) is recommended |
+
+> Only **one** Runner machine is needed — it handles deployments for all tenant repositories.
 
 ---
 
-## Part 1: Configure the Worker Repository
+## Part 2: Configuration Done by Our Team
 
-The Worker repository is the core of the system and only needs to be configured once.
+> Once we have the GitHub accounts and repositories, the following can be set up and adjusted at any time — no IT approval required.
 
-### 1. Create the Repository and Push Code
+### 2.1 Push Code to the Worker Repository
 
-Create a private repository named `ha-cicd-worker` under the target GitHub Organization and push the project code to the `main` branch.
+Push the `ha-cicd-worker` project code to the `main` branch of the `ha-cicd-worker` repository.
 
-### 2. Verify and Update the Organization Name
+> Before pushing, replace all occurrences of the default organization name `tapdata` with the actual `{org}` name in the workflow files:
+> - `ha-cicd-worker/.github/workflows/tapdata-deploy.yml`
+> - Each tenant repo's `.github/workflows/tapdata-deploy.yml`
 
-The Workflow files in this repository default to the organization name `tapdata` (Demo environment). When deploying to an actual customer environment, confirm whether this value matches the real GitHub organization name and replace it globally if needed.
+### 2.2 Install the Self-hosted Runner
 
-Files involved:
+> **Why Organization-level?** Tenant workflows call the worker's reusable workflow via `workflow_call`. GitHub runs those jobs in the context of the **caller** repository (e.g., `patient-team`), not the worker. A repository-level runner registered only to `ha-cicd-worker` is invisible to tenant repositories. Registering at the Organization level makes the runner available to all repositories under `{org}`.
 
-```
-ha-cicd-worker/.github/workflows/tapdata-deploy.yml   # multiple occurrences of tapdata/ha-cicd-worker
-case-team/.github/workflows/tapdata-deploy.yml         # uses: tapdata/ha-cicd-worker/...
-patient-team/.github/workflows/tapdata-deploy.yml      # uses: tapdata/ha-cicd-worker/...
-```
+1. Go to **`{org}` Organization** → **Settings** → **Actions** → **Runners** → **New self-hosted runner**
+2. Follow the on-screen instructions to register the Runner on the target machine
+3. During registration, add the custom label **`tapdata`** (in addition to the default `self-hosted` label):
+   ```
+   # When the setup script prompts for extra labels:
+   Enter any additional labels (comma separated): tapdata
+   ```
+4. Verify the Runner status shows **Idle** in the Organization's runner list
 
-Run the following command from the repository root to batch-replace the organization name (replace `your-actual-org` with the real organization name):
+> **Do not** register the runner under `ha-cicd-worker` → Settings → Actions → Runners (repository-level). A repository-level runner only accepts jobs from that one repository.
 
-```bash
-grep -rl 'tapdata/ha-cicd-worker' .github */. github | xargs sed -i 's|tapdata/ha-cicd-worker|your-actual-org/ha-cicd-worker|g'
-```
+### 2.3 Configure Environments in the Worker Repository
 
-Alternatively, use your editor's global find-and-replace to search for `tapdata/ha-cicd-worker` and replace it.
+Go to `ha-cicd-worker` → **Settings** → **Environments** and create:
 
-### 3. Install the Self-hosted Runner
-
-Go to the `ha-cicd-worker` repository → **Settings** → **Actions** → **Runners** → **New self-hosted runner**, and follow the instructions to install the Runner on the target machine.
-
-> **Important**: The Runner is registered under the Worker repository. All tenant-triggered deployments run on this Runner — no separate Runner installation is needed in each tenant repository.
-
-### 4. Configure Environments
-
-Go to the `ha-cicd-worker` repository **Settings** → **Environments** and create the following Environments:
-
-| Environment Name | Purpose |
+| Environment | Purpose |
 |---|---|
-| `dev` | Development environment |
-| `sit` | Testing environment |
-| `lpt` | Performance testing environment |
-| `aat` | Acceptance testing environment |
-| `prod` | Production environment |
+| `dev` | Development |
+| `sit` | Testing |
+| `lpt` | Performance testing |
+| `aat` | Acceptance testing |
+| `prod` | Production |
 
-> These Environments hold Worker-level configuration. No approval reviewers need to be configured here — the approval gate is set up in the `deploy` Environment of each tenant repository.
+### 2.4 Configure Each Tenant Repository
 
-### 5. Configure Repository Variables
+For each tenant repository (e.g., `patient-team`):
 
-Go to `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Variables**:
+**a. Create Environments**
 
-| Variable Name | Description | Example |
-|---|---|---|
-| `TAPDATA_URL` | TapData server address | `http://10.0.0.1:3030` |
+Go to the tenant repository → **Settings** → **Environments**:
 
-> If each environment uses a different TapData server address, configure an Environment-level Variable with the same name to override the repository-level value.
-
-### 6. Configure Repository Secrets
-
-Go to `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Secrets**:
-
-| Secret Name | Description |
+| Environment | Requires Reviewers |
 |---|---|
-| `SSH_PRIVATE_KEY` | SSH private key used by the Runner to access all repositories (the corresponding public key must be added to the GitHub account or Organization) |
+| `dev` | No |
+| `sit` | No |
+| `lpt` | No |
+| `deploy` | **Yes** — add the designated approvers |
 
-> `SSH_PRIVATE_KEY` must have read access to both the Worker repository and all tenant repositories. It is recommended to use a GitHub Organization Deploy Key or an account-level SSH key.
+> The `deploy` Environment is the manual approval gate. Every deployment pauses here until an approver clicks **Review deployments** on the GitHub Actions page.
 
----
+**b. Add the Workflow File**
 
-## Part 2: Configure Organization-Level Secrets (Optional)
-
-If `TAPDATA_ACCESS_CODE` is the same for all tenants, you can configure it at the Organization level so all repositories inherit it automatically, eliminating the need to configure it in each tenant repository individually.
-
-Go to GitHub **Organization** → **Settings** → **Secrets and variables** → **Actions** and add:
-
-| Secret Name | Description |
-|---|---|
-| `TAPDATA_ACCESS_CODE` | Access credentials for the TapData platform |
-| `SSH_PRIVATE_KEY` | (Can also be configured here for centralized management) |
-
-Set the Secret's **Repository access** to **All repositories** or a specific whitelist of repositories.
-
----
-
-## Part 3: Configure Each Tenant Repository
-
-For each new tenant, follow the steps below to configure their repository. Using `patient-team` as an example (project name: `patient`):
-
-### 1. Create the Repository
-
-Create a tenant repository (e.g., `patient-team`, private) under the `tapdata` organization.
-
-### 2. Configure Environments
-
-Go to the tenant repository **Settings** → **Environments** and create the following Environments:
-
-| Environment Name | Purpose | Requires Reviewers |
-|---|---|---|
-| `dev` | Development environment | No |
-| `sit` | Testing environment | No |
-| `lpt` | Performance testing environment | No |
-| `deploy` | Approval gate for connection/task/API deployments | **Yes** — configure reviewers |
-
-> **Note**: The `deploy` Environment is the manual approval gate in the pipeline. Deploying TapData connections, tasks, or APIs to this tenant requires a reviewer to confirm on the GitHub page before execution continues.
-
-### 3. Configure Repository Secrets
-
-Go to the tenant repository **Settings** → **Secrets and variables** → **Actions** → **Secrets**:
-
-| Secret Name | Description |
-|---|---|
-| `SSH_PRIVATE_KEY` | Add here if not configured at the Organization level |
-| `TAPDATA_ACCESS_CODE` | Add here if not configured at the Organization level |
-| Database connection passwords (see below) | Private database credentials for this tenant |
-
-**Database connection Secret naming rules** (`{NAME}` is the connection name in TapData, converted to uppercase):
-
-| Priority | Secret Name | Description |
-|---|---|---|
-| 1 (highest) | `{NAME}_URI` | Full database connection URI |
-| 2 | `{NAME}_PASSWORD` | Used with `{NAME}_URL` and `{NAME}_USER` Variables of the same name |
-| 3 | `{PREFIX}_PASSWORD` | Grouped by prefix (connection name `A_B_C` automatically tries prefix `A_B`) |
-| 4 (fallback) | `DEFAULT_PASSWORD` | Used with `DEFAULT_URL` and `DEFAULT_USER` |
-
-### 4. Configure Repository Variables
-
-Go to the tenant repository **Settings** → **Secrets and variables** → **Actions** → **Variables**:
-
-Based on the database connection naming rules, configure the corresponding URL and USER (passwords are configured separately as Secrets):
-
-| Variable Name | Example Value |
-|---|---|
-| `{NAME}_URL` | `mysql://10.0.0.2:3306/patient_db` |
-| `{NAME}_USER` | `deploy_user` |
-
-### 5. Add the Trigger Workflow File
-
-Create `.github/workflows/tapdata-deploy.yml` in the tenant repository with the following content (replace `tapdata` and `patient` with the actual values):
+Create `.github/workflows/tapdata-deploy.yml` in the tenant repository (replace `{org}` and `{project}` with actual values):
 
 ```yaml
 name: TapData Deploy
@@ -167,9 +125,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'patient_tapdata_export/**'
+      - '{project}_tapdata_export/**'
     tags:
-      - 'patient-*'
+      - '{project}-*'
   workflow_dispatch:
     inputs:
       target_env:
@@ -183,9 +141,9 @@ on:
 
 jobs:
   deploy:
-    uses: tapdata/ha-cicd-worker/.github/workflows/tapdata-deploy.yml@main
+    uses: {org}/ha-cicd-worker/.github/workflows/tapdata-deploy.yml@main
     with:
-      project: patient
+      project: {project}
       target_env: ${{ inputs.target_env || '' }}
       caller_repo: ${{ github.repository }}
       caller_sha: ${{ github.sha }}
@@ -194,43 +152,65 @@ jobs:
     secrets: inherit
 ```
 
-> **Tag naming convention**: When creating tags in a tenant repository, use the `{project}-v{version}` format (e.g., `patient-v1.0.0`) to distinguish them from the Worker repository's version tags.
+**c. Place TapData Export Files**
 
-### 6. Prepare TapData Export Files
-
-Place the JSON files exported from the TapData platform into the `{project}_tapdata_export/` directory at the root of the tenant repository:
+Add the exported TapData JSON files into the tenant repository:
 
 ```
-patient_tapdata_export/
-├── Connection/       # Database connection configuration JSON files
-├── Task/             # Data migration/sync task JSON files
-├── API/              # API endpoint JSON files
-├── User/             # User configuration JSON files
-└── GroupInfo.json    # Group information
+{project}_tapdata_export/
+├── Connection/
+├── Task/
+├── API/
+├── User/
+└── GroupInfo.json
 ```
+
+### 2.5 Configure Secrets and Variables
+
+**Worker repository** — go to `ha-cicd-worker` → **Settings** → **Secrets and variables** → **Actions**:
+
+| Type | Name | Description |
+|---|---|---|
+| Variable | `TAPDATA_URL` | TapData server address, e.g. `http://10.0.0.1:3030` |
+
+> If each environment uses a different TapData server, configure `TAPDATA_URL` as an Environment-level Variable inside each environment to override the repository-level value.
+
+**Organization level** — configure once at Organization → **Settings** → **Secrets and variables** → **Actions**:
+
+| Type | Name | Description |
+|---|---|---|
+| Secret | `GH_DEPLOY_TOKEN` | Fine-grained personal access token for accessing all repositories |
+| Secret | `TAPDATA_ACCESS_CODE` | TapData platform access credentials (if all tenants share the same) |
+
+> **Why `GH_DEPLOY_TOKEN` must be at the Organization level:** When a tenant workflow calls the worker via `workflow_call`, GitHub runs the jobs in the **caller (tenant) repository's context**, not the worker's. `secrets: inherit` only forwards secrets accessible to the calling repository. A secret stored only in `ha-cicd-worker` is invisible to tenant jobs. Setting `GH_DEPLOY_TOKEN` at the Organization level makes it available to all tenant repositories automatically.
+
+**Tenant repository** — for each tenant, go to the repo → **Settings** → **Secrets and variables** → **Actions**:
+
+| Type | Name | Description |
+|---|---|---|
+| Secret | `TAPDATA_ACCESS_CODE` | Only if not configured at the Org level |
+| Secret | Database passwords | Named by connection (see rules below) |
+| Variable | Database URLs / Users | Named by connection (see rules below) |
+
+**Database credential naming rules** (`{NAME}` = TapData connection name, uppercased):
+
+| Priority | Type | Name | Example |
+|---|---|---|---|
+| 1 (highest) | Secret | `{NAME}_URI` | `MYSQL_PROD_URI` = `mysql://user:pass@host:3306/db` |
+| 2 | Variable + Secret | `{NAME}_URL` / `{NAME}_USER` / `{NAME}_PASSWORD` | Split credentials |
+| 3 | Variable + Secret | `{PREFIX}_URL` / `{PREFIX}_USER` / `{PREFIX}_PASSWORD` | Shared by prefix group |
+| 4 (fallback) | Variable + Secret | `DEFAULT_URL` / `DEFAULT_USER` / `DEFAULT_PASSWORD` | Global default |
 
 ---
 
-## Part 4: Verify Triggers
+## Checklist for Adding a New Tenant
 
-| Action | Target Environment |
-|---|---|
-| Push to `main` in the tenant repository (with changes in `{project}_tapdata_export/`) | `dev` |
-| Create a `{project}-*` tag in the tenant repository | `sit` |
-| Manually trigger from the tenant repository's Actions page | Select `dev` / `sit` / `lpt` |
+**IT/Ops to provide (Part 1):**
+- [ ] Private repository `{project}-team` created under `{org}`
+- [ ] CI/CD admin account has write access to the new repository
 
-Go to the tenant repository's **Actions** tab to view the run status. When the pipeline reaches the `deploy` approval gate, reviewers will receive a notification and can click **Review deployments** on the GitHub page to confirm and continue.
-
----
-
-## Quick Checklist for Adding a New Tenant
-
-For each new tenant, complete the following:
-
-- [ ] Create the tenant GitHub repository
-- [ ] Configure Environments: `dev`, `sit`, `lpt`, `deploy` (set reviewers for `deploy`)
-- [ ] Configure Secrets: database connection passwords (add `TAPDATA_ACCESS_CODE` and `SSH_PRIVATE_KEY` if not configured at the Org level)
-- [ ] Configure Variables: database connection URL and USER
-- [ ] Add `.github/workflows/tapdata-deploy.yml` (confirm whether the org name `tapdata` needs to be replaced, and replace the `project` name)
-- [ ] Place the `{project}_tapdata_export/` directory and JSON files
-- [ ] Push to `main` to verify the pipeline triggers
+**Our team to configure (Part 2):**
+- [ ] Create a project named `{project}` on the TapData platform
+- [ ] Copy `.github/workflows/tapdata-deploy.yml` from an existing tenant repo into the new tenant repository (update `{project}` value)
+- [ ] Confirm `GH_DEPLOY_TOKEN` is configured at the Organization level (required for `secrets: inherit` to work from tenant repos)
+- [ ] Configure Secrets and Variables in the tenant repo (database credentials, access code if not at Org level)
