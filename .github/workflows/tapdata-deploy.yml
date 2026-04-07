@@ -137,6 +137,25 @@ jobs:
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
 
+      - name: Print Workflow Run Link
+        if: github.event_name == 'workflow_call'
+        env:
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CALLER_REPO: ${{ inputs.caller_repo }}
+        run: |
+          WORKER_REPO="${WORKFLOW_REF%%/.github/*}"
+          WORKFLOW_FILE_NAME=$(basename "${WORKFLOW_REF%%@*}")
+          WORKER_WORKFLOW_URL="https://github.com/${WORKER_REPO}/actions/workflows/${WORKFLOW_FILE_NAME}"
+          {
+            echo "## 部署运行链接"
+            echo ""
+            echo "| 描述 | 链接 |"
+            echo "|------|------|"
+            echo "| 当前部署 Run | [${CALLER_REPO} #${{ github.run_number }}](${RUN_URL}) |"
+            echo "| Worker Workflow 引擎 | [${WORKER_REPO}](${WORKER_WORKFLOW_URL}) |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Detect Project
         id: detect_project
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/detect-project.sh

@@ -1,0 +1,31 @@
+name: TapData Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*_tapdata_export/**'
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - sit
+          - lpt
+
+jobs:
+  deploy:
+    uses: tapdata/ha-cicd-worker/.github/workflows/tapdata-deploy.yml@main
+    with:
+      project: ${{ github.event.repository.name }}
+      target_env: ${{ inputs.target_env || '' }}
+      caller_repo: ${{ github.repository }}
+      caller_sha: ${{ github.sha }}
+      caller_event: ${{ github.event_name }}
+      caller_ref: ${{ github.ref }}
+    secrets: inherit
