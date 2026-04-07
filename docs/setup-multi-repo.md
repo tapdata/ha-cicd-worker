@@ -88,18 +88,6 @@ Go to `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions*
 
 > `SSH_PRIVATE_KEY` must have read access to both the Worker repository and all tenant repositories. It is recommended to use a GitHub Organization Deploy Key or an account-level SSH key.
 
-### 7. Configure Environment Mapping
-
-Edit `conf/env.conf` and fill in the TapData server address for each environment:
-
-```ini
-dev=http://<dev-server>:3030
-sit=http://<sit-server>:3030
-lpt=http://<lpt-server>:3030
-aat=http://<aat-server>:3030
-prod=http://<prod-server>:3030
-```
-
 ---
 
 ## Part 2: Configure Organization-Level Secrets (Optional)
