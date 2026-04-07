@@ -1,87 +1,87 @@
-# 单仓库模式：首次配置指南
+# Single-Repo Mode: Setup Guide
 
-所有 TapData 配置文件与 CI/CD 脚本均存放在同一个 GitHub 仓库（`ha-cicd-worker`）中，适合单一团队或项目场景。
-
----
-
-## 前提条件
-
-- 已有 GitHub 账号，具备创建仓库的权限
-- 已有 Self-hosted Runner 机器，可连接 GitHub 和目标 TapData 服务器
-- 已生成 SSH 密钥对，用于 Runner 访问仓库
+All TapData configuration files and CI/CD scripts are stored in a single GitHub repository (`ha-cicd-worker`). This mode is suitable for a single team or project.
 
 ---
 
-## 步骤一：创建仓库
+## Prerequisites
 
-1. 在 GitHub 创建名为 `ha-cicd-worker` 的仓库（私有或公开均可）
-2. 将本项目代码推送到该仓库的 `main` 分支
-
----
-
-## 步骤二：安装 Self-hosted Runner
-
-1. 进入仓库页面 → **Settings** → **Actions** → **Runners** → **New self-hosted runner**
-2. 按页面提示在目标机器上下载并安装 Runner
-3. 注册完成后，Runner 状态应显示为 **Idle**
+- A GitHub account with permission to create repositories
+- A Self-hosted Runner machine with access to GitHub and the target TapData server
+- An SSH key pair already generated for the Runner to access the repository
 
 ---
 
-## 步骤三：配置 GitHub Environments
+## Step 1: Create the Repository
 
-Environments 用于控制部署审批和管理环境变量。
+1. Create a repository named `ha-cicd-worker` on GitHub (private or public)
+2. Push the project code to the `main` branch of that repository
 
-进入仓库 **Settings** → **Environments**，按以下说明创建：
+---
 
-| Environment 名称 | 用途 | 是否需要审批人 |
+## Step 2: Install the Self-hosted Runner
+
+1. Go to the repository page → **Settings** → **Actions** → **Runners** → **New self-hosted runner**
+2. Follow the on-screen instructions to download and install the Runner on the target machine
+3. Once registered, the Runner status should show as **Idle**
+
+---
+
+## Step 3: Configure GitHub Environments
+
+Environments are used to control deployment approvals and manage environment-specific variables.
+
+Go to repository **Settings** → **Environments** and create the following:
+
+| Environment Name | Purpose | Requires Reviewers |
 |---|---|---|
-| `dev` | 开发环境（push 到 main 自动触发） | 否 |
-| `sit` | 测试环境（打 tag 自动触发） | 否 |
-| `lpt` | 性能测试环境（手动触发） | 否 |
-| `aat` | 验收测试环境（手动触发） | 否 |
-| `prod` | 生产环境（手动触发） | 否 |
-| `deploy` | 连接/任务/API 部署前的人工审批门 | **是**，配置审批人 |
+| `dev` | Development environment (auto-triggered on push to main) | No |
+| `sit` | Testing environment (auto-triggered on tag creation) | No |
+| `lpt` | Performance testing environment (manually triggered) | No |
+| `aat` | Acceptance testing environment (manually triggered) | No |
+| `prod` | Production environment (manually triggered) | No |
+| `deploy` | Manual approval gate before deploying connections/tasks/APIs | **Yes** — configure reviewers |
 
-> **说明**：`deploy` Environment 是流水线的审批节点。每次部署连接、迁移任务、同步任务、API 时，必须由审批人在 GitHub 页面确认后才会继续执行。
+> **Note**: The `deploy` Environment is the approval gate in the pipeline. Every time connections, migration tasks, sync tasks, or APIs are deployed, a reviewer must confirm on the GitHub page before execution continues.
 
 ---
 
-## 步骤四：配置 Repository Secrets
+## Step 4: Configure Repository Secrets
 
-进入仓库 **Settings** → **Secrets and variables** → **Actions** → **Secrets** 标签页，添加以下 Secrets：
+Go to repository **Settings** → **Secrets and variables** → **Actions** → **Secrets** tab and add the following:
 
-### 必填 Secrets
+### Required Secrets
 
-| Secret 名称 | 说明 |
+| Secret Name | Description |
 |---|---|
-| `SSH_PRIVATE_KEY` | Runner 访问仓库的 SSH 私钥内容（对应公钥已添加到 GitHub 账户或仓库的 Deploy Keys） |
-| `TAPDATA_ACCESS_CODE` | TapData 平台的访问凭证，用于获取 API Token |
+| `SSH_PRIVATE_KEY` | SSH private key content for the Runner to access the repository (the corresponding public key must be added to your GitHub account or the repository's Deploy Keys) |
+| `TAPDATA_ACCESS_CODE` | Access credentials for the TapData platform, used to obtain an API token |
 
-### 数据库连接 Secrets（按实际连接配置）
+### Database Connection Secrets (based on your actual connections)
 
-部署时，`generate-vault.sh` 会自动从 Secrets 中提取数据库连接信息，按以下优先级匹配（`{NAME}` 为 TapData 中的连接名称，转换为大写）：
+During deployment, `generate-vault.sh` automatically extracts database connection information from Secrets using the following priority order (`{NAME}` is the connection name in TapData, converted to uppercase):
 
-**优先级 1**：直接提供完整 URI
+**Priority 1**: Provide a full URI directly
 
-| Secret 名称 | 示例 |
+| Secret Name | Example |
 |---|---|
 | `{NAME}_URI` | `MYSQL_PROD_URI` = `mysql://user:pass@host:3306/db` |
 
-**优先级 2**：分开提供 URL + 用户名 + 密码
+**Priority 2**: Provide URL + username + password separately
 
-| 类型 | 名称 | 示例 |
+| Type | Name | Example |
 |---|---|---|
 | Variable | `{NAME}_URL` | `MYSQL_PROD_URL` = `mysql://host:3306/db` |
 | Variable | `{NAME}_USER` | `MYSQL_PROD_USER` = `admin` |
 | Secret | `{NAME}_PASSWORD` | `MYSQL_PROD_PASSWORD` = `secret123` |
 
-**优先级 3**：按前缀分组（连接名 `A_B_C_D` 自动截取前缀 `A_B`）
+**Priority 3**: Group by prefix (connection name `A_B_C_D` automatically tries prefix `A_B`)
 
-> 例如连接名为 `MYSQL_PROD_ORDERS`，自动尝试 `MYSQL_PROD_URL` / `MYSQL_PROD_USER` / `MYSQL_PROD_PASSWORD`
+> For example, if the connection name is `MYSQL_PROD_ORDERS`, it will automatically try `MYSQL_PROD_URL` / `MYSQL_PROD_USER` / `MYSQL_PROD_PASSWORD`
 
-**优先级 4**：默认兜底
+**Priority 4**: Default fallback
 
-| 类型 | 名称 |
+| Type | Name |
 |---|---|
 | Variable | `DEFAULT_URL` |
 | Variable | `DEFAULT_USER` |
@@ -89,21 +89,21 @@ Environments 用于控制部署审批和管理环境变量。
 
 ---
 
-## 步骤五：配置 Repository Variables
+## Step 5: Configure Repository Variables
 
-进入仓库 **Settings** → **Secrets and variables** → **Actions** → **Variables** 标签页，添加：
+Go to repository **Settings** → **Secrets and variables** → **Actions** → **Variables** tab and add:
 
-| Variable 名称 | 说明 | 示例 |
+| Variable Name | Description | Example |
 |---|---|---|
-| `TAPDATA_URL` | TapData 服务器地址（包含协议和端口） | `http://10.0.0.1:3030` |
+| `TAPDATA_URL` | TapData server address (including protocol and port) | `http://10.0.0.1:3030` |
 
-> 如果各环境的 TapData 服务器地址不同，可在对应的 Environment 下配置同名 Variable 覆盖仓库级别的值。
+> If each environment uses a different TapData server address, configure an Environment-level Variable with the same name to override the repository-level value.
 
 ---
 
-## 步骤六：配置环境映射
+## Step 6: Configure Environment Mapping
 
-编辑 `conf/env.conf`，按实际情况填写各环境的 TapData 服务器地址：
+Edit `conf/env.conf` and fill in the TapData server address for each environment:
 
 ```ini
 dev=http://<dev-server>:3030
@@ -115,29 +115,29 @@ prod=http://<prod-server>:3030
 
 ---
 
-## 步骤七：准备 TapData 导出文件
+## Step 7: Prepare TapData Export Files
 
-将从 TapData 平台导出的 JSON 文件放入仓库根目录下的 `{project}_tapdata_export/` 目录，目录结构如下：
+Place the JSON files exported from the TapData platform into the `{project}_tapdata_export/` directory at the root of the repository. The directory structure should look like this:
 
 ```
 {project}_tapdata_export/
-├── Connection/       # 数据库连接配置 JSON 文件
-├── Task/             # 数据迁移/同步任务 JSON 文件
-├── API/              # API 端点 JSON 文件
-├── User/             # 用户配置 JSON 文件
-└── GroupInfo.json    # 分组信息
+├── Connection/       # Database connection configuration JSON files
+├── Task/             # Data migration/sync task JSON files
+├── API/              # API endpoint JSON files
+├── User/             # User configuration JSON files
+└── GroupInfo.json    # Group information
 ```
 
 ---
 
-## 步骤八：验证触发
+## Step 8: Verify Triggers
 
-完成以上配置后，通过以下方式触发部署：
+After completing the above configuration, trigger a deployment using one of the following methods:
 
-| 操作 | 目标环境 |
+| Action | Target Environment |
 |---|---|
-| Push 到 `main` 分支（`{project}_tapdata_export/` 目录有变更） | `dev` |
-| 创建 Git Tag | `sit` |
-| 在 GitHub Actions 页面手动触发（Workflow dispatch） | 选择 `sit` / `lpt` / `aat` / `prod` |
+| Push to `main` branch (with changes in `{project}_tapdata_export/`) | `dev` |
+| Create a Git Tag | `sit` |
+| Manually trigger from GitHub Actions page (Workflow dispatch) | Select `sit` / `lpt` / `aat` / `prod` |
 
-进入仓库 **Actions** 标签页，可查看 Workflow 运行状态。当流水线到达 `deploy` 审批节点时，审批人会收到邮件通知，在 GitHub 页面点击 **Review deployments** 确认后继续执行。
+Go to the repository's **Actions** tab to view the Workflow run status. When the pipeline reaches the `deploy` approval gate, reviewers will receive an email notification and can click **Review deployments** on the GitHub page to confirm and continue execution.

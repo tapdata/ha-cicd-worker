@@ -1,96 +1,96 @@
-# 多仓库多租户模式：首次配置指南
+# Multi-Repo Multi-Tenant Mode: Setup Guide
 
-每个团队（租户）拥有独立的 GitHub 仓库，存放各自的 TapData 配置文件，通过调用共享的 `ha-cicd-worker` 仓库完成自动化部署。Worker 仓库作为统一的部署引擎被所有租户复用。
+Each team (tenant) owns an independent GitHub repository containing their TapData configuration files, and triggers automated deployments via the shared `ha-cicd-worker` repository. The Worker repository serves as a unified deployment engine reused by all tenants.
 
 ```
-ha-cicd-worker      ← 共享部署引擎（Workflows + Scripts，统一维护）
-├── patient-team    ← 租户仓库（存放 patient 项目的 TapData 配置文件）
-└── case-team       ← 租户仓库（存放 case 项目的 TapData 配置文件）
+ha-cicd-worker      ← Shared deployment engine (Workflows + Scripts, centrally maintained)
+├── patient-team    ← Tenant repo (TapData config files for the patient project)
+└── case-team       ← Tenant repo (TapData config files for the case project)
 ```
 
-Worker 更新后，所有租户仓库无需任何操作即可自动使用最新流水线。
+When the Worker is updated, all tenant repositories automatically use the latest pipeline without any changes needed.
 
 ---
 
-## 前提条件
+## Prerequisites
 
-- 已有 GitHub Organization（本项目使用 `tapdata`）
-- 已有 Self-hosted Runner 机器，可连接 GitHub 和目标 TapData 服务器
-- 已生成 SSH 密钥对
+- An existing GitHub Organization (this project uses `tapdata`)
+- A Self-hosted Runner machine with access to GitHub and the target TapData server
+- An SSH key pair already generated
 
 ---
 
-## 第一部分：配置 Worker 仓库
+## Part 1: Configure the Worker Repository
 
-Worker 仓库是整个系统的核心，只需配置一次。
+The Worker repository is the core of the system and only needs to be configured once.
 
-### 1. 创建仓库并推送代码
+### 1. Create the Repository and Push Code
 
-在目标 GitHub Organization 下创建名为 `ha-cicd-worker` 的私有仓库，将本项目代码推送到 `main` 分支。
+Create a private repository named `ha-cicd-worker` under the target GitHub Organization and push the project code to the `main` branch.
 
-### 2. 确认并更新组织名称
+### 2. Verify and Update the Organization Name
 
-本仓库的 Workflow 文件中，组织名称默认为 `tapdata`（Demo 环境）。部署到实际客户环境时，需确认该值是否与真实 GitHub 组织名一致，若不同则需要全局替换。
+The Workflow files in this repository default to the organization name `tapdata` (Demo environment). When deploying to an actual customer environment, confirm whether this value matches the real GitHub organization name and replace it globally if needed.
 
-涉及文件：
+Files involved:
 
 ```
-ha-cicd-worker/.github/workflows/tapdata-deploy.yml   # 多处 tapdata/ha-cicd-worker
+ha-cicd-worker/.github/workflows/tapdata-deploy.yml   # multiple occurrences of tapdata/ha-cicd-worker
 case-team/.github/workflows/tapdata-deploy.yml         # uses: tapdata/ha-cicd-worker/...
 patient-team/.github/workflows/tapdata-deploy.yml      # uses: tapdata/ha-cicd-worker/...
 ```
 
-在仓库根目录执行以下命令完成批量替换（将 `your-actual-org` 替换为真实组织名）：
+Run the following command from the repository root to batch-replace the organization name (replace `your-actual-org` with the real organization name):
 
 ```bash
 grep -rl 'tapdata/ha-cicd-worker' .github */. github | xargs sed -i 's|tapdata/ha-cicd-worker|your-actual-org/ha-cicd-worker|g'
 ```
 
-或直接在编辑器中全局搜索 `tapdata/ha-cicd-worker` 并替换。
+Alternatively, use your editor's global find-and-replace to search for `tapdata/ha-cicd-worker` and replace it.
 
-### 3. 安装 Self-hosted Runner
+### 3. Install the Self-hosted Runner
 
-进入 `ha-cicd-worker` 仓库 → **Settings** → **Actions** → **Runners** → **New self-hosted runner**，按提示在目标机器上安装 Runner。
+Go to the `ha-cicd-worker` repository → **Settings** → **Actions** → **Runners** → **New self-hosted runner**, and follow the instructions to install the Runner on the target machine.
 
-> **重要**：Runner 注册在 Worker 仓库下。所有租户触发的部署任务均运行在此 Runner 上，无需在租户仓库单独安装。
+> **Important**: The Runner is registered under the Worker repository. All tenant-triggered deployments run on this Runner — no separate Runner installation is needed in each tenant repository.
 
-### 4. 配置 Environments
+### 4. Configure Environments
 
-进入 `ha-cicd-worker` 仓库 **Settings** → **Environments**，创建以下 Environment：
+Go to the `ha-cicd-worker` repository **Settings** → **Environments** and create the following Environments:
 
-| Environment 名称 | 用途 |
+| Environment Name | Purpose |
 |---|---|
-| `dev` | 对应开发环境 |
-| `sit` | 对应测试环境 |
-| `lpt` | 对应性能测试环境 |
-| `aat` | 对应验收测试环境 |
-| `prod` | 对应生产环境 |
+| `dev` | Development environment |
+| `sit` | Testing environment |
+| `lpt` | Performance testing environment |
+| `aat` | Acceptance testing environment |
+| `prod` | Production environment |
 
-> 这些 Environment 用于承载 Worker 仓库级别的配置，无需配置审批人（审批门在租户仓库的 `deploy` Environment 中配置）。
+> These Environments hold Worker-level configuration. No approval reviewers need to be configured here — the approval gate is set up in the `deploy` Environment of each tenant repository.
 
-### 5. 配置 Repository Variables
+### 5. Configure Repository Variables
 
-进入 `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Variables**：
+Go to `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Variables**:
 
-| Variable 名称 | 说明 | 示例 |
+| Variable Name | Description | Example |
 |---|---|---|
-| `TAPDATA_URL` | TapData 服务器地址 | `http://10.0.0.1:3030` |
+| `TAPDATA_URL` | TapData server address | `http://10.0.0.1:3030` |
 
-> 如果各环境 TapData 地址不同，可在对应 Environment 下配置同名 Variable 覆盖。
+> If each environment uses a different TapData server address, configure an Environment-level Variable with the same name to override the repository-level value.
 
-### 6. 配置 Repository Secrets
+### 6. Configure Repository Secrets
 
-进入 `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Secrets**：
+Go to `ha-cicd-worker` **Settings** → **Secrets and variables** → **Actions** → **Secrets**:
 
-| Secret 名称 | 说明 |
+| Secret Name | Description |
 |---|---|
-| `SSH_PRIVATE_KEY` | Runner 访问各仓库的 SSH 私钥（对应公钥需添加到 GitHub 账户或 Organization） |
+| `SSH_PRIVATE_KEY` | SSH private key used by the Runner to access all repositories (the corresponding public key must be added to the GitHub account or Organization) |
 
-> `SSH_PRIVATE_KEY` 需对 Worker 仓库和所有租户仓库均有读取权限（建议使用 GitHub Organization 的 Deploy Key 或账号级 SSH Key）。
+> `SSH_PRIVATE_KEY` must have read access to both the Worker repository and all tenant repositories. It is recommended to use a GitHub Organization Deploy Key or an account-level SSH key.
 
-### 7. 配置环境映射
+### 7. Configure Environment Mapping
 
-编辑 `conf/env.conf`，填写各环境的 TapData 服务器地址：
+Edit `conf/env.conf` and fill in the TapData server address for each environment:
 
 ```ini
 dev=http://<dev-server>:3030
@@ -102,75 +102,75 @@ prod=http://<prod-server>:3030
 
 ---
 
-## 第二部分：配置 Organization 级别 Secrets（可选）
+## Part 2: Configure Organization-Level Secrets (Optional)
 
-如果 `TAPDATA_ACCESS_CODE` 对所有租户相同，可将其配置在 Organization 级别，所有仓库自动继承，无需在每个租户仓库重复配置。
+If `TAPDATA_ACCESS_CODE` is the same for all tenants, you can configure it at the Organization level so all repositories inherit it automatically, eliminating the need to configure it in each tenant repository individually.
 
-进入 GitHub **Organization** → **Settings** → **Secrets and variables** → **Actions**，添加：
+Go to GitHub **Organization** → **Settings** → **Secrets and variables** → **Actions** and add:
 
-| Secret 名称 | 说明 |
+| Secret Name | Description |
 |---|---|
-| `TAPDATA_ACCESS_CODE` | TapData 平台的访问凭证 |
-| `SSH_PRIVATE_KEY` | （也可在此配置，统一管理） |
+| `TAPDATA_ACCESS_CODE` | Access credentials for the TapData platform |
+| `SSH_PRIVATE_KEY` | (Can also be configured here for centralized management) |
 
-将 Secret 的 **Repository access** 设置为 **All repositories** 或指定白名单仓库。
+Set the Secret's **Repository access** to **All repositories** or a specific whitelist of repositories.
 
 ---
 
-## 第三部分：配置每个租户仓库
+## Part 3: Configure Each Tenant Repository
 
-每新增一个租户，按以下步骤配置其仓库。以 `patient-team` 为例（`project` 名称为 `patient`）：
+For each new tenant, follow the steps below to configure their repository. Using `patient-team` as an example (project name: `patient`):
 
-### 1. 创建仓库
+### 1. Create the Repository
 
-在 `tapdata` 下创建租户仓库（如 `patient-team`，私有）。
+Create a tenant repository (e.g., `patient-team`, private) under the `tapdata` organization.
 
-### 2. 配置 Environments
+### 2. Configure Environments
 
-进入租户仓库 **Settings** → **Environments**，创建以下 Environment：
+Go to the tenant repository **Settings** → **Environments** and create the following Environments:
 
-| Environment 名称 | 用途 | 是否需要审批人 |
+| Environment Name | Purpose | Requires Reviewers |
 |---|---|---|
-| `dev` | 开发环境 | 否 |
-| `sit` | 测试环境 | 否 |
-| `lpt` | 性能测试环境 | 否 |
-| `deploy` | 连接/任务/API 部署审批门 | **是**，配置审批人 |
+| `dev` | Development environment | No |
+| `sit` | Testing environment | No |
+| `lpt` | Performance testing environment | No |
+| `deploy` | Approval gate for connection/task/API deployments | **Yes** — configure reviewers |
 
-> **说明**：`deploy` Environment 是流水线的人工审批节点。当部署到此租户的 TapData 连接、任务、API 时，必须由审批人在 GitHub 页面确认后才会继续执行。
+> **Note**: The `deploy` Environment is the manual approval gate in the pipeline. Deploying TapData connections, tasks, or APIs to this tenant requires a reviewer to confirm on the GitHub page before execution continues.
 
-### 3. 配置 Repository Secrets
+### 3. Configure Repository Secrets
 
-进入租户仓库 **Settings** → **Secrets and variables** → **Actions** → **Secrets**：
+Go to the tenant repository **Settings** → **Secrets and variables** → **Actions** → **Secrets**:
 
-| Secret 名称 | 说明 |
+| Secret Name | Description |
 |---|---|
-| `SSH_PRIVATE_KEY` | 如未在 Organization 级别配置，在此添加 |
-| `TAPDATA_ACCESS_CODE` | 如未在 Organization 级别配置，在此添加 |
-| 数据库连接密码（见下方） | 该租户私有的数据库凭证 |
+| `SSH_PRIVATE_KEY` | Add here if not configured at the Organization level |
+| `TAPDATA_ACCESS_CODE` | Add here if not configured at the Organization level |
+| Database connection passwords (see below) | Private database credentials for this tenant |
 
-**数据库连接 Secrets 命名规则**（`{NAME}` 为 TapData 中的连接名称，转换为大写）：
+**Database connection Secret naming rules** (`{NAME}` is the connection name in TapData, converted to uppercase):
 
-| 优先级 | Secret 名称 | 说明 |
+| Priority | Secret Name | Description |
 |---|---|---|
-| 1（最高） | `{NAME}_URI` | 完整数据库连接 URI |
-| 2 | `{NAME}_PASSWORD` | 配合同名 Variable 中的 `{NAME}_URL` 和 `{NAME}_USER` |
-| 3 | `{PREFIX}_PASSWORD` | 按前缀分组（连接名 `A_B_C` 自动尝试前缀 `A_B`） |
-| 4（兜底） | `DEFAULT_PASSWORD` | 配合 `DEFAULT_URL` 和 `DEFAULT_USER` |
+| 1 (highest) | `{NAME}_URI` | Full database connection URI |
+| 2 | `{NAME}_PASSWORD` | Used with `{NAME}_URL` and `{NAME}_USER` Variables of the same name |
+| 3 | `{PREFIX}_PASSWORD` | Grouped by prefix (connection name `A_B_C` automatically tries prefix `A_B`) |
+| 4 (fallback) | `DEFAULT_PASSWORD` | Used with `DEFAULT_URL` and `DEFAULT_USER` |
 
-### 4. 配置 Repository Variables
+### 4. Configure Repository Variables
 
-进入租户仓库 **Settings** → **Secrets and variables** → **Actions** → **Variables**：
+Go to the tenant repository **Settings** → **Secrets and variables** → **Actions** → **Variables**:
 
-根据数据库连接命名规则，配置对应的 URL 和 USER（密码作为 Secret 单独配置）：
+Based on the database connection naming rules, configure the corresponding URL and USER (passwords are configured separately as Secrets):
 
-| Variable 名称 | 示例值 |
+| Variable Name | Example Value |
 |---|---|
 | `{NAME}_URL` | `mysql://10.0.0.2:3306/patient_db` |
 | `{NAME}_USER` | `deploy_user` |
 
-### 5. 添加触发 Workflow 文件
+### 5. Add the Trigger Workflow File
 
-在租户仓库中创建 `.github/workflows/tapdata-deploy.yml`，内容如下（替换 `tapdata` 和 `patient` 为实际值）：
+Create `.github/workflows/tapdata-deploy.yml` in the tenant repository with the following content (replace `tapdata` and `patient` with the actual values):
 
 ```yaml
 name: TapData Deploy
@@ -206,43 +206,43 @@ jobs:
     secrets: inherit
 ```
 
-> **Tag 命名规范**：租户仓库创建 Tag 时，建议使用 `{project}-v{版本}` 格式（如 `patient-v1.0.0`），与 Worker 仓库的版本 Tag 区分。
+> **Tag naming convention**: When creating tags in a tenant repository, use the `{project}-v{version}` format (e.g., `patient-v1.0.0`) to distinguish them from the Worker repository's version tags.
 
-### 6. 准备 TapData 导出文件
+### 6. Prepare TapData Export Files
 
-将从 TapData 平台导出的 JSON 文件放入租户仓库根目录下的 `{project}_tapdata_export/` 目录：
+Place the JSON files exported from the TapData platform into the `{project}_tapdata_export/` directory at the root of the tenant repository:
 
 ```
 patient_tapdata_export/
-├── Connection/       # 数据库连接配置 JSON 文件
-├── Task/             # 数据迁移/同步任务 JSON 文件
-├── API/              # API 端点 JSON 文件
-├── User/             # 用户配置 JSON 文件
-└── GroupInfo.json    # 分组信息
+├── Connection/       # Database connection configuration JSON files
+├── Task/             # Data migration/sync task JSON files
+├── API/              # API endpoint JSON files
+├── User/             # User configuration JSON files
+└── GroupInfo.json    # Group information
 ```
 
 ---
 
-## 第四部分：验证触发
+## Part 4: Verify Triggers
 
-| 操作 | 目标环境 |
+| Action | Target Environment |
 |---|---|
-| 在租户仓库 Push 到 `main`（`{project}_tapdata_export/` 目录有变更） | `dev` |
-| 在租户仓库创建 `{project}-*` Tag | `sit` |
-| 在租户仓库 Actions 页面手动触发 | 选择 `dev` / `sit` / `lpt` |
+| Push to `main` in the tenant repository (with changes in `{project}_tapdata_export/`) | `dev` |
+| Create a `{project}-*` tag in the tenant repository | `sit` |
+| Manually trigger from the tenant repository's Actions page | Select `dev` / `sit` / `lpt` |
 
-进入租户仓库 **Actions** 标签页查看运行状态。到达 `deploy` 审批节点时，审批人收到通知后在 GitHub 页面点击 **Review deployments** 确认。
+Go to the tenant repository's **Actions** tab to view the run status. When the pipeline reaches the `deploy` approval gate, reviewers will receive a notification and can click **Review deployments** on the GitHub page to confirm and continue.
 
 ---
 
-## 新增租户的快速清单
+## Quick Checklist for Adding a New Tenant
 
-每新增一个租户，需完成以下操作：
+For each new tenant, complete the following:
 
-- [ ] 创建租户 GitHub 仓库
-- [ ] 配置 Environments：`dev`、`sit`、`lpt`、`deploy`（`deploy` 设置审批人）
-- [ ] 配置 Secrets：数据库连接密码（`TAPDATA_ACCESS_CODE` 和 `SSH_PRIVATE_KEY` 若未在 Org 配置则补充）
-- [ ] 配置 Variables：数据库连接 URL 和 USER
-- [ ] 添加 `.github/workflows/tapdata-deploy.yml`（确认组织名 `tapdata` 是否需要替换，替换 `project` 名称）
-- [ ] 放入 `{project}_tapdata_export/` 目录及 JSON 文件
-- [ ] Push 到 `main` 验证流水线触发
+- [ ] Create the tenant GitHub repository
+- [ ] Configure Environments: `dev`, `sit`, `lpt`, `deploy` (set reviewers for `deploy`)
+- [ ] Configure Secrets: database connection passwords (add `TAPDATA_ACCESS_CODE` and `SSH_PRIVATE_KEY` if not configured at the Org level)
+- [ ] Configure Variables: database connection URL and USER
+- [ ] Add `.github/workflows/tapdata-deploy.yml` (confirm whether the org name `tapdata` needs to be replaced, and replace the `project` name)
+- [ ] Place the `{project}_tapdata_export/` directory and JSON files
+- [ ] Push to `main` to verify the pipeline triggers
