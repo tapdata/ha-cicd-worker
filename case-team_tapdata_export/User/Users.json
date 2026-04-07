@@ -1,0 +1,33 @@
+[ {
+  "collectionName" : "User",
+  "json" : {
+    "_id" : "69c6449cb9dbbccec453fb5f",
+    "account_status" : 1,
+    "completeGuide" : false,
+    "email" : "martin@tapdata.io",
+    "emailVerified" : true,
+    "emailVerified_from_frontend" : true,
+    "listtags" : [ ],
+    "notification" : {
+      "connected" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      },
+      "connectionInterrupted" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      },
+      "stoppedByError" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      }
+    },
+    "password" : "$2a$10$VKFRSHzT9Cf65fEEj2saKeVzq1HIijXBEIqGsiEA/MyCWVkB.yAom",
+    "roleusers" : [ "69c623071f850faa41527910" ],
+    "user_id" : "62bc5008d4958d013d97c7a6",
+    "username" : "cpicase-martin"
+  }
+} ]
