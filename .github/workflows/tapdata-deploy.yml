@@ -21,9 +21,10 @@ on:
         description: 'Project name'
         required: true
         type: choice
-        default: dmp
+        default: patient-team
         options:
-          - dmp
+          - patient-team
+          - case-team
 
   # 多租户模式：被租户仓库通过 workflow_call 调用
   workflow_call:
