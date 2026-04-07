@@ -55,7 +55,7 @@ on:
         required: true
         type: string
     secrets:
-      SSH_PRIVATE_KEY:
+      GH_DEPLOY_TOKEN:
         required: true
 
 env:
