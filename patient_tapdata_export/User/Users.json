@@ -1,0 +1,33 @@
+[ {
+  "collectionName" : "User",
+  "json" : {
+    "_id" : "69c64490b9dbbccec453fb54",
+    "account_status" : 1,
+    "completeGuide" : false,
+    "email" : "sam@tapdata.io",
+    "emailVerified" : true,
+    "emailVerified_from_frontend" : true,
+    "listtags" : [ ],
+    "notification" : {
+      "connected" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      },
+      "connectionInterrupted" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      },
+      "stoppedByError" : {
+        "email" : false,
+        "sms" : false,
+        "weChat" : false
+      }
+    },
+    "password" : "$2a$10$QdEIQ4iOkDnxNkjmjaDWZexvaKf4nr.SRHsQW9EVgKKxisWXynwRa",
+    "roleusers" : [ "69c622ff1f850faa41527872" ],
+    "user_id" : "62bc5008d4958d013d97c7a6",
+    "username" : "patient-sam"
+  }
+} ]
