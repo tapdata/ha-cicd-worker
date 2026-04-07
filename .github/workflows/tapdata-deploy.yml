@@ -25,12 +25,59 @@ on:
         options:
           - dmp
 
+  # 多租户模式：被租户仓库通过 workflow_call 调用
+  workflow_call:
+    inputs:
+      project:
+        description: 'Project name (租户仓库中 {project}_tapdata_export/ 目录的前缀)'
+        required: true
+        type: string
+      target_env:
+        description: 'Target environment (workflow_dispatch 手动触发时由租户传入；push/tag 时留空，由 caller_event/caller_ref 自动推导)'
+        required: false
+        type: string
+        default: ''
+      caller_repo:
+        description: '租户仓库全名，如 tapdata/patient-team'
+        required: true
+        type: string
+      caller_sha:
+        description: '租户仓库的 commit SHA，用于精确 checkout'
+        required: true
+        type: string
+      caller_event:
+        description: '租户仓库的原始事件名（push/workflow_dispatch），用于推导 TARGET_ENV'
+        required: true
+        type: string
+      caller_ref:
+        description: '租户仓库的原始 ref（refs/heads/main 或 refs/tags/xxx），用于判断是否为 tag'
+        required: true
+        type: string
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
+
 env:
   DEPLOY_DIR: /tmp/tapdata-deploy-${{ github.run_id }}
-  # push 到 main 或创建 Tag 时使用 ref_name
-  DEPLOY_REF: ${{ github.ref_name }}
-  # push 到 main 时固定 dev；push 创建 Tag 时固定 sit；手动触发时使用 inputs.target_env
-  TARGET_ENV: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+  # 单仓库模式：push/workflow_dispatch 时使用 ref_name
+  # 多租户模式：workflow_call 时使用租户的 caller_sha
+  DEPLOY_REF: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || github.ref_name }}
+  # TARGET_ENV 推导逻辑（兼容单仓库和多租户）：
+  #   workflow_call + target_env 已传入 → 使用 inputs.target_env
+  #   workflow_call + caller_event=push + 非 tag ref → dev
+  #   workflow_call + caller_event=push + tag ref → sit
+  #   单仓库 push 到 main → dev
+  #   单仓库 push tag → sit
+  #   单仓库 workflow_dispatch → inputs.target_env
+  TARGET_ENV: >-
+    ${{
+      (github.event_name == 'workflow_call' && inputs.target_env != '') && inputs.target_env
+      || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
+      || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
+      || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')) && 'dev'
+      || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'sit'
+      || inputs.target_env
+    }}
 
 jobs:
   # ============================================================
@@ -40,45 +87,84 @@ jobs:
     name: Preparation Phase
     runs-on: self-hosted
     timeout-minutes: 5
-    environment: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+    environment: >-
+      ${{
+        (github.event_name == 'workflow_call' && inputs.target_env != '') && inputs.target_env
+        || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
+        || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
+        || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')) && 'dev'
+        || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'sit'
+        || inputs.target_env
+      }}
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
-      target_env: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && 'dev' || github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'sit' || inputs.target_env }}
+      target_env: ${{ env.TARGET_ENV }}
       tapdata_url: ${{ vars.TAPDATA_URL }}
       project: ${{ steps.detect_project.outputs.project }}
     steps:
-      - name: Checkout Repository
+      # Step 1: checkout 数据源
+      #   - workflow_call：checkout 租户仓库（含 JSON 文件）到 workspace 根
+      #   - push/workflow_dispatch（单仓库）：checkout worker 自身（行为不变）
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: 2
 
+      # Step 2: 仅 workflow_call 时，额外 checkout worker scripts 到 _worker/
+      #   - push/workflow_dispatch（单仓库）：跳过，scripts 已在 workspace 根
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      # Step 3: 设置 SCRIPT_ROOT 和 REPO_ROOT
+      #   - workflow_call：SCRIPT_ROOT=_worker，REPO_ROOT=workspace 根（含租户 JSON 文件）
+      #   - 单仓库：SCRIPT_ROOT=.，REPO_ROOT=worker 仓库根（与现有行为完全一致）
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
+
       - name: Detect Project
         id: detect_project
-        run: bash scripts/tapdata-deploy/detect-project.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/detect-project.sh
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_PROJECT: ${{ inputs.project }}
+          # workflow_call 时：project 已由租户明确传入，用 workflow_dispatch 路径直接使用 INPUT_PROJECT
+          EVENT_NAME: ${{ github.event_name == 'workflow_call' && 'workflow_dispatch' || github.event_name }}
+          INPUT_PROJECT: ${{ github.event_name == 'workflow_call' && inputs.project || inputs.project }}
 
       - name: Validate Input Parameters
-        run: bash scripts/tapdata-deploy/validate-inputs.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/validate-inputs.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOYMENT_REF: ${{ env.DEPLOY_REF }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
           PROJECT: ${{ env.PROJECT }}
 
       - name: Get TapData Token
         id: get_token
-        run: bash scripts/common/get-token.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/get-token.sh
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
           TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESS_CODE }}
 
       - name: Generate vault.json with Connection Secrets
-        run: bash scripts/tapdata-deploy/generate-vault.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/generate-vault.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           PROJECT: ${{ env.PROJECT }}
           ALL_SECRETS: ${{ toJSON(secrets) }}
           ALL_VARS: ${{ toJSON(vars) }}
@@ -102,11 +188,31 @@ jobs:
     env:
       PROJECT: ${{ needs.preparation.outputs.project }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -115,15 +221,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: users-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import Users via TapData API
         id: import_users
-        run: bash scripts/common/import-resource.sh users
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh users
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: users-export.tar
@@ -147,11 +254,31 @@ jobs:
       sync_tasks_has_changes: ${{ steps.preview_sync_tasks.outputs.has_changes }}
       apis_has_changes: ${{ steps.preview_apis.outputs.has_changes }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -160,15 +287,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Connections Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Preview Connections
         id: preview_connections
-        run: bash scripts/common/preview-resource.sh connections
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/preview-resource.sh connections
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
@@ -177,15 +305,16 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Compress Tasks Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Preview Migrate Tasks
         id: preview_migrate_tasks
-        run: bash scripts/common/preview-resource.sh migrate/tasks
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/preview-resource.sh migrate/tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -195,7 +324,7 @@ jobs:
 
       - name: Preview Sync Tasks
         id: preview_sync_tasks
-        run: bash scripts/common/preview-resource.sh sync/tasks
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/preview-resource.sh sync/tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -204,15 +333,16 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Compress APIs Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Preview APIs
         id: preview_apis
-        run: bash scripts/common/preview-resource.sh apis
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/preview-resource.sh apis
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
@@ -221,7 +351,7 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 3: Deploy Connections (requires approval)
+  # Job 4: Deploy Connections (requires approval)
   # ============================================================
   deploy-connections:
     name: Deploy Connections
@@ -235,11 +365,31 @@ jobs:
     outputs:
       changed_connections: ${{ steps.import_connections.outputs.changed_connections }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -248,15 +398,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import Connections via TapData API
         id: import_connections
-        run: bash scripts/common/import-resource.sh connections
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh connections
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
@@ -265,7 +416,7 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 4: Deploy Migrate Tasks (requires approval)
+  # Job 5: Deploy Migrate Tasks (requires approval)
   # ============================================================
   deploy-migrate-tasks:
     name: Deploy Data Replication(FDM)
@@ -284,11 +435,31 @@ jobs:
     outputs:
       changed_migrate_tasks: ${{ steps.import_migrate_tasks.outputs.changed_migrate_tasks }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -297,15 +468,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import Migrate Tasks via TapData API
         id: import_migrate_tasks
-        run: bash scripts/common/import-resource.sh migrate/tasks
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh migrate/tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -314,7 +486,7 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 5: Deploy Sync Tasks (requires approval)
+  # Job 6: Deploy Sync Tasks (requires approval)
   # ============================================================
   deploy-sync-tasks:
     name: Deploy Data Transformation(MDM)
@@ -334,11 +506,31 @@ jobs:
     outputs:
       changed_sync_tasks: ${{ steps.import_sync_tasks.outputs.changed_sync_tasks }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -347,15 +539,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import Sync Tasks via TapData API
         id: import_sync_tasks
-        run: bash scripts/common/import-resource.sh sync/tasks
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh sync/tasks
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
@@ -364,7 +557,7 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 6: Deploy APIs (requires approval)
+  # Job 7: Deploy APIs (requires approval)
   # ============================================================
   deploy-apis:
     name: Deploy APIs
@@ -385,11 +578,31 @@ jobs:
     outputs:
       changed_apis: ${{ steps.import_apis.outputs.changed_apis }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -398,15 +611,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import APIs via TapData API
         id: import_apis
-        run: bash scripts/common/import-resource.sh apis
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh apis
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
@@ -415,7 +629,7 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
-  # Job 7: Deploy Group Info
+  # Job 8: Deploy Group Info
   # ============================================================
   deploy-group-info:
     name: Deploy Group Info
@@ -435,11 +649,31 @@ jobs:
     outputs:
       changed_groupInfo: ${{ steps.import_group_info.outputs.changed_groupInfo }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.DEPLOY_REF }}
+          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Worker Scripts
+        if: github.event_name == 'workflow_call'
+        uses: actions/checkout@v4
+        with:
+          repository: tapdata/ha-cicd-worker
+          ref: main
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          path: _worker
+
+      - name: Set Runtime Paths
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -448,15 +682,16 @@ jobs:
           path: ${{ env.PROJECT }}_tapdata_export
 
       - name: Compress Export Files
-        run: bash scripts/common/compress-files.sh
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
+          REPO_ROOT: ${{ env.REPO_ROOT }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
           PROJECT: ${{ env.PROJECT }}
 
       - name: Import Group Info via TapData API
         id: import_group_info
-        run: bash scripts/common/import-resource.sh groupInfo
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/import-resource.sh groupInfo
         env:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
