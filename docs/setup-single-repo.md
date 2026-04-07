@@ -101,21 +101,7 @@ Go to repository **Settings** → **Secrets and variables** → **Actions** → 
 
 ---
 
-## Step 6: Configure Environment Mapping
-
-Edit `conf/env.conf` and fill in the TapData server address for each environment:
-
-```ini
-dev=http://<dev-server>:3030
-sit=http://<sit-server>:3030
-lpt=http://<lpt-server>:3030
-aat=http://<aat-server>:3030
-prod=http://<prod-server>:3030
-```
-
----
-
-## Step 7: Prepare TapData Export Files
+## Step 6: Prepare TapData Export Files
 
 Place the JSON files exported from the TapData platform into the `{project}_tapdata_export/` directory at the root of the repository. The directory structure should look like this:
 
@@ -130,7 +116,7 @@ Place the JSON files exported from the TapData platform into the `{project}_tapd
 
 ---
 
-## Step 8: Verify Triggers
+## Step 7: Verify Triggers
 
 After completing the above configuration, trigger a deployment using one of the following methods:
 
