@@ -62,7 +62,7 @@ env:
   DEPLOY_DIR: /tmp/tapdata-deploy-${{ github.run_id }}
   # 单仓库模式：push/workflow_dispatch 时使用 ref_name
   # 多租户模式：workflow_call 时使用租户的 caller_sha
-  DEPLOY_REF: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || github.ref_name }}
+  DEPLOY_REF: ${{ inputs.caller_repo != '' && inputs.caller_sha || github.ref_name }}
   # TARGET_ENV 推导逻辑（兼容单仓库和多租户）：
   #   workflow_call + target_env 已传入 → 使用 inputs.target_env
   #   workflow_call + caller_event=push + 非 tag ref → dev
@@ -72,9 +72,9 @@ env:
   #   单仓库 workflow_dispatch → inputs.target_env
   TARGET_ENV: >-
     ${{
-      (github.event_name == 'workflow_call' && inputs.target_env != '') && inputs.target_env
-      || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
-      || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
+      (inputs.caller_repo != '' && inputs.target_env != '') && inputs.target_env
+      || (inputs.caller_repo != '' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
+      || (inputs.caller_repo != '' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
       || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')) && 'dev'
       || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'sit'
       || inputs.target_env
@@ -90,9 +90,9 @@ jobs:
     timeout-minutes: 5
     environment: >-
       ${{
-        (github.event_name == 'workflow_call' && inputs.target_env != '') && inputs.target_env
-        || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
-        || (github.event_name == 'workflow_call' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
+        (inputs.caller_repo != '' && inputs.target_env != '') && inputs.target_env
+        || (inputs.caller_repo != '' && inputs.caller_event == 'push' && !startsWith(inputs.caller_ref, 'refs/tags/')) && 'dev'
+        || (inputs.caller_repo != '' && inputs.caller_event == 'push' && startsWith(inputs.caller_ref, 'refs/tags/')) && 'sit'
         || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')) && 'dev'
         || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'sit'
         || inputs.target_env
@@ -109,15 +109,15 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
           fetch-depth: 2
 
       # Step 2: 仅 workflow_call 时，额外 checkout worker scripts 到 _worker/
       #   - push/workflow_dispatch（单仓库）：跳过，scripts 已在 workspace 根
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -130,7 +130,7 @@ jobs:
       #   - 单仓库：SCRIPT_ROOT=.，REPO_ROOT=worker 仓库根（与现有行为完全一致）
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -139,7 +139,7 @@ jobs:
           fi
 
       - name: Print Workflow Run Link
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         env:
           WORKFLOW_REF: ${{ github.workflow_ref }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -162,8 +162,8 @@ jobs:
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/detect-project.sh
         env:
           # workflow_call 时：project 已由租户明确传入，用 workflow_dispatch 路径直接使用 INPUT_PROJECT
-          EVENT_NAME: ${{ github.event_name == 'workflow_call' && 'workflow_dispatch' || github.event_name }}
-          INPUT_PROJECT: ${{ github.event_name == 'workflow_call' && inputs.project || inputs.project }}
+          EVENT_NAME: ${{ inputs.caller_repo != '' && 'workflow_dispatch' || github.event_name }}
+          INPUT_PROJECT: ${{ inputs.caller_repo != '' && inputs.project || inputs.project }}
 
       - name: Validate Input Parameters
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/validate-inputs.sh
@@ -211,12 +211,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -226,7 +226,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -277,12 +277,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -292,7 +292,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -388,12 +388,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -403,7 +403,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -458,12 +458,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -473,7 +473,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -529,12 +529,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -544,7 +544,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -601,12 +601,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -616,7 +616,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
@@ -672,12 +672,12 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'workflow_call' && inputs.caller_repo || github.repository }}
-          ref: ${{ github.event_name == 'workflow_call' && inputs.caller_sha || env.DEPLOY_REF }}
+          repository: ${{ inputs.caller_repo != '' && inputs.caller_repo || github.repository }}
+          ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Checkout Worker Scripts
-        if: github.event_name == 'workflow_call'
+        if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
           repository: tapdata/ha-cicd-worker
@@ -687,7 +687,7 @@ jobs:
 
       - name: Set Runtime Paths
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
             echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
