@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Validate rebuild input parameters
-# Required env vars: TARGET_ENV, TASK_NAMES, RESET_REASON, TAPDATA_BASE_URL
+# Required env vars: TARGET_ENV, TASK_NAMES, RESET_REASON, TAPDATA_URL
 set -euo pipefail
 
 VALID_ENVS=("dev" "sit" "lpt" "aat" "prod")
@@ -39,9 +39,9 @@ if [[ -z "${RESET_REASON:-}" ]]; then
   exit 1
 fi
 
-# Validate TAPDATA_BASE_URL
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+# Validate TAPDATA_URL
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
@@ -49,6 +49,6 @@ echo "Target environment: ${TARGET_ENV}"
 echo "Task names: ${TASK_NAMES}"
 echo "Reset reason: ${RESET_REASON}"
 echo "Need drop table: ${NEED_DROP_TABLE:-false}"
-echo "Base URL: ${TAPDATA_BASE_URL}"
+echo "Base URL: ${TAPDATA_URL}"
 echo "=== Validation Passed ==="
 

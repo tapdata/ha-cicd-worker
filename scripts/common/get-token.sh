@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Get TapData access token via authentication API
-# Required env vars: TAPDATA_BASE_URL, TAPDATA_ACCESSCODE
+# Required env vars: TAPDATA_URL, TAPDATA_ACCESSCODE
 # Output: tapdata_token (via GITHUB_OUTPUT)
 set -euo pipefail
 
 echo "=== Getting TapData Token ==="
 
 # Validate required env vars
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
@@ -17,7 +17,7 @@ if [[ -z "${TAPDATA_ACCESSCODE:-}" ]]; then
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+BASE_URL="${TAPDATA_URL}"
 
 # Build full API URL
 API_URL="${BASE_URL%/}/api/users/generatetoken"

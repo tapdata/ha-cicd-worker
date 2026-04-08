@@ -100,7 +100,7 @@ jobs:
     outputs:
       tapdata_token: ${{ steps.get_token.outputs.tapdata_token }}
       target_env: ${{ env.TARGET_ENV }}
-      tapdata_url: ${{ vars.TAPDATA_URL }}
+      tapdata_url: ${{ steps.resolve_config.outputs.tapdata_url }}
       project: ${{ steps.detect_project.outputs.project }}
     steps:
       # Step 1: checkout 数据源
@@ -173,13 +173,42 @@ jobs:
           TARGET_ENV: ${{ env.TARGET_ENV }}
           PROJECT: ${{ env.PROJECT }}
 
+      - name: Resolve TapData Connection Config
+        id: resolve_config
+        run: |
+          case "${TARGET_ENV}" in
+            dev)  URL="${DEV_TAPDATA_URL:-${TAPDATA_URL}}"  ; CODE="${DEV_TAPDATA_ACCESS_CODE:-${TAPDATA_ACCESS_CODE}}" ;;
+            sit)  URL="${SIT_TAPDATA_URL:-${TAPDATA_URL}}"  ; CODE="${SIT_TAPDATA_ACCESS_CODE:-${TAPDATA_ACCESS_CODE}}" ;;
+            lpt)  URL="${LPT_TAPDATA_URL:-${TAPDATA_URL}}"  ; CODE="${LPT_TAPDATA_ACCESS_CODE:-${TAPDATA_ACCESS_CODE}}" ;;
+            aat)  URL="${AAT_TAPDATA_URL:-${TAPDATA_URL}}"  ; CODE="${AAT_TAPDATA_ACCESS_CODE:-${TAPDATA_ACCESS_CODE}}" ;;
+            prod) URL="${PROD_TAPDATA_URL:-${TAPDATA_URL}}" ; CODE="${PROD_TAPDATA_ACCESS_CODE:-${TAPDATA_ACCESS_CODE}}" ;;
+            *)    URL="${TAPDATA_URL}" ; CODE="${TAPDATA_ACCESS_CODE}" ;;
+          esac
+          echo "tapdata_url=${URL}" >> "${GITHUB_OUTPUT}"
+          echo "::add-mask::${CODE}"
+          echo "tapdata_accesscode=${CODE}" >> "${GITHUB_OUTPUT}"
+        env:
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+          TAPDATA_URL:              ${{ vars.TAPDATA_URL }}
+          DEV_TAPDATA_URL:          ${{ vars.DEV_TAPDATA_URL }}
+          SIT_TAPDATA_URL:          ${{ vars.SIT_TAPDATA_URL }}
+          LPT_TAPDATA_URL:          ${{ vars.LPT_TAPDATA_URL }}
+          AAT_TAPDATA_URL:          ${{ vars.AAT_TAPDATA_URL }}
+          PROD_TAPDATA_URL:         ${{ vars.PROD_TAPDATA_URL }}
+          TAPDATA_ACCESS_CODE:      ${{ secrets.TAPDATA_ACCESS_CODE }}
+          DEV_TAPDATA_ACCESS_CODE:  ${{ secrets.DEV_TAPDATA_ACCESS_CODE }}
+          SIT_TAPDATA_ACCESS_CODE:  ${{ secrets.SIT_TAPDATA_ACCESS_CODE }}
+          LPT_TAPDATA_ACCESS_CODE:  ${{ secrets.LPT_TAPDATA_ACCESS_CODE }}
+          AAT_TAPDATA_ACCESS_CODE:  ${{ secrets.AAT_TAPDATA_ACCESS_CODE }}
+          PROD_TAPDATA_ACCESS_CODE: ${{ secrets.PROD_TAPDATA_ACCESS_CODE }}
+
       - name: Get TapData Token
         id: get_token
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/get-token.sh
         env:
           TARGET_ENV: ${{ env.TARGET_ENV }}
-          TAPDATA_BASE_URL: ${{ vars.TAPDATA_URL }}
-          TAPDATA_ACCESSCODE: ${{ secrets.TAPDATA_ACCESS_CODE }}
+          TAPDATA_URL: ${{ steps.resolve_config.outputs.tapdata_url }}
+          TAPDATA_ACCESSCODE: ${{ steps.resolve_config.outputs.tapdata_accesscode }}
 
       - name: Generate vault.json with Connection Secrets
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/generate-vault.sh
@@ -255,7 +284,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: users-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -321,7 +350,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Compress Tasks Export Files
@@ -339,7 +368,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Preview Sync Tasks
@@ -349,7 +378,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
       - name: Compress APIs Export Files
@@ -367,7 +396,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -432,7 +461,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: connections-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -502,7 +531,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -573,7 +602,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: tasks-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -645,7 +674,7 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: apis-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
 
   # ============================================================
@@ -716,5 +745,5 @@ jobs:
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           ARCHIVE_NAME: groupInfo-export.tar
           TAPDATA_TOKEN: ${{ needs.preparation.outputs.tapdata_token }}
-          TAPDATA_BASE_URL: ${{ needs.preparation.outputs.tapdata_url }}
+          TAPDATA_URL: ${{ needs.preparation.outputs.tapdata_url }}
           TARGET_ENV: ${{ env.TARGET_ENV }}
