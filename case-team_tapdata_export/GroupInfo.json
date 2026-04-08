@@ -1,0 +1,45 @@
+[ {
+  "collectionName" : "GroupInfo",
+  "json" : {
+    "description" : "",
+    "gitInfo" : {
+      "branch" : "main",
+      "repoUrl" : "https://github.com/tapdata/ha-cicd-worker.git"
+    },
+    "name" : "case-team",
+    "resetTaskList" : [ ],
+    "resourceItemList" : [ {
+      "id" : "69cb888fbda877370a5efb80",
+      "name" : "UNION_discharge_information",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb8829bda877370a5efa38",
+      "name" : "UNION_cpi_case",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb87ebbda877370a5ef917",
+      "name" : "TMH_CMS_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb87c2bda877370a5ef8aa",
+      "name" : "QMH_CMS_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb879fbda877370a5ef82f",
+      "name" : "QMH_HPI_CASE_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb8762bda877370a5ef7af",
+      "name" : "TMH_HPI_CASE_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69cb88e6bda877370a5efce8",
+      "name" : "MDM_cpi_case",
+      "type" : "SYNC_TASK"
+    }, {
+      "id" : "69cb8b86bda877370a5f03f6",
+      "name" : "cpi case v1",
+      "type" : "MODULE"
+    } ]
+  }
+} ]

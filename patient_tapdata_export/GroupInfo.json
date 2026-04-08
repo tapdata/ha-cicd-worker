@@ -1,0 +1,37 @@
+[ {
+  "collectionName" : "GroupInfo",
+  "json" : {
+    "description" : "",
+    "gitInfo" : {
+      "branch" : "main",
+      "repoUrl" : "https://github.com/tapdata/ha-cicd-worker.git"
+    },
+    "name" : "patient",
+    "resetTaskList" : [ ],
+    "resourceItemList" : [ {
+      "id" : "69ca2a98d8de1e64a96402b9",
+      "name" : "UNION_cpi_patient_hospital_data",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69ca29e0d8de1e64a9640191",
+      "name" : "UNION_cpi_patient",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69ca298cd8de1e64a96400ab",
+      "name" : "TMH_HPI_PATIENT_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69ca294ed8de1e64a963ff95",
+      "name" : "QMH_HPI_PATIENT_TO_FDM",
+      "type" : "MIGRATE_TASK"
+    }, {
+      "id" : "69ca2af5d8de1e64a964038a",
+      "name" : "MDM_cpi_patient",
+      "type" : "SYNC_TASK"
+    }, {
+      "id" : "69cb8475bda877370a5ef457",
+      "name" : "patient v1",
+      "type" : "MODULE"
+    } ]
+  }
+} ]

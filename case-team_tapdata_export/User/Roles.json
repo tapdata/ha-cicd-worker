@@ -1,0 +1,10 @@
+[ {
+  "collectionName" : "Role",
+  "json" : {
+    "_id" : "69c623071f850faa41527910",
+    "description" : "cpi case team",
+    "name" : "cpi case",
+    "register_user_default" : false,
+    "user_id" : "62bc5008d4958d013d97c7a6"
+  }
+} ]
