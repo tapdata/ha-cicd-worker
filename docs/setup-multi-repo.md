@@ -97,6 +97,8 @@ Go to `ha-cicd-worker` → **Settings** → **Environments** and create:
 | `aat` | Acceptance testing |
 | `prod` | Production |
 
+> These environments are used for deployment **protection rules** (e.g., required reviewers, wait timers). Do not configure `TAPDATA_URL` here — in `workflow_call` mode the worker's environment variables are not accessible to jobs. See section 2.5 for where to configure variables.
+
 ### 2.4 Configure Each Tenant Repository
 
 For each tenant repository (e.g., `patient-team`):
@@ -167,28 +169,32 @@ Add the exported TapData JSON files into the tenant repository:
 
 ### 2.5 Configure Secrets and Variables
 
-**Worker repository** — go to `ha-cicd-worker` → **Settings** → **Secrets and variables** → **Actions**:
+> **Why this split?** When a tenant workflow calls the worker via `workflow_call`, GitHub resolves `vars.*` and `secrets.*` from the **caller (tenant) repository**, not from `ha-cicd-worker`. Secrets and variables stored only in `ha-cicd-worker` are invisible to tenant jobs. This determines exactly where each item must be placed.
+
+#### Organization level
+
+Configure once at Organization → **Settings** → **Secrets and variables** → **Actions**. Automatically inherited by all tenant repositories.
 
 | Type | Name | Description |
 |---|---|---|
-| Variable | `TAPDATA_URL` | TapData server address, e.g. `http://10.0.0.1:3030` |
+| Secret | `GH_DEPLOY_TOKEN` | Fine-grained personal access token with read access to all repositories under `{org}` |
+| Secret | `DEV_TAPDATA_ACCESS_CODE` | TapData access credentials for the `dev` environment |
+| Secret | `SIT_TAPDATA_ACCESS_CODE` | TapData access credentials for the `sit` environment |
+| Secret | `LPT_TAPDATA_ACCESS_CODE` | TapData access credentials for the `lpt` environment |
+| Secret | `AAT_TAPDATA_ACCESS_CODE` | TapData access credentials for the `aat` environment |
+| Secret | `PROD_TAPDATA_ACCESS_CODE` | TapData access credentials for the `prod` environment |
+| Variable | `DEV_TAPDATA_URL` | TapData server address for the `dev` environment, e.g. `http://10.0.0.1:3030` |
+| Variable | `SIT_TAPDATA_URL` | TapData server address for the `sit` environment |
+| Variable | `LPT_TAPDATA_URL` | TapData server address for the `lpt` environment |
+| Variable | `AAT_TAPDATA_URL` | TapData server address for the `aat` environment |
+| Variable | `PROD_TAPDATA_URL` | TapData server address for the `prod` environment |
 
-> If each environment uses a different TapData server, configure `TAPDATA_URL` as an Environment-level Variable inside each environment to override the repository-level value.
+#### Tenant repository — repository-level credentials
 
-**Organization level** — configure once at Organization → **Settings** → **Secrets and variables** → **Actions**:
+For each tenant repository, go to repo → **Settings** → **Secrets and variables** → **Actions**.
 
 | Type | Name | Description |
 |---|---|---|
-| Secret | `GH_DEPLOY_TOKEN` | Fine-grained personal access token for accessing all repositories |
-| Secret | `TAPDATA_ACCESS_CODE` | TapData platform access credentials (if all tenants share the same) |
-
-> **Why `GH_DEPLOY_TOKEN` must be at the Organization level:** When a tenant workflow calls the worker via `workflow_call`, GitHub runs the jobs in the **caller (tenant) repository's context**, not the worker's. `secrets: inherit` only forwards secrets accessible to the calling repository. A secret stored only in `ha-cicd-worker` is invisible to tenant jobs. Setting `GH_DEPLOY_TOKEN` at the Organization level makes it available to all tenant repositories automatically.
-
-**Tenant repository** — for each tenant, go to the repo → **Settings** → **Secrets and variables** → **Actions**:
-
-| Type | Name | Description |
-|---|---|---|
-| Secret | `TAPDATA_ACCESS_CODE` | Only if not configured at the Org level |
 | Secret | Database passwords | Named by connection (see rules below) |
 | Variable | Database URLs / Users | Named by connection (see rules below) |
 
@@ -212,5 +218,6 @@ Add the exported TapData JSON files into the tenant repository:
 **Our team to configure (Part 2):**
 - [ ] Create a project named `{project}` on the TapData platform
 - [ ] Copy `.github/workflows/tapdata-deploy.yml` from an existing tenant repo into the new tenant repository (update `{project}` value)
-- [ ] Confirm `GH_DEPLOY_TOKEN` is configured at the Organization level (required for `secrets: inherit` to work from tenant repos)
-- [ ] Configure Secrets and Variables in the tenant repo (database credentials, access code if not at Org level)
+- [ ] Confirm `GH_DEPLOY_TOKEN` and `TAPDATA_ACCESS_CODE` are configured at the Organization level
+- [ ] Configure `TAPDATA_URL` in each environment (`dev`, `sit`, `lpt`, `aat`, `prod`) of the tenant repository
+- [ ] Configure database credential Secrets and Variables in the tenant repository (see naming rules in section 2.5)

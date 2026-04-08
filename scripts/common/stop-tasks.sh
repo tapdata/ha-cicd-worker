@@ -4,7 +4,7 @@
 #    - If TASK_NAMES is set: query by specified task names (rebuild mode)
 #    - If TASK_NAMES is empty/unset: query all tasks (rollback mode)
 # 2. Batch stop tasks via PUT /api/Task/batchStop
-# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
+# Required env vars: TAPDATA_TOKEN, TAPDATA_URL
 # Optional env vars: TASK_NAMES (comma separated, if empty stops all tasks)
 # Output: stopped_task_ids (comma separated, via GITHUB_OUTPUT)
 #         stopped_tasks_file (path to JSON file with id, attrs and status, via GITHUB_OUTPUT)
@@ -12,12 +12,12 @@ set -euo pipefail
 
 echo "=== Stopping Tasks ==="
 
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+BASE_URL="${TAPDATA_URL}"
 
 API_BASE="${BASE_URL%/}/api"
 

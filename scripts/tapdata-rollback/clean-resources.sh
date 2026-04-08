@@ -2,19 +2,19 @@
 # Clean TapData resources (APIs, tasks) for rollback
 # 1. Delete each API via DELETE /api/Modules/{id}
 # 2. Poll stopped tasks and progressively batch delete via DELETE /api/Task/batchDelete
-# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL
+# Required env vars: TAPDATA_TOKEN, TAPDATA_URL
 # Optional env vars: STOPPED_TASKS_FILE (path to JSON file with task id/attrs/status), API_IDS (comma separated)
 set -euo pipefail
 
 echo "=== Cleaning Resources ==="
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting resource cleanup..."
 
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+BASE_URL="${TAPDATA_URL}"
 API_BASE="${BASE_URL%/}/api"
 
 # ── Step 1: Delete APIs one by one ──

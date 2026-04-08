@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Restore task attrs, start tasks defined in export directory, and publish previously-active APIs after rollback
-# Required env vars: TAPDATA_TOKEN, TAPDATA_BASE_URL, PROJECT
+# Required env vars: TAPDATA_TOKEN, TAPDATA_URL, PROJECT
 # Optional env vars: STOPPED_TASKS_FILE (JSON with id, name, attrs, status)
 #                    UNPUBLISHED_APIS_FILE (JSON with id, status, tableName)
 set -euo pipefail
 
 echo "=== Starting Tasks and Publishing APIs ==="
 
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
@@ -17,7 +17,7 @@ if [[ -z "${PROJECT:-}" ]]; then
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+BASE_URL="${TAPDATA_URL}"
 API_BASE="${BASE_URL%/}/api"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${SCRIPT_DIR}/../.."

@@ -2,7 +2,7 @@
 # Preview resource changes (connections/migrate/tasks/sync/tasks/apis) via TapData API
 # Usage: preview-resource.sh <resource_type>
 # resource_type: connections | migrate/tasks | sync/tasks | apis
-# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TAPDATA_BASE_URL
+# Required env vars: DEPLOY_DIR, TAPDATA_TOKEN, TAPDATA_URL
 # Optional env vars: ARCHIVE_NAME
 set -euo pipefail
 
@@ -26,12 +26,12 @@ if [[ -z "${TAPDATA_TOKEN:-}" ]]; then
   exit 1
 fi
 
-if [[ -z "${TAPDATA_BASE_URL:-}" ]]; then
-  echo "::error::TAPDATA_BASE_URL is not set or empty"
+if [[ -z "${TAPDATA_URL:-}" ]]; then
+  echo "::error::TAPDATA_URL is not set or empty"
   exit 1
 fi
 
-BASE_URL="${TAPDATA_BASE_URL}"
+BASE_URL="${TAPDATA_URL}"
 
 # Determine API path based on resource type
 case "${RESOURCE_TYPE}" in
