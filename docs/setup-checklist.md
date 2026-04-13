@@ -15,16 +15,16 @@
 ### 1.1 GitHub Instance & Organizations
 
 - [ ] Confirm GitHub instance URL: `___________` (e.g. `https://github.example.com`)
-- [ ] Confirm the organization for the worker repository: `___________` (referred to as `{worker_org}`)
+- [ ] Confirm the worker repository full name (org/repo): `___________` (referred to as `{WORKER_REPO}`, e.g. `tapdata/ha-cicd-worker`)
 - [ ] Confirm the organization for the tenant repositories: `___________` (referred to as `{team_org}`)
 
-> `{worker_org}` and `{team_org}` can be the same organization or different organizations on the same GitHub instance.
+> The worker repo and tenant repos can be in the same organization or different organizations on the same GitHub instance.
 
 ### 1.2 GitHub Repositories
 
 Create the following repositories:
 
-- [ ] `{worker_org}/{worker_repo}` — shared deployment engine (CI/CD scripts and workflows); visibility must be set to **internal** (so tenant repos in `{team_org}` can reference its reusable workflows)
+- [ ] `{WORKER_REPO}` — shared deployment engine (CI/CD scripts and workflows); visibility must be set to **internal** (so tenant repos in `{team_org}` can reference its reusable workflows)
 - [ ] `{team_org}/{tenant_repo}` — tenant repository (holds TapData export files for one project)
 
 > Repository names above are suggestions — can be adjusted based on the actual project naming conventions.
@@ -32,10 +32,10 @@ Create the following repositories:
 ### 1.3 GitHub User Account for TapData Engineer
 
 - [ ] Create **1 GitHub account** for TapData implementation engineer
-- [ ] Add to `{worker_org}` with write access to the worker repository (for pushing code)
+- [ ] Add to `{WORKER_REPO}` organization with write access to the worker repository (for pushing code)
 - [ ] Add to `{team_org}` with admin access to tenant repositories (for configuring Environments, Secrets, and Variables)
 
-> If `{worker_org}` and `{team_org}` are the same organization, only one membership is needed.
+> If the worker and tenant repos are in the same organization, only one membership is needed.
 
 > Customer-side deployment approvers use their existing GitHub accounts — no additional account requests needed. They will be added as Environment reviewers in Part 2.
 
@@ -103,7 +103,7 @@ graph LR
 
 > Once Part 1 is complete, the following is done by the TapData deployment team.
 
-### 2.1 Worker Repository (`{worker_org}/{worker_repo}`)
+### 2.1 Worker Repository (`{WORKER_REPO}`)
 
 - [ ] Push worker code to the `main` branch
 - [ ] Verify repository visibility is set to **internal** (Settings > General > Danger Zone > Change visibility)
@@ -118,7 +118,7 @@ Configure at `{team_org}` > **Settings** > **Secrets and variables** > **Actions
 
 **Secrets:**
 
-- [ ] `GH_DEPLOY_TOKEN` — Personal Access Token with read access to `{worker_org}/{worker_repo}` (for checking out worker scripts) and read/write access to tenant repos under `{team_org}`
+- [ ] `GH_DEPLOY_TOKEN` — Personal Access Token with read access to `{WORKER_REPO}` (for checking out worker scripts) and read/write access to tenant repos under `{team_org}`
 - [ ] `SIT_TAPDATA_ACCESS_CODE`
 - [ ] `LPT_TAPDATA_ACCESS_CODE`
 
@@ -139,7 +139,7 @@ Configure at `{team_org}` > **Settings** > **Secrets and variables** > **Actions
 
 **Workflow file:**
 
-- [ ] Create `.github/workflows/tapdata-deploy.yml` (replace `{worker_org}`, `{worker_repo}`, and `{project}` with actual values):
+- [ ] Create `.github/workflows/tapdata-deploy.yml` (replace `{WORKER_REPO}` and `{project}` with actual values):
 
 ```yaml
 name: TapData Deploy
@@ -163,7 +163,7 @@ on:
 
 jobs:
   deploy:
-    uses: {worker_org}/{worker_repo}/.github/workflows/tapdata-deploy.yml@main
+    uses: {WORKER_REPO}/.github/workflows/tapdata-deploy.yml@main
     with:
       project: {project}
       target_env: ${{ inputs.target_env || '' }}
@@ -171,7 +171,7 @@ jobs:
       caller_sha: ${{ github.sha }}
       caller_event: ${{ github.event_name }}
       caller_ref: ${{ github.ref }}
-      worker_repo: {worker_org}/{worker_repo}
+      worker_repo: {WORKER_REPO}
     secrets: inherit
 ```
 
