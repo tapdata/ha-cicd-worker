@@ -50,14 +50,52 @@ Provide a self-hosted GitHub Actions Runner that is **shared across all tenant r
 - [ ] Network (internal): can reach the TapData server (host + port)
 - [ ] Verify Runner status shows **Idle** and is available to the tenant repositories
 
-### 1.5 TapData Local Dev Server
+### 1.5 TapData Servers (MDM Dev + Dev)
 
-Provide **one** server for the TapData local development environment — TapData and MongoDB will be installed on this machine:
+Provide **two** servers with the same specifications — one for the TapData local development environment, one for the Dev environment. TapData and MongoDB will be installed on each machine:
+
+| Server | Purpose |
+|---|---|
+| MDM Dev Server | TapData local development and testing |
+| Dev Server | Dev environment for CI/CD automated deployment |
+
+**Specifications (per server):**
 
 - [ ] CPU: 16 cores
 - [ ] Memory: 128 GB
 - [ ] Disk: 300 GB
 - [ ] OS: Linux (Ubuntu 20.04+ recommended)
+
+**Reference: SIT Environment Architecture**
+
+```mermaid
+graph LR
+    subgraph Sources["Source PGDB · DC7 / PLTE"]
+        HKPMI["HKPMI<br/>PostgreSQL"]
+        HPI["HPI<br/>PostgreSQL"]
+        CMS["CMS<br/>PostgreSQL"]
+    end
+
+    subgraph TapData["TapData Cluster"]
+        API["API Server"]
+        Mgmt["Management"]
+        Engine["Flow Engine"]
+        Client["API Client"]
+    end
+
+    subgraph MongoDB["MongoDB Cluster · MDM"]
+        Primary["Mongo Primary"]
+        Secondary1["Mongo Secondary"]
+        Secondary2["Mongo Secondary"]
+    end
+
+    HKPMI -->|CDC| TapData
+    HPI -->|CDC| TapData
+    CMS -->|CDC| TapData
+    TapData --> Primary
+    Primary --- Secondary1
+    Primary --- Secondary2
+```
 
 ---
 
@@ -164,14 +202,14 @@ Configure at tenant repo > **Settings** > **Secrets and variables** > **Actions*
 
 ---
 
-## Part 3: Local Dev Environment Setup (TapData Team)
+## Part 3: MDM Dev Environment Setup (TapData Team)
 
-> Once the Local Dev Server (1.5) is ready, the TapData team will install and configure the software.
+> Once the MDM Dev Server (1.5) is ready, the TapData team will install and configure the software.
 
 ### 3.1 Install & Configure
 
-- [ ] Install MongoDB on the Local Dev Server
-- [ ] Install TapData on the Local Dev Server
+- [ ] Install MongoDB on the MDM Dev Server
+- [ ] Install TapData on the MDM Dev Server
 - [ ] Configure all required parameters (database connection, ports, credentials, etc.)
 - [ ] Verify TapData starts successfully and is accessible
 
