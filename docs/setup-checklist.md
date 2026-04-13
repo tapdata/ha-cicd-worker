@@ -3,7 +3,8 @@
 > **Purpose: Pre-Go-Live Environment Preparation and Configuration Verification**
 
 > Each team (tenant) owns an independent GitHub repository for their TapData configuration files.
-> A shared `cicd-worker` repository serves as the unified deployment engine.
+> A shared worker repository serves as the unified deployment engine.
+> The worker repo and tenant repos may reside in different GitHub organizations.
 
 ---
 
@@ -11,41 +12,43 @@
 
 > The following items require internal approval and should be completed **before go-live**.
 
-### 1.1 GitHub Organization
+### 1.1 GitHub Instance & Organizations
 
-- [ ] Provide a GitHub Organization (or confirm an existing one can be used)
-- [ ] Confirm Organization name: `___________` (referred to as `{org}`, recommended value: `tapdata`)
+- [ ] Confirm GitHub instance URL: `___________` (e.g. `https://github.example.com`)
+- [ ] Confirm the organization for the worker repository: `___________` (referred to as `{worker_org}`)
+- [ ] Confirm the organization for the tenant repositories: `___________` (referred to as `{team_org}`)
+
+> `{worker_org}` and `{team_org}` can be the same organization or different organizations on the same GitHub instance.
 
 ### 1.2 GitHub Repositories
 
-Create the following **private** repositories under `{org}`:
+Create the following repositories:
 
-- [ ] `cicd-worker` — shared deployment engine (CI/CD scripts and workflows)
-- [ ] `patient-case-team` — tenant repository (holds TapData export files for patient-case project)
+- [ ] `{worker_org}/{worker_repo}` — shared deployment engine (CI/CD scripts and workflows); visibility must be set to **internal** (so tenant repos in `{team_org}` can reference its reusable workflows)
+- [ ] `{team_org}/{tenant_repo}` — tenant repository (holds TapData export files for one project)
 
 > Repository names above are suggestions — can be adjusted based on the actual project naming conventions.
 
 ### 1.3 GitHub User Account for TapData Engineer
 
 - [ ] Create **1 GitHub account** for TapData implementation engineer
-- [ ] Add to `{org}` as **Owner** role
+- [ ] Add to `{worker_org}` with write access to the worker repository (for pushing code)
+- [ ] Add to `{team_org}` with admin access to tenant repositories (for configuring Environments, Secrets, and Variables)
 
-> **Note:** Owner access is required for the current trial/test phase so the TapData team can independently complete all configuration in Part 2. For future production go-live, a more restricted permission model can be discussed and adopted.
+> If `{worker_org}` and `{team_org}` are the same organization, only one membership is needed.
 
-> Customer-side deployment approvers use their existing GitHub accounts — no additional account requests needed. They will be added as **Member** and assigned as Environment reviewers in Part 3.
+> Customer-side deployment approvers use their existing GitHub accounts — no additional account requests needed. They will be added as Environment reviewers in Part 2.
 
-### 1.4 Self-hosted Runner Machine (Organization Level)
+### 1.4 Self-hosted Runner
 
-Provide **one** server/VM and register it as an **Organization-level** GitHub Actions Runner (shared across all repositories under `{org}`):
+Provide a self-hosted GitHub Actions Runner that is **shared across all tenant repositories** under `{team_org}`:
 
-- [ ] OS: Linux (Ubuntu 20.04+ recommended)
-- [ ] Disk: >= 20 GB
+- [ ] Runner is accessible to all tenant repositories (registration method is up to customer IT — organization-level, enterprise-level, or repository-level with sharing)
+- [ ] Custom label **`tapdata`** is added to the Runner
+- [ ] Dependencies installed: `git`, `bash`, `jq`
 - [ ] Network (outbound): can reach GitHub (HTTPS)
 - [ ] Network (internal): can reach the TapData server (host + port)
-- [ ] Dependencies installed: `git`, `bash`, `jq`
-- [ ] Register the Runner: go to `{org}` > **Settings** > **Actions** > **Runners** > **New self-hosted runner**, follow the instructions to install and start the Runner on the machine
-- [ ] Add custom label **`tapdata`** during registration
-- [ ] Verify Runner status shows **Idle** in the Organization's runner list
+- [ ] Verify Runner status shows **Idle** and is available to the tenant repositories
 
 ### 1.5 TapData Local Dev Server
 
@@ -62,19 +65,22 @@ Provide **one** server for the TapData local development environment — TapData
 
 > Once Part 1 is complete, the following is done by the TapData deployment team.
 
-### 2.1 Worker Repository (`cicd-worker`)
+### 2.1 Worker Repository (`{worker_org}/{worker_repo}`)
 
-- [ ] Push `cicd-worker` code to the `main` branch
-- [ ] Replace all occurrences of the default org name `tapdata` with `{org}` in workflow files _(skip if the org name is already `tapdata`)_:
-  - [ ] `.github/workflows/tapdata-deploy.yml`
+- [ ] Push worker code to the `main` branch
+- [ ] Verify repository visibility is set to **internal** (Settings > General > Danger Zone > Change visibility)
 
-### 2.2 Organization-level Secrets & Variables
+> The worker workflow dynamically resolves its own repository name at runtime — no manual org name replacement is needed in workflow files.
 
-Configure at `{org}` > **Settings** > **Secrets and variables** > **Actions**:
+### 2.2 Secrets & Variables (at `{team_org}` level)
+
+Configure at `{team_org}` > **Settings** > **Secrets and variables** > **Actions**:
+
+> All Secrets and Variables must be configured at the **`{team_org}`** level (or per-tenant repo level), because reusable workflows execute in the caller's context.
 
 **Secrets:**
 
-- [ ] `GH_DEPLOY_TOKEN` — fine-grained PAT for cross-repo checkout and `workflow_call`; scoped to all repos under `{org}` with `Actions`, `Workflows`, `Contents`: Read and Write
+- [ ] `GH_DEPLOY_TOKEN` — Personal Access Token with read access to `{worker_org}/{worker_repo}` (for checking out worker scripts) and read/write access to tenant repos under `{team_org}`
 - [ ] `SIT_TAPDATA_ACCESS_CODE`
 - [ ] `LPT_TAPDATA_ACCESS_CODE`
 
@@ -85,7 +91,7 @@ Configure at `{org}` > **Settings** > **Secrets and variables** > **Actions**:
 
 ### 2.3 Per-Tenant Repository Configuration
 
-> Repeat the following for each tenant repository (e.g. `patient-case-team`).
+> Repeat the following for each tenant repository (e.g. `{team_org}/{tenant_repo}`).
 
 **Environments:**
 
@@ -95,7 +101,7 @@ Configure at `{org}` > **Settings** > **Secrets and variables** > **Actions**:
 
 **Workflow file:**
 
-- [ ] Create `.github/workflows/tapdata-deploy.yml` (replace `{org}` and `{project}`):
+- [ ] Create `.github/workflows/tapdata-deploy.yml` (replace `{worker_org}`, `{worker_repo}`, and `{project}` with actual values):
 
 ```yaml
 name: TapData Deploy
@@ -119,7 +125,7 @@ on:
 
 jobs:
   deploy:
-    uses: {org}/cicd-worker/.github/workflows/tapdata-deploy.yml@main
+    uses: {worker_org}/{worker_repo}/.github/workflows/tapdata-deploy.yml@main
     with:
       project: {project}
       target_env: ${{ inputs.target_env || '' }}

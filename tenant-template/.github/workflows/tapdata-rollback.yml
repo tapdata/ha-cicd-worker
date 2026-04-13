@@ -19,7 +19,8 @@ on:
 
 jobs:
   rollback:
-    uses: tapdata/ha-cicd-worker/.github/workflows/tapdata-rollback.yml@main
+    # TODO: Replace {worker_org}/{worker_repo} with actual values
+    uses: "{worker_org}/{worker_repo}/.github/workflows/tapdata-rollback.yml@main"
     with:
       project: ${{ github.event.repository.name }}
       target_env: ${{ inputs.target_env }}

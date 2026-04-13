@@ -114,29 +114,34 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
           fetch-depth: 2
 
-      # Step 2: 仅 workflow_call 时，额外 checkout worker scripts 到 _worker/
+      # Step 2: 设置 SCRIPT_ROOT、REPO_ROOT 和 WORKER_REPO
+      #   - workflow_call：SCRIPT_ROOT=_worker，REPO_ROOT=workspace 根（含租户 JSON 文件）
+      #   - 单仓库：SCRIPT_ROOT=.，REPO_ROOT=worker 仓库根（与现有行为完全一致）
+      - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+          else
+            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
+            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
+          fi
+
+      # Step 3: 仅 workflow_call 时，额外 checkout worker scripts 到 _worker/
       #   - push/workflow_dispatch（单仓库）：跳过，scripts 已在 workspace 根
       - name: Checkout Worker Scripts
         if: inputs.caller_repo != ''
         uses: actions/checkout@v4
         with:
-          repository: tapdata/ha-cicd-worker
+          repository: ${{ env.WORKER_REPO }}
           ref: main
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
           path: _worker
-
-      # Step 3: 设置 SCRIPT_ROOT 和 REPO_ROOT
-      #   - workflow_call：SCRIPT_ROOT=_worker，REPO_ROOT=workspace 根（含租户 JSON 文件）
-      #   - 单仓库：SCRIPT_ROOT=.，REPO_ROOT=worker 仓库根（与现有行为完全一致）
-      - name: Set Runtime Paths
-        run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
-            echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
-          else
-            echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
-            echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
-          fi
 
       - name: Print Workflow Run Link
         if: inputs.caller_repo != ''
@@ -244,24 +249,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -310,24 +320,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -421,24 +436,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -491,24 +511,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -562,24 +587,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -634,24 +664,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
@@ -705,24 +740,29 @@ jobs:
           ref: ${{ inputs.caller_repo != '' && inputs.caller_sha || env.DEPLOY_REF }}
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
-      - name: Checkout Worker Scripts
-        if: inputs.caller_repo != ''
-        uses: actions/checkout@v4
-        with:
-          repository: tapdata/ha-cicd-worker
-          ref: main
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}
-          path: _worker
-
       - name: Set Runtime Paths
+        env:
+          CALLER_REPO: ${{ inputs.caller_repo }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+          if [[ -n "${CALLER_REPO}" ]]; then
+            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout Worker Scripts
+        if: inputs.caller_repo != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKER_REPO }}
+          ref: main
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          path: _worker
 
       - name: Download vault artifact
         uses: actions/download-artifact@v4
