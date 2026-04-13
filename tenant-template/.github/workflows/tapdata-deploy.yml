@@ -29,4 +29,5 @@ jobs:
       caller_sha: ${{ github.sha }}
       caller_event: ${{ github.event_name }}
       caller_ref: ${{ github.ref }}
+      worker_repo: "{worker_org}/{worker_repo}"
     secrets: inherit

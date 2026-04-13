@@ -42,6 +42,11 @@ on:
         required: false
         type: string
         default: ''
+      worker_repo:
+        description: 'Worker 仓库全名，如 tapdata/ha-cicd-worker（用于 checkout worker scripts）'
+        required: false
+        type: string
+        default: ''
     secrets:
       GH_DEPLOY_TOKEN:
         required: true
@@ -74,13 +79,9 @@ jobs:
 
       # 多租户模式：额外 checkout worker scripts 到 _worker/
       - name: Set Runtime Paths
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
         run: |
-          if [[ "${EVENT_NAME}" == "workflow_call" && -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ "${{ github.event_name }}" == "workflow_call" && -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
@@ -166,13 +167,9 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
         run: |
-          if [[ "${EVENT_NAME}" == "workflow_call" && -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ "${{ github.event_name }}" == "workflow_call" && -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
@@ -234,16 +231,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ "${EVENT_NAME}" == "workflow_call" && -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ "${{ github.event_name }}" == "workflow_call" && -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
