@@ -143,22 +143,6 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
           path: _worker
 
-      - name: Print Workflow Run Link
-        if: inputs.caller_repo != ''
-        env:
-          WORKER_REPO: ${{ inputs.worker_repo }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          CALLER_REPO: ${{ inputs.caller_repo }}
-        run: |
-          WORKER_WORKFLOW_URL="https://github.com/${WORKER_REPO}/actions/workflows/tapdata-deploy.yml"
-          {
-            echo "## 部署运行链接"
-            echo ""
-            echo "| 描述 | 链接 |"
-            echo "|------|------|"
-            echo "| 当前部署 Run | [${CALLER_REPO} #${{ github.run_number }}](${RUN_URL}) |"
-            echo "| Worker Workflow 引擎 | [${WORKER_REPO}](${WORKER_WORKFLOW_URL}) |"
-          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Detect Project
         id: detect_project
