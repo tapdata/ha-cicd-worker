@@ -54,6 +54,10 @@ on:
         description: '租户仓库的原始 ref（refs/heads/main 或 refs/tags/xxx），用于判断是否为 tag'
         required: true
         type: string
+      worker_repo:
+        description: 'Worker 仓库全名，如 tapdata/ha-cicd-worker（用于 checkout worker scripts）'
+        required: true
+        type: string
     secrets:
       GH_DEPLOY_TOKEN:
         required: true
@@ -118,15 +122,11 @@ jobs:
       #   - workflow_call：SCRIPT_ROOT=_worker，REPO_ROOT=workspace 根（含租户 JSON 文件）
       #   - 单仓库：SCRIPT_ROOT=.，REPO_ROOT=worker 仓库根（与现有行为完全一致）
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -146,13 +146,11 @@ jobs:
       - name: Print Workflow Run Link
         if: inputs.caller_repo != ''
         env:
-          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKER_REPO: ${{ inputs.worker_repo }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           CALLER_REPO: ${{ inputs.caller_repo }}
         run: |
-          WORKER_REPO="${WORKFLOW_REF%%/.github/*}"
-          WORKFLOW_FILE_NAME=$(basename "${WORKFLOW_REF%%@*}")
-          WORKER_WORKFLOW_URL="https://github.com/${WORKER_REPO}/actions/workflows/${WORKFLOW_FILE_NAME}"
+          WORKER_WORKFLOW_URL="https://github.com/${WORKER_REPO}/actions/workflows/tapdata-deploy.yml"
           {
             echo "## 部署运行链接"
             echo ""
@@ -250,15 +248,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -321,15 +315,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -437,15 +427,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -512,15 +498,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -588,15 +570,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -665,15 +643,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
@@ -741,15 +715,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
 
       - name: Set Runtime Paths
-        env:
-          CALLER_REPO: ${{ inputs.caller_repo }}
-          WORKFLOW_REF: ${{ github.workflow_ref }}
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          if [[ -n "${CALLER_REPO}" ]]; then
-            echo "WORKER_REPO=${WORKFLOW_REF%%/.github/*}" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.caller_repo }}" ]]; then
+            echo "WORKER_REPO=${{ inputs.worker_repo }}" >> "$GITHUB_ENV"
             echo "SCRIPT_ROOT=_worker" >> "$GITHUB_ENV"
-            echo "REPO_ROOT=${WORKSPACE}" >> "$GITHUB_ENV"
+            echo "REPO_ROOT=${{ github.workspace }}" >> "$GITHUB_ENV"
           else
             echo "SCRIPT_ROOT=." >> "$GITHUB_ENV"
             echo "REPO_ROOT=$(pwd)" >> "$GITHUB_ENV"
