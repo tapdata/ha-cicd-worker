@@ -97,18 +97,9 @@ jobs:
           path: _worker
 
       - name: Check tapdata_export Directory
-        run: |
-          EXPORT_DIR="${{ github.workspace }}/${PROJECT}_tapdata_export"
-          if [[ ! -d "$EXPORT_DIR" ]]; then
-            echo "::error::tapdata_export directory not found: $EXPORT_DIR"
-            echo "## ❌ Rollback Aborted" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "Export directory \`${PROJECT}_tapdata_export/\` not found. Please check:" >> "$GITHUB_STEP_SUMMARY"
-            echo "1. Is the project name \`${PROJECT}\` correct?" >> "$GITHUB_STEP_SUMMARY"
-            echo "2. Has the directory been committed to the repository?" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ Export directory found: $EXPORT_DIR"
+        run: bash $SCRIPT_ROOT/scripts/common/check-export-dir.sh
+        env:
+          EXPORT_DIR: ${{ github.workspace }}/${{ env.PROJECT }}_tapdata_export
 
       - name: Validate Input Parameters
         run: bash $SCRIPT_ROOT/scripts/tapdata-rollback/validate-inputs.sh

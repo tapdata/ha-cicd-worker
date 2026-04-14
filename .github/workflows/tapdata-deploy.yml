@@ -153,18 +153,9 @@ jobs:
           INPUT_PROJECT: ${{ inputs.caller_repo != '' && inputs.project || inputs.project }}
 
       - name: Check tapdata_export Directory
-        run: |
-          EXPORT_DIR="${REPO_ROOT}/${PROJECT}_tapdata_export"
-          if [[ ! -d "$EXPORT_DIR" ]]; then
-            echo "::error::tapdata_export directory not found: $EXPORT_DIR"
-            echo "## ❌ Deploy Aborted" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "Export directory \`${PROJECT}_tapdata_export/\` not found. Please check:" >> "$GITHUB_STEP_SUMMARY"
-            echo "1. Is the project name \`${PROJECT}\` correct?" >> "$GITHUB_STEP_SUMMARY"
-            echo "2. Has the directory been committed to the repository?" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ Export directory found: $EXPORT_DIR"
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/check-export-dir.sh
+        env:
+          EXPORT_DIR: ${{ env.REPO_ROOT }}/${{ env.PROJECT }}_tapdata_export
 
       - name: Validate Input Parameters
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/validate-inputs.sh
