@@ -152,6 +152,11 @@ jobs:
           EVENT_NAME: ${{ inputs.caller_repo != '' && 'workflow_dispatch' || github.event_name }}
           INPUT_PROJECT: ${{ inputs.caller_repo != '' && inputs.project || inputs.project }}
 
+      - name: Check tapdata_export Directory
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/check-export-dir.sh
+        env:
+          EXPORT_DIR: ${{ env.REPO_ROOT }}/${{ env.PROJECT }}_tapdata_export
+
       - name: Validate Input Parameters
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/tapdata-deploy/validate-inputs.sh
         env:

@@ -96,6 +96,11 @@ jobs:
           token: ${{ secrets.GH_DEPLOY_TOKEN }}
           path: _worker
 
+      - name: Check tapdata_export Directory
+        run: bash $SCRIPT_ROOT/scripts/common/check-export-dir.sh
+        env:
+          EXPORT_DIR: ${{ github.workspace }}/${{ env.PROJECT }}_tapdata_export
+
       - name: Validate Input Parameters
         run: bash $SCRIPT_ROOT/scripts/tapdata-rollback/validate-inputs.sh
         env:
