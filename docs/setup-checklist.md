@@ -121,6 +121,7 @@ Configure at `{team_org}` > **Settings** > **Secrets and variables** > **Actions
 - [ ] `GH_DEPLOY_TOKEN` — Personal Access Token with read access to `{WORKER_REPO}` (for checking out worker scripts) and read/write access to tenant repos under `{team_org}`
 - [ ] `SIT_TAPDATA_ACCESS_CODE`
 - [ ] `LPT_TAPDATA_ACCESS_CODE`
+- [ ] `VAULT_ENCRYPTION_KEY` — *(optional)* AES-256 key for encrypting vault.json artifact (32+ char random string). If not set, vault.json is uploaded as plaintext
 
 **Variables:**
 

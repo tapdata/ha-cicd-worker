@@ -210,6 +210,13 @@ jobs:
           ALL_SECRETS: ${{ toJSON(secrets) }}
           ALL_VARS: ${{ toJSON(vars) }}
 
+      - name: Encrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: encrypt
+
       - name: Upload vault and export files
         uses: actions/upload-artifact@v4
         with:
@@ -261,6 +268,13 @@ jobs:
         with:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
 
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
@@ -328,6 +342,13 @@ jobs:
         with:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
 
       - name: Compress Connections Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
@@ -441,6 +462,13 @@ jobs:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
 
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
+
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
@@ -511,6 +539,13 @@ jobs:
         with:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
 
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
@@ -583,6 +618,13 @@ jobs:
         with:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
 
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
@@ -657,6 +699,13 @@ jobs:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
 
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
+
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh
         env:
@@ -728,6 +777,13 @@ jobs:
         with:
           name: vault-and-export
           path: ${{ env.PROJECT }}_tapdata_export
+
+      - name: Decrypt vault.json
+        run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/vault-crypto.sh
+        env:
+          VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          VAULT_ENCRYPTION_KEY: ${{ secrets.VAULT_ENCRYPTION_KEY }}
+          CRYPTO_ACTION: decrypt
 
       - name: Compress Export Files
         run: bash ${{ env.SCRIPT_ROOT }}/scripts/common/compress-files.sh

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # 检测 PROJECT 参数
-# 输入环境变量：EVENT_NAME, INPUT_PROJECT, GITHUB_OUTPUT, GITHUB_ENV, GITHUB_STEP_SUMMARY
+# 输入环境变量：EVENT_NAME, INPUT_PROJECT, GITHUB_OUTPUT, GITHUB_ENV
 # 逻辑：
 #   - workflow_dispatch: 使用手动输入的 project
 #   - push: 从 git diff 变更文件路径中提取 {project}_tapdata_export 前缀
@@ -19,10 +19,3 @@ PROJECT="${PROJECT:-dmp}"
 echo "Detected PROJECT: $PROJECT"
 echo "project=$PROJECT" >> "$GITHUB_OUTPUT"
 echo "PROJECT=$PROJECT" >> "$GITHUB_ENV"
-
-# 输出到 Job Summary
-echo "### 🔍 Project Detection" >> "$GITHUB_STEP_SUMMARY"
-echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
-echo "|-----|-------|" >> "$GITHUB_STEP_SUMMARY"
-echo "| **Trigger** | \`${EVENT_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-echo "| **Detected Project** | \`${PROJECT}\` |" >> "$GITHUB_STEP_SUMMARY"
