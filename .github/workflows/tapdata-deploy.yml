@@ -238,6 +238,7 @@ jobs:
           UPLOAD_OUTCOME: ${{ steps.upload_vault.outcome }}
           DEPLOY_DIR: ${{ env.DEPLOY_DIR }}
           VAULT_FILE: ${{ env.PROJECT }}_tapdata_export/vault.json
+          RUNNER_NAME: ${{ runner.name }}
 
   # ============================================================
   # Job 2: Deploy Users (no approval required)
