@@ -41,6 +41,15 @@ if [[ "$(out vault_transport)" == "local" ]] && [[ -f "${DEPLOY_DIR}/vault-trans
 else fail "auto+failure => local + push"; fi
 teardown
 
+# Test 2b: auto + upload skipped (canonical GHES case) => local + push
+setup
+export FORCED_TRANSPORT=""; export UPLOAD_OUTCOME="skipped"
+bash "${SUT}" >/dev/null 2>&1
+if [[ "$(out vault_transport)" == "local" ]] && [[ -f "${DEPLOY_DIR}/vault-transport.enc" ]]; then
+  pass "auto+skipped => local + push"
+else fail "auto+skipped => local + push"; fi
+teardown
+
 # Test 3: forced local (upload skipped) => local + push
 setup
 export FORCED_TRANSPORT="local"; export UPLOAD_OUTCOME="skipped"

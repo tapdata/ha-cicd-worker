@@ -12,6 +12,7 @@
 #   GITHUB_OUTPUT    - injected by GitHub; where Job outputs are written
 set -euo pipefail
 
+: "${GITHUB_OUTPUT:?GITHUB_OUTPUT not set}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 FORCED="${FORCED_TRANSPORT:-}"
