@@ -127,6 +127,7 @@ Configure at `{team_org}` > **Settings** > **Secrets and variables** > **Actions
 
 - [ ] `SIT_TAPDATA_URL` (e.g. `http://10.0.0.1:3030`)
 - [ ] `LPT_TAPDATA_URL`
+- [ ] `VAULT_TRANSPORT` — *(optional)* how vault.json is passed between Jobs. `auto` (default, unset): try `upload-artifact@v4`, fall back to `@v3` (works on older GHES that don't support v4), then fall back to a local file if both are unavailable; `local`: skip artifacts entirely (no error log noise) — **use this on a single self-hosted runner where artifacts are not supported**; `artifact`: force native artifacts (v4 → v3) and **never** use the local file — fails if both versions are unavailable. Local-file mode requires all Jobs to run on the **same** runner.
 
 ### 2.3 Per-Tenant Repository Configuration
 
@@ -198,9 +199,18 @@ Configure at tenant repo > **Settings** > **Secrets and variables** > **Actions*
 - [ ] `sit` environment database credentials configured
 - [ ] `lpt` environment database credentials configured
 
+**Optional repository variable (only when project name differs from repo name):**
+
+- [ ] `PROJECT_NAME` — set on the tenant repo if the TapData project name and `{project}_tapdata_export/` directory prefix should differ from the repo name. Leave unset to default to the repo name.
+
+> **Project name resolution priority** (highest first):
+> 1. `workflow_dispatch` manual input `project` (per-run override)
+> 2. Repository variable `vars.PROJECT_NAME`
+> 3. Repository name (`github.event.repository.name`)
+
 **TapData platform:**
 
-- [ ] Create a project on TapData platform with the name matching the tenant repository name (e.g. repository `patient-case-team` → project name `patient-case-team`)
+- [ ] Create a project on TapData platform whose name matches the resolved project name. By default this is the tenant repository name (e.g. repo `patient-case-team` → project `patient-case-team`). If `PROJECT_NAME` is set, the project name on TapData must match that variable's value instead.
 
 ---
 
